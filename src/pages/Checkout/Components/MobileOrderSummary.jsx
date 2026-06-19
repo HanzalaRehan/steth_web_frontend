@@ -15,127 +15,8 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
   const prevPointsToUseRef = useRef(pointsToUse);
   const prevTotalPriceRef = useRef(totalPrice);
 
-  // SHIPPING RATES - Exact same as desktop version
-  const shippingRates = {
-    'Pakistan': 200,
-    'India': 500,
-    'UAE': 800,
-    'Saudi Arabia': 800,
-    'United States': 1500,
-    'United Kingdom': 1200,
-    'Canada': 1300,
-    'Australia': 1600,
-    'Germany': 1000,
-    'France': 1000,
-    'Italy': 1000,
-    'Spain': 1000,
-    'Netherlands': 1000,
-    'Belgium': 1000,
-    'Sweden': 1200,
-    'Norway': 1200,
-    'Denmark': 1200,
-    'Finland': 1200,
-    'Switzerland': 1300,
-    'Austria': 1100,
-    'Japan': 1400,
-    'South Korea': 1400,
-    'Singapore': 900,
-    'Malaysia': 700,
-    'Thailand': 700,
-    'Indonesia': 800,
-    'Philippines': 800,
-    'Vietnam': 700,
-    'Bangladesh': 300,
-    'Sri Lanka': 400,
-    'Nepal': 350,
-    'Afghanistan': 400,
-    'Iran': 600,
-    'Turkey': 900,
-    'Egypt': 800,
-    'South Africa': 1100,
-    'Nigeria': 1000,
-    'Kenya': 900,
-    'Morocco': 900,
-    'Brazil': 1800,
-    'Argentina': 1900,
-    'Chile': 2000,
-    'Mexico': 1400,
-    'Colombia': 1700,
-    'Peru': 1800,
-    'Venezuela': 1900,
-    'China': 1200,
-    'Russia': 1500,
-    'Ukraine': 1200,
-    'Poland': 1000,
-    'Czech Republic': 1100,
-    'Hungary': 1100,
-    'Romania': 1200,
-    'Bulgaria': 1200,
-    'Croatia': 1100,
-    'Serbia': 1200,
-    'Greece': 1100,
-    'Portugal': 1000,
-    'Ireland': 1200,
-    'Iceland': 1400,
-    'New Zealand': 1700,
-    'Israel': 1000,
-    'Lebanon': 800,
-    'Jordan': 700,
-    'Kuwait': 700,
-    'Qatar': 700,
-    'Bahrain': 700,
-    'Oman': 700,
-    'Yemen': 800,
-    'Iraq': 800,
-    'Syria': 900,
-    'Cyprus': 900,
-    'Malta': 1000,
-    'Luxembourg': 1000,
-    'Monaco': 1000,
-    'Andorra': 1100,
-    'San Marino': 1100,
-    'Vatican City': 1100,
-    'Liechtenstein': 1300,
-    'Estonia': 1200,
-    'Latvia': 1200,
-    'Lithuania': 1200,
-    'Slovenia': 1100,
-    'Slovakia': 1100,
-    'Bosnia and Herzegovina': 1200,
-    'Montenegro': 1200,
-    'Albania': 1200,
-    'North Macedonia': 1200,
-    'Moldova': 1300,
-    'Belarus': 1400,
-    'Georgia': 1200,
-    'Armenia': 1200,
-    'Azerbaijan': 1200,
-    'Kazakhstan': 1400,
-    'Uzbekistan': 1300,
-    'Turkmenistan': 1400,
-    'Kyrgyzstan': 1400,
-    'Tajikistan': 1500,
-    'Mongolia': 1500,
-    'Myanmar': 800,
-    'Laos': 800,
-    'Cambodia': 800,
-    'Brunei': 900,
-    'Maldives': 800,
-    'Bhutan': 500,
-    'East Timor': 1000,
-    'Papua New Guinea': 1800,
-    'Fiji': 1900,
-    'Solomon Islands': 2000,
-    'Vanuatu': 2000,
-    'Samoa': 2100,
-    'Tonga': 2100,
-    'Palau': 2000,
-    'Micronesia': 2000,
-    'Marshall Islands': 2100,
-    'Kiribati': 2200,
-    'Tuvalu': 2200,
-    'Nauru': 2200
-  };
+  const FLAT_SHIPPING_RATE = 200;
+  const FREE_SHIPPING_THRESHOLD = 5000;
 
   useEffect(() => {
     // Load cart items from localStorage
@@ -256,23 +137,11 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
     calculateDiscounts();
   }, [cartItems.length, totalPrice, pointsToUse]);
 
-  // FIXED: Calculate shipping charges based on country and total - Same as desktop
   const calculateShipping = () => {
-    // If no delivery info or country, return default shipping
-    if (!deliveryInfo || !deliveryInfo.country) {
-      return totalPrice >= 5000 ? 0 : 200; // Default shipping rate
-    }
-    
-    // Free shipping for orders >= 5000
-    if (totalPrice >= 5000) {
+    if (totalPrice >= FREE_SHIPPING_THRESHOLD) {
       return 0;
     }
-    
-    // Get country name
-    const countryName = deliveryInfo.country.name || deliveryInfo.country;
-    
-    // Return shipping rate for the country, or default rate if not found
-    return shippingRates[countryName] || 500;
+    return FLAT_SHIPPING_RATE;
   };
 
   // Calculate final total
@@ -351,12 +220,8 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
     return `Rs. ${shippingAmount.toFixed(2)}`;
   }
 
-  // Get country display name for shipping info - Same as desktop
   const getCountryDisplayName = () => {
-    if (!deliveryInfo || !deliveryInfo.country) {
-      return 'No country selected';
-    }
-    return deliveryInfo.country.name || deliveryInfo.country;
+    return 'Pakistan';
   }
 
   return (
@@ -482,10 +347,10 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
               <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-white p-2 rounded shadow-md text-sm w-64 z-10">
                 <p className="mb-1 font-medium">Shipping Information:</p>
                 <p className="text-xs mb-1">Country: {getCountryDisplayName()}</p>
-                <p className="text-xs mb-1">Free shipping on orders ≥ Rs. 5,000</p>
-                {totalPrice < 5000 && (
+                <p className="text-xs mb-1">Free shipping on orders ≥ Rs. {FREE_SHIPPING_THRESHOLD.toLocaleString()}</p>
+                {totalPrice < FREE_SHIPPING_THRESHOLD && (
                   <p className="text-xs text-blue-600">
-                    Add Rs. {(5000 - totalPrice).toFixed(2)} more for free shipping!
+                    Add Rs. {(FREE_SHIPPING_THRESHOLD - totalPrice).toFixed(2)} more for free shipping!
                   </p>
                 )}
               </div>
@@ -496,17 +361,16 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
           </span>
         </div>
 
-        {/* Free shipping progress indicator - Same as desktop */}
-        {totalPrice < 5000 && (
+        {totalPrice < FREE_SHIPPING_THRESHOLD && (
           <div className="mb-4">
             <div className="bg-gray-200 rounded-full h-2">
               <div 
                 className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${Math.min((totalPrice / 5000) * 100, 100)}%` }}
+                style={{ width: `${Math.min((totalPrice / FREE_SHIPPING_THRESHOLD) * 100, 100)}%` }}
               ></div>
             </div>
             <p className="text-xs text-gray-600 mt-1 text-center">
-              Rs. {(5000 - totalPrice).toFixed(2)} away from free shipping!
+              Rs. {(FREE_SHIPPING_THRESHOLD - totalPrice).toFixed(2)} away from free shipping!
             </p>
           </div>
         )}

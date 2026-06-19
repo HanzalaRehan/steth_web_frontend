@@ -264,7 +264,7 @@ const Profile = () => {
                         <div key={order._id} className="border rounded-lg p-6 hover:bg-gray-50 transition-colors">
                           <div className="flex flex-col sm:flex-row justify-between items-start mb-4">
                             <div>
-                              <p className="font-medium text-gray-900">Order #{order._id.slice(-6)}</p>
+                              <p className="font-medium text-gray-900">Order #{order.orderId || order._id.slice(-6)}</p>
                               <p className="text-sm text-gray-600 flex items-center">
                                 <Calendar size={16} className="mr-1" />
                                 {new Date(order.createdAt).toLocaleDateString()}

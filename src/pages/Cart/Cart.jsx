@@ -51,7 +51,7 @@ const Cart = () => {
           
           if (response.ok) {
             const userData = await response.json()
-            setPointsAvailable(userData.rewardPoints || 0)
+            setPointsAvailable(userData.user?.rewardPoints || 0)
           }
         }
       } catch (error) {
@@ -221,7 +221,7 @@ const Cart = () => {
     return () => ctx.revert()
   }, [])
 
-  const handleCheckout = () => 
+  const handleCheckout = () => {
     // GTM BEGIN CHECKOUT EVENT
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
@@ -238,7 +238,16 @@ const Cart = () => {
         }))
       }
     });
-    
+    console.log("checkout initiated")
+    if (window.fbq) {
+      console.log("fbq active")
+      window.fbq('track', 'InitiateCheckout', {
+        content_ids: products.map(i => i.id),
+        value: products.reduce((sum, i) => sum + i.totalPrice, 0),
+        currency: 'PKR'
+      });
+    }
+  
     if (!isLoggedIn) {
       setIsLoginModalOpen(true);
       return;
@@ -253,11 +262,11 @@ const Cart = () => {
         quantity: product.quantity
       })),
       pointsToUse: pointsToUse
-    }
-    
+    };
+  
     localStorage.setItem('checkoutData', JSON.stringify(orderData));
     navigate('/checkout');
-  }
+  };
 
   // Add this component near the return statement
   const LoginPromptModal = () => (

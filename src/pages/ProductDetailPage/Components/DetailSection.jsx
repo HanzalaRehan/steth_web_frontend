@@ -382,10 +382,13 @@ const onTouchEnd = () => {
       setIsColorSelected(true)
     }
     
+    console.log("Validation Before")
     // Validate inputs
     if (!validateInputs()) {
+      console.log("Validation Failed")
       return
     }
+    console.log("Validation After")
 
     // Get selected color object for complete information
     const selectedColorObj = product.colors.find(color => color.name === colorToUse)
@@ -410,6 +413,36 @@ const onTouchEnd = () => {
       description: product.description,
       availableSizes: colorToUse ? availableSizes[colorToUse] : {},
       sizeInventory: colorToUse ? sizeInventory[colorToUse] : {}
+    }
+
+    // GTM ADD TO CART EVENT
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "add_to_cart",
+      ecommerce: {
+        currency: "PKR",
+        value: item.price * item.quantity,
+        items: [
+          {
+            item_id: item.id,
+            item_name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            item_variant: `${item.colorName} - ${item.size}`
+          }
+        ]
+      }
+    });
+    console.log("Add to Cart fired!")
+    if (window.fbq) {
+      console.log("fbq active")
+      window.fbq('track', 'AddToCart', {
+        content_name: item.name,
+        content_ids: [item.id],
+        content_type: 'product',
+        value: item.totalPrice,
+        currency: 'PKR'
+      });
     }
 
     try {

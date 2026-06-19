@@ -74,23 +74,17 @@ const CheckoutPage = () => {
   const [checkoutDetails, setCheckoutDetails] = useState({
     customerInfo: {
       contactInfo: {
+        name: "",
         email: "",
         phoneNumber: "",
       },
       deliveryInfo: {
-        firstName: "",
-        lastName: "",
         address: "",
-        apartment: "",
-        company: "",
         city: "",
-        state: "",
-        zipCode: "",
-        country: null,
-        shippingCharges: 0, // Add shipping charges to delivery info
+        shippingCharges: 0,
       },
       payment: {
-        method: "cash-on-delivery", // Set default to cash-on-delivery
+        method: "cash-on-delivery",
         bankTransfer: {
           receipt: null,
         },
@@ -153,11 +147,9 @@ const CheckoutPage = () => {
     if (!updatedData || !updatedData.customerInfo) {
       return;
     }
-    
-    // Extract delivery info and contact info from the updated data
-    const { deliveryInfo, contactInfo } = updatedData.customerInfo;
-    
-    // Update the checkout details with new delivery info
+
+    const { deliveryInfo } = updatedData.customerInfo;
+
     setCheckoutDetails((prev) => ({
       ...prev,
       customerInfo: {
@@ -165,11 +157,6 @@ const CheckoutPage = () => {
         deliveryInfo: {
           ...prev.customerInfo.deliveryInfo,
           ...deliveryInfo,
-        },
-        // Update contact info with the new phone number
-        contactInfo: {
-          ...prev.customerInfo.contactInfo,
-          phoneNumber: contactInfo?.phoneNumber || prev.customerInfo.contactInfo.phoneNumber,
         },
       },
     }))
@@ -233,24 +220,16 @@ const CheckoutPage = () => {
     const errors = []
     const { customerInfo } = checkoutDetails
 
-    // Validate contact information
+    if (!customerInfo.contactInfo.name) errors.push("Name is required")
     if (!customerInfo.contactInfo.email) {
       errors.push("Email is required")
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerInfo.contactInfo.email)) {
       errors.push("Please enter a valid email address")
     }
+    if (!customerInfo.contactInfo.phoneNumber) errors.push("Phone number is required")
+    if (!customerInfo.deliveryInfo.address) errors.push("Street address is required")
+    if (!customerInfo.deliveryInfo.city) errors.push("City is required")
 
-    // Validate delivery information
-    const { deliveryInfo } = customerInfo
-    if (!deliveryInfo.firstName) errors.push("First name is required")
-    if (!deliveryInfo.lastName) errors.push("Last name is required")
-    if (!deliveryInfo.address) errors.push("Address is required")
-    if (!deliveryInfo.city) errors.push("City is required")
-    if (!deliveryInfo.state) errors.push("State/Province is required")
-    if (!deliveryInfo.zipCode) errors.push("ZIP/Postal code is required")
-    if (!deliveryInfo.country) errors.push("Country is required")
-
-    // Validate payment method
     if (!customerInfo.payment.method) {
       errors.push("Please select a payment method")
     } else if (customerInfo.payment.method === "bank-transfer" && !customerInfo.payment.bankTransfer.receipt) {
@@ -272,13 +251,12 @@ const CheckoutPage = () => {
     try {
       // Format shipping address from delivery info
       const shippingAddress = {
-        fullName: `${checkoutDetails.customerInfo.deliveryInfo.firstName} ${checkoutDetails.customerInfo.deliveryInfo.lastName}`,
+        fullName: checkoutDetails.customerInfo.contactInfo.name,
         addressLine1: checkoutDetails.customerInfo.deliveryInfo.address,
-        addressLine2: checkoutDetails.customerInfo.deliveryInfo.apartment || '',
         city: checkoutDetails.customerInfo.deliveryInfo.city,
-        state: checkoutDetails.customerInfo.deliveryInfo.state,
-        postalCode: checkoutDetails.customerInfo.deliveryInfo.zipCode,
-        country: checkoutDetails.customerInfo.deliveryInfo.country.name,
+        state: 'N/A',
+        postalCode: '00000',
+        country: 'Pakistan',
         phoneNumber: checkoutDetails.customerInfo.contactInfo.phoneNumber
       };
   
@@ -372,7 +350,7 @@ const CheckoutPage = () => {
         window.dataLayer.push({
           event: "purchase",
           ecommerce: {
-            transaction_id: result.order._id,
+            transaction_id: result.order.orderId || result.order._id,
             value: finalTotal,
             currency: "PKR",
             shipping: shippingAmount,
@@ -385,13 +363,18 @@ const CheckoutPage = () => {
             }))
           }
         });
+        console.log("Purchase fired")
+        window.fbq('track', 'Purchase', {
+          value: finalTotal,
+          currency: 'PKR'
+        });
         // Clear cart
         localStorage.removeItem('cartItems');
         window.dispatchEvent(new Event('cartUpdated'));
         
         // Show success message and set order ID
         setOrderSuccess(true);
-        setOrderId(result.order._id);
+        setOrderId(result.order.orderId);
       } else {
         alert(`Order failed: ${result.message || 'Unknown error'}`);
       }
