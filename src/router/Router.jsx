@@ -22,6 +22,23 @@ import TermsAndConditions from '../pages/TermsAndConditions/TermsAndConditions';
 import AdminRoute from '../pages/Login&Signup/AdminRoute';
 import AdminLayout from '../pages/Admin/AdminLayout';
 import Dashboard from '../pages/Admin/Dashboard/Dashboard';
+import ProductManagementHub from '../pages/Admin/ProductManagement/ProductManagementHub';
+import ProductList from '../pages/Admin/ProductManagement/ProductList';
+import ProductAdd from '../pages/Admin/ProductManagement/ProductAdd';
+import ProductDelete from '../pages/Admin/ProductManagement/ProductDelete';
+import ProductUpdate from '../pages/Admin/ProductManagement/ProductUpdate';
+import ProductImages from '../pages/Admin/ProductManagement/ProductImages';
+import ProductUpdateImages from '../pages/Admin/ProductManagement/ProductUpdateImages';
+import CustomersAlsoBought from '../pages/Admin/ProductManagement/CustomersAlsoBought';
+import CustomersAlsoBoughtEdit from '../pages/Admin/ProductManagement/CustomersAlsoBoughtEdit';
+import StudentApprovalList from '../pages/Admin/StudentApproval/StudentApprovalList';
+import StudentApprovalDetail from '../pages/Admin/StudentApproval/StudentApprovalDetail';
+import OrdersList from '../pages/Admin/Orders/OrdersList';
+import OrderUpdateStatus from '../pages/Admin/Orders/OrderUpdateStatus';
+import HeroImages from '../pages/Admin/HeroImages/HeroImages';
+import ColorTiles from '../pages/Admin/ColorTiles/ColorTiles';
+import Newsletter from '../pages/Admin/Newsletter/Newsletter';
+import Settings from '../pages/Admin/Settings/Settings';
 
 const AppRouter = () => {
   return (
@@ -59,11 +76,27 @@ const AppRouter = () => {
       {/* Cart route */}
       <Route path="/cart"  element={<Cart/>} />
 
-      {/* Admin section - guarded by role. More screens land here as
-          Phase 4 ports them over from Steth_admin_Panel. */}
+      {/* Admin section - guarded by role. Ported from Steth_admin_Panel. */}
       <Route element={<AdminRoute />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
+          <Route path="product-management" element={<ProductManagementHub />} />
+          <Route path="product-management/list" element={<ProductList />} />
+          <Route path="product-management/add" element={<ProductAdd />} />
+          <Route path="product-management/delete" element={<ProductDelete />} />
+          <Route path="product-management/update/:id" element={<ProductUpdate />} />
+          <Route path="product-management/:id/images" element={<ProductImages />} />
+          <Route path="product-management/:id/update-images" element={<ProductUpdateImages />} />
+          <Route path="product-management/customers-also-bought" element={<CustomersAlsoBought />} />
+          <Route path="product-management/customers-also-bought/:id" element={<CustomersAlsoBoughtEdit />} />
+          <Route path="student-approval" element={<StudentApprovalList />} />
+          <Route path="student-approval/:studentId" element={<StudentApprovalDetail />} />
+          <Route path="orders" element={<OrdersList />} />
+          <Route path="orders/:id/update-status" element={<OrderUpdateStatus />} />
+          <Route path="hero-images" element={<HeroImages />} />
+          <Route path="color-tiles" element={<ColorTiles />} />
+          <Route path="newsletter" element={<Newsletter />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Route>
 
