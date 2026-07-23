@@ -43,6 +43,13 @@ import CategoryPage from '../pages/Admin/Category/Category';
 import ColorsPage from '../pages/Admin/Colors/Colors';
 import VendorPage from '../pages/Admin/Vendor/Vendor';
 import InventoryPage from '../pages/Admin/Inventory/Inventory';
+import Rewards from '../pages/Rewards/Rewards';
+import GiftCards from '../pages/GiftCards/GiftCards';
+import BlogList from '../pages/Blog/BlogList';
+import BlogDetail from '../pages/Blog/BlogDetail';
+import PrivacyPolicy from '../pages/PrivacyPolicy/PrivacyPolicy';
+import FAQs from '../pages/FAQs/FAQs';
+import Affiliate from '../pages/Affiliate/Affiliate';
 
 const AppRouter = () => {
   return (
@@ -79,6 +86,15 @@ const AppRouter = () => {
 
       {/* Cart route */}
       <Route path="/cart"  element={<Cart/>} />
+
+      {/* Navbar/footer rebuild - issues #23/#24 + B.4 */}
+      <Route path="/rewards" element={<Rewards />} />
+      <Route path="/gift-cards" element={<GiftCards />} />
+      <Route path="/blog" element={<BlogList />} />
+      <Route path="/blog/:slug" element={<BlogDetail />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/faqs" element={<FAQs />} />
+      <Route path="/affiliate" element={<Affiliate />} />
 
       {/* Admin section - guarded by role. Ported from Steth_admin_Panel. */}
       <Route element={<AdminRoute />}>
