@@ -8,8 +8,7 @@ import MensPage from '../pages/Menspage/MensPage';
 import WomenPage from '../pages/Womenpage/WomenPage';
 import CheckoutPage from '../pages/Checkout/CheckoutPage';
 import Cart from '../pages/Cart/Cart';
-import Login from '../pages/Login&Signup/Login';
-import Signup from '../pages/Login&Signup/SignUp';
+import AuthRedirect from '../pages/Login&Signup/AuthRedirect';
 import OTP from '../pages/Login&Signup/OTP';
 import PasswordRecovery from '../pages/Login&Signup/Password-Recovery'
 import AboutUs from '../pages/AboutUs/AboutUs';
@@ -66,8 +65,8 @@ const AppRouter = () => {
       <Route path="/profile"  element={<Profile/>} />
       
       {/* Auth routes */}
-      <Route path="/login"  element={<Login/>} />
-      <Route path="/signup"  element={<Signup/>} />
+      <Route path="/login"  element={<AuthRedirect mode="login" />} />
+      <Route path="/signup"  element={<AuthRedirect mode="signup" />} />
       <Route path="/otp"  element={<OTP/>} />
       <Route path="/password-recovery"  element={<PasswordRecovery/>} />
 
