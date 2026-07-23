@@ -5,6 +5,7 @@ import { gsap } from "gsap"
 import { ArrowLeft, ArrowRight, Mail } from "lucide-react"
 import { useNavigate, useLocation } from "react-router-dom"
 import Header from "../../components/Header"
+import { API_BASE_URL } from "../../config/api"
 
 const OTP = () => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
@@ -101,7 +102,7 @@ const OTP = () => {
     }
 
     try {
-      const response = await fetch('https://steth-backend.onrender.com/api/users/verify-otp', {
+      const response = await fetch(`${API_BASE_URL}/api/users/verify-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,7 +146,7 @@ const OTP = () => {
     if (!canResend) return
 
     try {
-      const response = await fetch('https://steth-backend.onrender.com/api/users/resend-otp', {
+      const response = await fetch(`${API_BASE_URL}/api/users/resend-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
