@@ -39,6 +39,11 @@ import HeroImages from '../pages/Admin/HeroImages/HeroImages';
 import ColorTiles from '../pages/Admin/ColorTiles/ColorTiles';
 import Newsletter from '../pages/Admin/Newsletter/Newsletter';
 import Settings from '../pages/Admin/Settings/Settings';
+import FabricPage from '../pages/Admin/Fabric/Fabric';
+import CategoryPage from '../pages/Admin/Category/Category';
+import ColorsPage from '../pages/Admin/Colors/Colors';
+import VendorPage from '../pages/Admin/Vendor/Vendor';
+import InventoryPage from '../pages/Admin/Inventory/Inventory';
 
 const AppRouter = () => {
   return (
@@ -95,6 +100,11 @@ const AppRouter = () => {
           <Route path="orders/:id/update-status" element={<OrderUpdateStatus />} />
           <Route path="hero-images" element={<HeroImages />} />
           <Route path="color-tiles" element={<ColorTiles />} />
+          <Route path="fabrics" element={<FabricPage />} />
+          <Route path="categories" element={<CategoryPage />} />
+          <Route path="colors" element={<ColorsPage />} />
+          <Route path="vendors" element={<VendorPage />} />
+          <Route path="inventory" element={<InventoryPage />} />
           <Route path="newsletter" element={<Newsletter />} />
           <Route path="settings" element={<Settings />} />
         </Route>

@@ -14,6 +14,11 @@ import {
   Menu,
   X,
   User,
+  Layers,
+  Tags,
+  Droplet,
+  Truck,
+  Warehouse,
 } from "lucide-react"
 import { API_BASE_URL } from "../../config/api"
 import { AuthContext } from "../Login&Signup/AuthContext"
@@ -26,6 +31,11 @@ const NAV_ITEMS = [
   { to: "/admin/orders", label: "Orders", icon: Package },
   { to: "/admin/hero-images", label: "Hero Images", icon: ImageIcon },
   { to: "/admin/color-tiles", label: "Color Tiles", icon: Palette },
+  { to: "/admin/fabrics", label: "Fabric", icon: Layers },
+  { to: "/admin/categories", label: "Category", icon: Tags },
+  { to: "/admin/colors", label: "Colors", icon: Droplet },
+  { to: "/admin/vendors", label: "Vendor", icon: Truck },
+  { to: "/admin/inventory", label: "Inventory", icon: Warehouse },
   { to: "/admin/newsletter", label: "Newsletter", icon: Mail },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ]
@@ -37,6 +47,11 @@ const PAGE_TITLES = {
   "/admin/orders": "Orders",
   "/admin/hero-images": "Hero Image Management",
   "/admin/color-tiles": "Color Tiles",
+  "/admin/fabrics": "Fabric Management",
+  "/admin/categories": "Category Management",
+  "/admin/colors": "Colors Management",
+  "/admin/vendors": "Vendor Management",
+  "/admin/inventory": "Inventory Management",
   "/admin/newsletter": "Newsletter Management",
   "/admin/settings": "Settings",
 }
