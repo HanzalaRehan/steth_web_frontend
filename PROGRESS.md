@@ -107,6 +107,53 @@ Nav: 5 new `NAV_ITEMS`/`PAGE_TITLES` entries in `AdminLayout.jsx`. Routes: 5 new
 
 **Real bug fixed in passing:** `ProductUpdate.jsx`'s `GENDERS` constant had lowercase values (`'men'`/`'women'`) while the schema enum is capitalized (`'Men'`/`'Women'`) — every actual dropdown selection would have failed server-side validation on save; only the "custom gender" free-text fallback happened to work, which is presumably why this hadn't been noticed. Fixed to match the schema exactly, and removed the "custom gender" escape hatch entirely now that the enum is a hard 3-value set — keeping it would let admins bypass the narrowing you just asked for.
 
+---
+
+## Session: Auth/UX cluster — issues #5, #6, #7/A6, #8 (2026-07-23)
+
+A6 (send OTP on registration, gate login on `isVerified`, treat Google accounts as pre-verified) was already fully done backend-side (confirmed in `Steth_web_backend`'s PROGRESS.md, prior session) but never wired into this repo's UI — `SignUp.jsx` redirected straight to `/login` after registering, and no screen anywhere called `/verify-registration-otp`. That gap, plus #5 (login/signup should be a slide-over, not a routed page duplicating `<Header/>`) and #8 (Header's 8 overlapping `@media` blocks), were the actual work here. Plan mode was used for the login/signup restructure specifically, per your request, since it touched routing and auth state read in multiple places outside `AuthContext`. Commits in order (`git log`): `AuthContext` panel state → the panel itself (new components + deleted old pages + compat wiring) → `OTP.jsx` URL fix → `Header.jsx` (auth wiring + responsive rebuild).
+
+### Architecture: login/signup panel
+`AuthContext.jsx` gained `authPanel: {isOpen, mode, meta}` + `openAuthPanel`/`closeAuthPanel` — kept in the existing context rather than a new one, since this is auth UI state. `src/components/AuthPanel/AuthPanel.jsx` renders once in `App.jsx` (sibling to `<AppRouter/>`), not embedded in `Header.jsx` — avoids depending on every page rendering Header and avoids any duplicate-mount risk. `LoginForm.jsx`/`SignupForm.jsx`/`VerifyOtpForm.jsx` are the three modes; switching between them (e.g. "Sign up" link, post-registration handoff to OTP) swaps content in place, no full close/reopen.
+
+Header's Login control (desktop + mobile) now calls `openAuthPanel('login')` directly — no navigation, panel just layers over whatever page is showing, which is the literal ask in #5. `/login` and `/signup` stay as routes (`AuthRedirect.jsx`, new) purely for backward compat with existing `navigate('/login')`/`navigate('/signup')` call sites that weren't touched: `Cart.jsx` (`{state:{from:'/cart'}}`, preserved — `LoginForm` reads `meta.from` to redirect to `/checkout` same as before), `Profile.jsx`, `AdminLayout.jsx`, `Student.jsx`, `PopUp.jsx`. `/otp` (password-reset) and `/password-recovery` were **not** swept into the panel — only issue #5's named pages moved; that would have been scope creep.
+
+Deleted `Login.jsx`/`SignUp.jsx` outright (confirmed via grep only `Router.jsx` imported either).
+
+### A6 frontend wiring (issues #7)
+`SignupForm.jsx`: on successful registration, switches to `mode:'verify'` with the returned email instead of the old redirect-to-`/login`. `VerifyOtpForm.jsx` (new) calls `/verify-registration-otp`, resend calls the existing generic `/resend-otp`. `LoginForm.jsx`: a `403` "please verify your email" response (backend sends `{message, email}`) now routes into `mode:'verify'` with that email prefilled, instead of just showing a red error banner with no path forward.
+
+Two real bugs fixed while rewriting `SignupForm.jsx`: its 2 hardcoded `steth-backend.onrender.com` URLs (missed in the earlier hardcoded-URL cleanup — `CLAUDE.md` claimed this was done everywhere, it wasn't), and its Google-auth success path used to write `localStorage` directly instead of calling `AuthContext.login()`, leaving the rest of the app (including Header) unaware of the new session until next reload.
+
+### Google OAuth (#6)
+Confirmed both `Login.jsx` and `SignUp.jsx` called `google.accounts.id.prompt()` (One Tap) unconditionally on every mount, alongside the already-rendered standard button. **You chose to drop it** — `LoginForm.jsx`/`SignupForm.jsx` now render only the standard button, no `prompt()` call. Reasoning we agreed on: the panel can now open/close repeatedly within one page load instead of via fresh page mounts, so calling `prompt()` every open would be considerably more aggressive than the old every-mount behavior already was.
+
+**Google Cloud Console checklist — I can't check this myself, you need to verify:**
+- OAuth consent screen: "Testing" (100 user cap + "unverified app" warning) vs "In production" — confirm which.
+- Authorized JavaScript origins on the OAuth Client ID: exact production frontend origin + local dev origin. This flow uses `ux_mode:'popup'` via Google Identity Services, so it's origins that matter, not redirect URIs.
+- App branding completeness (name, support email, logo, homepage/privacy/terms links) — required to publish and avoid the unverified-app screen.
+- Scopes requested: confirm nothing beyond basic profile/email (anything more needs separate Google review).
+- Test users list, if still in Testing mode.
+
+Also worth restating from the backend's PROGRESS.md: `backfillIsVerified.js` was never confirmed run against production. Not this session's problem to fix, but this session is the first time the `isVerified` login gate becomes reachable through a real UI (the OTP-verify panel), so it's worth checking before this ships.
+
+### Header responsive rebuild (#8)
+Confirmed this Vite project has no styled-jsx plugin configured, so the `<style jsx>` block wasn't scoping anything — the 8 `@media` blocks were just unscoped global CSS the whole time (a latent class-name-collision risk, on top of being unmaintainable). Replaced with a 3-column CSS grid (logo | nav | icons) instead of a flex row with the center nav absolutely-centered on the *entire* header regardless of its siblings' widths. That absolute-centering was the actual root cause the old media queries were patching around — it doesn't know the icons-container's real width, so at real viewport widths (confirmed ~1024-1150px) the two visibly overlapped. Grid columns can't overlap by construction, which is what "coherent" needed to mean here, not just fewer/prettier breakpoints.
+
+Search-box width and header padding now use Tailwind arbitrary-value `clamp()` (continuous scaling) instead of 5-7 discrete, overlapping tiers per property. Nav gap/font-size, logo size stayed on the standard Tailwind breakpoint prefixes that were already coherent once the conflicting custom CSS was removed.
+
+**Real bug found and fixed while retuning the search box width:** a pre-existing GSAP entrance animation was tweening the search box's `width` from `0%` to `100%` on mount. GSAP sets these as inline styles, which beat any CSS class permanently once the tween finishes — meaning the *old* media-query widths were also being silently overridden by this the entire time, not just my new `clamp()` value (confirmed by inspecting the live inline style: it was stuck at `width:100%`, computing to a much narrower rendered width than any CSS rule specified, due to how that percentage resolved in the flex context). Changed the animation to an opacity-only fade so the actual Tailwind width class takes effect and stays stable.
+
+Not touched: nav link order/content, dropdowns, marquee slider, mobile menu structure, search logic — all reserved for #23 per your instruction, and this rebuild doesn't make that harder to build on top of (if anything, the grid layout is a better foundation for adding dropdowns than the old absolute-positioned nav was).
+
+### Verification
+`npm run lint` (full project): 62 pre-existing problems, unchanged count, none in any file this session touched (confirmed via diff against the prior session's baseline). `npm run build`: 2441 modules, clean (first attempt hit a sandbox-level `ETIMEDOUT` reading a file mid-build — pure I/O flakiness, unrelated to the code; retry succeeded cleanly). Manual click-through in the browser preview at 375px and 1024-1920px: panel opens from Header, slides from the left, both Login and Signup forms fit with no scroll needed at either viewport, mode-switching works without a full close/reopen, `/login` and `/signup` direct navigation both correctly open the panel over the homepage, Header's own login-state updates immediately after a panel login (no stale UI), and the search-box/nav overlap is gone at every width checked (measured directly via `getBoundingClientRect`, not just eyeballed).
+
+**Not done, by your choice:** live submission of a real login/signup/OTP round-trip. This dev environment has no `.env`/`.env.local`, so `API_BASE_URL` falls back to the real production backend — there's no dev/staging backend configured for this repo. Submitting a real signup would create a genuine production user record and send a real email. You chose to skip this and rely on the panel-mechanics verification above instead.
+
+### What's next
+Live-verify the full login → OTP-verify → login round trip against a real (dev/staging, not production) backend once one exists for this repo. Check the Google Cloud Console items above. Per the master plan: navbar/footer rebuild (#23) next, building on top of the Header grid layout landed here rather than the old absolute-centered nav.
+
 `ProductImages.jsx` (the image-upload screen shown right after creating a product) gets a new panel, shown only when the product's gender is `Unisex`: per-color Men/Women image-set upload, hitting a new backend endpoint (`POST /:id/images/variant/:color/:gender`) that writes into `Product.variants` rather than the existing `colorImages`.
 
 **Scope call, not done:** `ProductUpdateImages.jsx` — the separate, narrower screen for uploading images to colors newly added during a product *update* (not creation) — was **not** extended with the same per-gender panel. It only receives the newly-added colors via route state, not the product's gender, and wiring that through was judged lower-value than the primary create-flow screen every new product actually goes through. If a Unisex product needs per-gender images added to a color introduced after initial creation, that has to go through direct API calls today, not this screen. Flag if you want this closed.
