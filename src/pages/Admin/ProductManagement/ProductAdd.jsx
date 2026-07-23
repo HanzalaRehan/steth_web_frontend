@@ -24,14 +24,6 @@ import { ArrowLeft, X, Plus, Save, Loader2 } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import { API_BASE_URL } from "../../../config/api"
 
-const AVAILABLE_COLORS = [
-  { id: 1, name: "Black", value: "Black", code: "#000000" },
-  { id: 2, name: "Emerald", value: "Emerald", code: "#50C878" },
-  { id: 3, name: "Navy Blue", value: "Navy Blue", code: "#000080" },
-  { id: 4, name: "Maroon", value: "Maroon", code: "#800000" },
-  { id: 5, name: "Ceil Blue", value: "Ceil Blue", code: "#92A1CF" },
-]
-
 const AVAILABLE_SIZES = [
   { id: 1, name: "XS", value: "XS" },
   { id: 2, name: "S", value: "S" },
@@ -39,12 +31,6 @@ const AVAILABLE_SIZES = [
   { id: 4, name: "L", value: "L" },
   { id: 5, name: "XL", value: "XL" },
   { id: 6, name: "XXL", value: "XXL" },
-]
-
-const CATEGORIES = [
-  { id: 1, name: "Scrubs", value: "Scrubs" },
-  { id: 2, name: "Masks", value: "Masks" },
-  { id: 3, name: "Caps", value: "Caps" },
 ]
 
 const MATERIALS = [
@@ -57,18 +43,23 @@ const MATERIALS = [
 const GENDERS = [
   { id: 1, name: "Men", value: "Men" },
   { id: 2, name: "Women", value: "Women" },
+  { id: 3, name: "Unisex", value: "Unisex" },
 ]
 
 const ProductAdd = () => {
-  // availableColors is mutable (custom colors get pushed onto it), so it
-  // lives in state rather than as a module constant like the others.
-  const [availableColors, setAvailableColors] = useState(AVAILABLE_COLORS)
+  // availableColors is mutable (custom colors get pushed onto it on top of
+  // whatever comes back from GET /api/colors), so it lives in state rather
+  // than as a module constant like AVAILABLE_SIZES/MATERIALS.
+  const [availableColors, setAvailableColors] = useState([])
+  const [categories, setCategories] = useState([])
+  const [fabrics, setFabrics] = useState([])
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     category: "",
     customCategory: "",
+    fabric: "",
     gender: "",
     material: "",
     customMaterial: "",
@@ -76,6 +67,7 @@ const ProductAdd = () => {
     colors: [],
     selectedSizes: [],
     colorSizeInventory: [],
+    attributes: [],
   })
 
   const [selectedColor, setSelectedColor] = useState("")
@@ -89,6 +81,38 @@ const ProductAdd = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const fetchLookups = async () => {
+      try {
+        const [categoriesRes, fabricsRes, colorsRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/categories`),
+          fetch(`${API_BASE_URL}/api/fabrics`),
+          fetch(`${API_BASE_URL}/api/colors`),
+        ])
+        const [categoriesData, fabricsData, colorsData] = await Promise.all([
+          categoriesRes.json(),
+          fabricsRes.json(),
+          colorsRes.json(),
+        ])
+
+        setCategories(categoriesData.data || [])
+        setFabrics(fabricsData.data || [])
+        setAvailableColors(
+          (colorsData.data || []).map((color) => ({
+            id: color._id,
+            name: color.name,
+            value: color.name,
+            code: color.hexCode,
+          }))
+        )
+      } catch (error) {
+        console.error("Failed to load categories/fabrics/colors:", error)
+      }
+    }
+
+    fetchLookups()
+  }, [])
 
   useEffect(() => {
     const isValidDetails = Boolean(
@@ -193,7 +217,7 @@ const ProductAdd = () => {
   }
 
   const handleSelectChange = (name, value) => {
-    if (name === "gender") {
+    if (name === "gender" || name === "fabric") {
       setFormData((prev) => ({ ...prev, [name]: value }))
     } else {
       setFormData((prev) => ({
@@ -202,6 +226,21 @@ const ProductAdd = () => {
         [`custom${name.charAt(0).toUpperCase() + name.slice(1)}`]: "",
       }))
     }
+  }
+
+  const addAttribute = () => {
+    setFormData((prev) => ({ ...prev, attributes: [...prev.attributes, { name: "", iconUrl: "" }] }))
+  }
+
+  const updateAttribute = (index, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      attributes: prev.attributes.map((attr, i) => (i === index ? { ...attr, [field]: value } : attr)),
+    }))
+  }
+
+  const removeAttribute = (index) => {
+    setFormData((prev) => ({ ...prev, attributes: prev.attributes.filter((_, i) => i !== index) }))
   }
 
   const formatDataForApi = () => {
@@ -215,19 +254,33 @@ const ProductAdd = () => {
         : { name: colorValue, code: colorValue }
     })
 
+    const categoryName = formData.category === "custom" ? formData.customCategory.trim() : formData.category
+    const categoryObj = categories.find((c) => c.name === categoryName)
+
+    // colorRefs only includes colors that exist in the managed Color list -
+    // one-off custom colors added inline stay in `colors` only, same as before.
+    const colorRefs = formData.colors
+      .map((colorValue) => availableColors.find((c) => c.value === colorValue))
+      .filter((c) => c && c.id)
+      .map((c) => c.id)
+
     return {
       name: formData.title.trim(),
       description: formData.description.trim(),
       price: cleanPrice,
-      category: formData.category === "custom" ? formData.customCategory.trim() : formData.category,
+      category: categoryName,
+      categoryRef: categoryObj?._id,
+      fabric: formData.fabric || undefined,
       gender: formData.gender,
       material: formData.material === "custom" ? formData.customMaterial.trim() : formData.material,
+      attributes: formData.attributes.filter((a) => a.name.trim()),
       colors: formData.colors.map((colorValue) => ({
         name: colorMapping[colorValue].name,
         value: colorValue,
         code: colorMapping[colorValue].code,
         available: true,
       })),
+      colorRefs,
       sizes: formData.selectedSizes.map((size) => {
         const sizeObj = AVAILABLE_SIZES.find((s) => s.value === size)
         return { name: sizeObj ? sizeObj.name : size.toUpperCase(), value: size.toUpperCase(), available: true }
@@ -362,7 +415,7 @@ const ProductAdd = () => {
                   <Textarea id="description" name="description" placeholder="Enter product description" rows={5} value={formData.description} onChange={handleChange} required />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="category">Category*</Label>
                     <div className="flex gap-2">
@@ -379,8 +432,8 @@ const ProductAdd = () => {
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                          {CATEGORIES.map((category) => (
-                            <SelectItem key={category.id} value={category.value}>
+                          {categories.map((category) => (
+                            <SelectItem key={category._id} value={category.name}>
                               {category.name}
                             </SelectItem>
                           ))}
@@ -402,6 +455,21 @@ const ProductAdd = () => {
                         {GENDERS.map((gender) => (
                           <SelectItem key={gender.id} value={gender.value}>
                             {gender.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fabric">Fabric</Label>
+                    <Select value={formData.fabric} onValueChange={(value) => handleSelectChange("fabric", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select fabric (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {fabrics.map((fabric) => (
+                          <SelectItem key={fabric._id} value={fabric._id}>
+                            {fabric.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -436,6 +504,35 @@ const ProductAdd = () => {
                       )}
                     </div>
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Attributes</Label>
+                    <Button type="button" variant="outline" size="sm" onClick={addAttribute}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Attribute
+                    </Button>
+                  </div>
+                  {formData.attributes.map((attribute, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input
+                        placeholder="Attribute name (e.g. Breathable)"
+                        value={attribute.name}
+                        onChange={(e) => updateAttribute(index, "name", e.target.value)}
+                        className="flex-1"
+                      />
+                      <Input
+                        placeholder="Icon URL (optional)"
+                        value={attribute.iconUrl}
+                        onChange={(e) => updateAttribute(index, "iconUrl", e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button type="button" variant="ghost" size="sm" onClick={() => removeAttribute(index)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               </div>
             </Card>

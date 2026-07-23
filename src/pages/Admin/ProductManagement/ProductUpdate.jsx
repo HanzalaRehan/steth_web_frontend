@@ -24,14 +24,6 @@ import { ArrowLeft, X, Plus, Save, Loader2 } from "lucide-react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { API_BASE_URL } from "../../../config/api"
 
-const AVAILABLE_COLORS = [
-  { id: 1, name: "Black", value: "Black", code: "#000000" },
-  { id: 2, name: "Emerald", value: "Emerald", code: "#50C878" },
-  { id: 3, name: "Navy Blue", value: "Navy Blue", code: "#000080" },
-  { id: 4, name: "Maroon", value: "Maroon", code: "#800000" },
-  { id: 5, name: "Ceil Blue", value: "Ceil Blue", code: "#92A1CF" },
-]
-
 const AVAILABLE_SIZES = [
   { id: 1, name: "XS", value: "xs" },
   { id: 2, name: "S", value: "s" },
@@ -41,12 +33,6 @@ const AVAILABLE_SIZES = [
   { id: 6, name: "XXL", value: "xxl" },
 ]
 
-const CATEGORIES = [
-  { id: 1, name: "Scrubs", value: "scrubs" },
-  { id: 2, name: "Masks", value: "masks" },
-  { id: 3, name: "Caps", value: "caps" },
-]
-
 const MATERIALS = [
   { id: 1, name: "Cotton", value: "cotton" },
   { id: 2, name: "Polyester", value: "polyester" },
@@ -54,9 +40,15 @@ const MATERIALS = [
   { id: 4, name: "Spandex", value: "spandex" },
 ]
 
+// Values are capitalized to match Product.gender's schema enum
+// (['Men','Women','Unisex']) - the previous lowercase values here were a
+// pre-existing bug that would fail server-side validation whenever a gender
+// was actually picked from this dropdown (only the "custom" fallback path
+// happened to work, since it stores exactly what the admin types).
 const GENDERS = [
-  { id: 1, name: "Men", value: "men" },
-  { id: 2, name: "Women", value: "women" },
+  { id: 1, name: "Men", value: "Men" },
+  { id: 2, name: "Women", value: "Women" },
+  { id: 3, name: "Unisex", value: "Unisex" },
 ]
 
 const ProductUpdate = () => {
@@ -68,6 +60,7 @@ const ProductUpdate = () => {
     description: "",
     category: "",
     customCategory: "",
+    fabric: "",
     gender: "",
     customGender: "",
     material: "",
@@ -76,7 +69,12 @@ const ProductUpdate = () => {
     colors: [],
     selectedSizes: [],
     colorSizeInventory: [],
+    attributes: [],
   })
+
+  const [availableColors, setAvailableColors] = useState([])
+  const [categories, setCategories] = useState([])
+  const [fabrics, setFabrics] = useState([])
 
   const [selectedColor, setSelectedColor] = useState("")
   const [selectedSize, setSelectedSize] = useState("")
@@ -88,6 +86,38 @@ const ProductUpdate = () => {
   const [responseMessage, setResponseMessage] = useState(null)
   const [loading, setLoading] = useState(true)
   const [newlyAddedColors, setNewlyAddedColors] = useState([])
+
+  useEffect(() => {
+    const fetchLookups = async () => {
+      try {
+        const [categoriesRes, fabricsRes, colorsRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/categories`),
+          fetch(`${API_BASE_URL}/api/fabrics`),
+          fetch(`${API_BASE_URL}/api/colors`),
+        ])
+        const [categoriesData, fabricsData, colorsData] = await Promise.all([
+          categoriesRes.json(),
+          fabricsRes.json(),
+          colorsRes.json(),
+        ])
+
+        setCategories(categoriesData.data || [])
+        setFabrics(fabricsData.data || [])
+        setAvailableColors(
+          (colorsData.data || []).map((color) => ({
+            id: color._id,
+            name: color.name,
+            value: color.name,
+            code: color.hexCode,
+          }))
+        )
+      } catch (error) {
+        console.error("Failed to load categories/fabrics/colors:", error)
+      }
+    }
+
+    fetchLookups()
+  }, [])
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -109,6 +139,7 @@ const ProductUpdate = () => {
           description: productData.description || "",
           category: productData.category || "",
           customCategory: productData.category || "",
+          fabric: productData.fabric?._id || productData.fabric || "",
           gender: productData.gender || "",
           customGender: productData.gender || "",
           material: productData.material || "",
@@ -121,6 +152,7 @@ const ProductUpdate = () => {
             size: item.size,
             stock: item.stock,
           })) || [],
+          attributes: productData.attributes || [],
         })
       } catch (error) {
         setResponseMessage({ text: "Error loading product data", type: "error" })
@@ -158,7 +190,7 @@ const ProductUpdate = () => {
   }
 
   const handleSelectChange = (name, value) => {
-    if (name === "gender") {
+    if (name === "gender" || name === "fabric") {
       setFormData((prev) => ({ ...prev, [name]: value }))
     } else {
       setFormData((prev) => ({
@@ -169,9 +201,24 @@ const ProductUpdate = () => {
     }
   }
 
+  const addAttribute = () => {
+    setFormData((prev) => ({ ...prev, attributes: [...prev.attributes, { name: "", iconUrl: "" }] }))
+  }
+
+  const updateAttribute = (index, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      attributes: prev.attributes.map((attr, i) => (i === index ? { ...attr, [field]: value } : attr)),
+    }))
+  }
+
+  const removeAttribute = (index) => {
+    setFormData((prev) => ({ ...prev, attributes: prev.attributes.filter((_, i) => i !== index) }))
+  }
+
   const formatDataForApi = () => {
     const uniqueColors = formData.colors.map((color) => {
-      const colorObj = AVAILABLE_COLORS.find((c) => c.name === color)
+      const colorObj = availableColors.find((c) => c.name === color)
       return { name: color, code: colorObj ? colorObj.code : "#000000", isAvailable: true }
     })
 
@@ -183,14 +230,26 @@ const ProductUpdate = () => {
       stock: item.stock,
     }))
 
+    const categoryName = formData.category === "custom" ? formData.customCategory : formData.category
+    const categoryObj = categories.find((c) => c.name === categoryName)
+
+    const colorRefs = formData.colors
+      .map((color) => availableColors.find((c) => c.name === color))
+      .filter((c) => c && c.id)
+      .map((c) => c.id)
+
     return {
       name: formData.title,
       description: formData.description,
       price: parseFloat(formData.price),
-      category: formData.category === "custom" ? formData.customCategory : formData.category,
+      category: categoryName,
+      categoryRef: categoryObj?._id,
+      fabric: formData.fabric || undefined,
       gender: formData.gender === "custom" ? formData.customGender : formData.gender,
       material: formData.material === "custom" ? formData.customMaterial : formData.material,
+      attributes: formData.attributes.filter((a) => a.name.trim()),
       colors: uniqueColors,
+      colorRefs,
       sizes: uniqueSizes,
       inventory: uniqueInventory,
     }
@@ -222,7 +281,7 @@ const ProductUpdate = () => {
       if (response.ok && data.success) {
         if (newlyAddedColors.length > 0) {
           const formattedNewColors = newlyAddedColors.map((color) => {
-            const colorObj = AVAILABLE_COLORS.find((c) => c.name === color)
+            const colorObj = availableColors.find((c) => c.name === color)
             return { name: color, code: colorObj ? colorObj.code : "#000000" }
           })
 
@@ -324,7 +383,7 @@ const ProductUpdate = () => {
                   <Textarea id="description" name="description" placeholder="Enter product description" rows={5} value={formData.description} onChange={handleChange} required />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="category">Category*</Label>
                     <div className="flex gap-2">
@@ -341,8 +400,8 @@ const ProductUpdate = () => {
                           <SelectValue>{formData.category}</SelectValue>
                         </SelectTrigger>
                         <SelectContent>
-                          {CATEGORIES.map((category) => (
-                            <SelectItem key={category.id} value={category.value}>
+                          {categories.map((category) => (
+                            <SelectItem key={category._id} value={category.name}>
                               {category.name}
                             </SelectItem>
                           ))}
@@ -356,32 +415,33 @@ const ProductUpdate = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="gender">Gender*</Label>
-                    <div className="flex gap-2">
-                      <Select
-                        value={formData.gender}
-                        onValueChange={(value) => {
-                          handleSelectChange("gender", value)
-                          if (value !== "custom") {
-                            setFormData((prev) => ({ ...prev, customGender: value }))
-                          }
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue>{formData.gender}</SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          {GENDERS.map((gender) => (
-                            <SelectItem key={gender.id} value={gender.value}>
-                              {gender.name}
-                            </SelectItem>
-                          ))}
-                          <SelectItem value="custom">Custom gender</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {formData.gender === "custom" && (
-                        <Input placeholder="Enter gender" value={formData.customGender} name="customGender" onChange={handleChange} required />
-                      )}
-                    </div>
+                    <Select value={formData.gender} onValueChange={(value) => handleSelectChange("gender", value)}>
+                      <SelectTrigger>
+                        <SelectValue>{formData.gender}</SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {GENDERS.map((gender) => (
+                          <SelectItem key={gender.id} value={gender.value}>
+                            {gender.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fabric">Fabric</Label>
+                    <Select value={formData.fabric} onValueChange={(value) => handleSelectChange("fabric", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select fabric (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {fabrics.map((fabric) => (
+                          <SelectItem key={fabric._id} value={fabric._id}>
+                            {fabric.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="material">Material*</Label>
@@ -413,6 +473,35 @@ const ProductUpdate = () => {
                     </div>
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Attributes</Label>
+                    <Button type="button" variant="outline" size="sm" onClick={addAttribute}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Attribute
+                    </Button>
+                  </div>
+                  {formData.attributes.map((attribute, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input
+                        placeholder="Attribute name (e.g. Breathable)"
+                        value={attribute.name}
+                        onChange={(e) => updateAttribute(index, "name", e.target.value)}
+                        className="flex-1"
+                      />
+                      <Input
+                        placeholder="Icon URL (optional)"
+                        value={attribute.iconUrl}
+                        onChange={(e) => updateAttribute(index, "iconUrl", e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button type="button" variant="ghost" size="sm" onClick={() => removeAttribute(index)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
               </div>
             </Card>
           </TabsContent>
@@ -439,7 +528,7 @@ const ProductUpdate = () => {
                           <SelectValue placeholder="Select color" />
                         </SelectTrigger>
                         <SelectContent>
-                          {AVAILABLE_COLORS.map((color) => (
+                          {availableColors.map((color) => (
                             <SelectItem key={color.id} value={color.value}>
                               {color.name}
                             </SelectItem>
@@ -509,7 +598,7 @@ const ProductUpdate = () => {
                       </SelectTrigger>
                       <SelectContent>
                         {formData.colors.map((color) => {
-                          const colorObj = AVAILABLE_COLORS.find((c) => c.name === color)
+                          const colorObj = availableColors.find((c) => c.name === color)
                           return (
                             <SelectItem key={color} value={color}>
                               {colorObj?.name || color}
@@ -579,7 +668,7 @@ const ProductUpdate = () => {
                     </TableHeader>
                     <TableBody>
                       {formData.colorSizeInventory.map((item, index) => {
-                        const colorObj = AVAILABLE_COLORS.find((c) => c.name === item.color)
+                        const colorObj = availableColors.find((c) => c.name === item.color)
                         const sizeObj = AVAILABLE_SIZES.find((s) => s.value === item.size)
                         return (
                           <TableRow key={index}>
