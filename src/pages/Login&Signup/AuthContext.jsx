@@ -24,12 +24,13 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [authPanel, setAuthPanel] = useState({ isOpen: false, mode: 'login', meta: {} });
 
   // Initialize auth state on mount
   useEffect(() => {
     const checkAuth = () => {
       const token = localStorage.getItem('accessToken');
-      
+
       if (token) {
         if (isTokenExpired(token)) {
           // Token is expired, remove it and update state
@@ -46,18 +47,25 @@ export const AuthProvider = ({ children }) => {
         setIsLoggedIn(false);
         setUser(null);
       }
-      
+
       setLoading(false);
     };
 
     checkAuth();
-    
+
     // Set up periodic token validation (every minute)
     const intervalId = setInterval(() => {
       checkAuth();
     }, 60000);
 
-    return () => clearInterval(intervalId);
+    // Cross-tab sync: same-tab updates already propagate via React state,
+    // this covers a login/logout that happened in another tab.
+    window.addEventListener('storage', checkAuth);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('storage', checkAuth);
+    };
   }, []);
 
   // Logout function
@@ -92,16 +100,29 @@ export const AuthProvider = ({ children }) => {
     return true;
   };
 
+  // Open the login/signup/verify slide-over. `meta` carries flow-specific
+  // context (e.g. {from} for post-login redirect, {email} to prefill).
+  const openAuthPanel = (mode = 'login', meta = {}) => {
+    setAuthPanel({ isOpen: true, mode, meta });
+  };
+
+  const closeAuthPanel = () => {
+    setAuthPanel((prev) => ({ ...prev, isOpen: false }));
+  };
+
   return (
-    <AuthContext.Provider 
-      value={{ 
-        isLoggedIn, 
-        setIsLoggedIn, 
-        user, 
-        loading, 
+    <AuthContext.Provider
+      value={{
+        isLoggedIn,
+        setIsLoggedIn,
+        user,
+        loading,
         logout,
         login,
-        checkAuthenticated
+        checkAuthenticated,
+        authPanel,
+        openAuthPanel,
+        closeAuthPanel
       }}
     >
       {children}
