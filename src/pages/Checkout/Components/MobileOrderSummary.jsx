@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { X, Info } from "lucide-react"
+import { API_BASE_URL } from "../../../config/api"
 
 export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProduct, onDiscountUpdate, deliveryInfo }) {
   const [discountCode, setDiscountCode] = useState("")
@@ -9,7 +10,17 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
   const [pointsAvailable, setPointsAvailable] = useState(0)
   const [pointsToUse, setPointsToUse] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
-  
+
+  // Gift card redemption - mirrors the reward-points pattern above (bounded
+  // amount folded into calculateTotal()/onDiscountUpdate) but needs an
+  // explicit "Apply" step first since a code has to be looked up, unlike
+  // points which are already known from the logged-in user's balance.
+  const [giftCardInput, setGiftCardInput] = useState("")
+  const [giftCardCode, setGiftCardCode] = useState("")
+  const [giftCardAmount, setGiftCardAmount] = useState(0)
+  const [giftCardError, setGiftCardError] = useState("")
+  const [giftCardValidating, setGiftCardValidating] = useState(false)
+
   // Add refs to track previous values and prevent infinite loops
   const prevDiscountsRef = useRef(null);
   const prevPointsToUseRef = useRef(pointsToUse);
@@ -147,10 +158,52 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
   // Calculate final total
   const calculateTotal = () => {
     const subtotal = totalPrice;
-    const totalDiscounts = (discounts.amount || 0) + (pointsToUse || 0);
+    const totalDiscounts = (discounts.amount || 0) + (pointsToUse || 0) + (giftCardAmount || 0);
     const shipping = calculateShipping();
     return subtotal - totalDiscounts + shipping;
   };
+
+  const handleApplyGiftCard = async () => {
+    setGiftCardError("")
+    const code = giftCardInput.trim().toUpperCase()
+    if (!code) {
+      setGiftCardError("Enter a gift card code")
+      return
+    }
+
+    setGiftCardValidating(true)
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/gift-cards/validate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, orderSubtotal: totalPrice }),
+      })
+      const data = await response.json()
+
+      if (!data.success || !data.valid) {
+        setGiftCardError(data.message || "Invalid gift card")
+        return
+      }
+
+      const remaining = Math.max(totalPrice - (discounts.amount || 0) - (pointsToUse || 0), 0)
+      const amountToApply = Math.min(data.availableBalance, remaining)
+
+      setGiftCardCode(code)
+      setGiftCardAmount(amountToApply)
+    } catch (error) {
+      console.error("Error validating gift card:", error)
+      setGiftCardError("Could not validate gift card right now")
+    } finally {
+      setGiftCardValidating(false)
+    }
+  }
+
+  const handleRemoveGiftCard = () => {
+    setGiftCardCode("")
+    setGiftCardAmount(0)
+    setGiftCardInput("")
+    setGiftCardError("")
+  }
 
   // Send complete discount information back to parent component - with memoization
   useEffect(() => {
@@ -164,21 +217,24 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
     prevDiscountsRef.current = currentDiscounts;
     
     const finalTotal = calculateTotal();
-    const totalDiscountAmount = (discounts.amount || 0) + (pointsToUse || 0);
+    const totalDiscountAmount = (discounts.amount || 0) + (pointsToUse || 0) + (giftCardAmount || 0);
     const shippingAmount = calculateShipping();
-    
+
     if (onDiscountUpdate) {
       onDiscountUpdate({
         subtotal: totalPrice,
         finalTotal,
         discountAmount: totalDiscountAmount,
-        discountReasons: [...(discounts.reasons || []), 
-                         pointsToUse > 0 ? `Points Discount (-Rs. ${pointsToUse.toFixed(2)})` : []].flat(),
+        discountReasons: [...(discounts.reasons || []),
+                         pointsToUse > 0 ? `Points Discount (-Rs. ${pointsToUse.toFixed(2)})` : [],
+                         giftCardAmount > 0 ? `Gift Card (-Rs. ${giftCardAmount.toFixed(2)})` : []].flat(),
         pointsUsed: pointsToUse,
-        shippingCharges: shippingAmount // This will now have the correct value
+        shippingCharges: shippingAmount, // This will now have the correct value
+        giftCardCode,
+        giftCardAmount
       });
     }
-  }, [discounts, pointsToUse, totalPrice, deliveryInfo, onDiscountUpdate]);
+  }, [discounts, pointsToUse, totalPrice, deliveryInfo, onDiscountUpdate, giftCardCode, giftCardAmount]);
 
   const handleDiscountCodeSubmit = (e) => {
     e.preventDefault()
@@ -337,6 +393,49 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
             )}
           </div>
         )}
+
+        {/* Gift card section */}
+        <div className="mt-4 mb-2">
+          <span className="text-[#333333] font-medium">GIFT CARD</span>
+          {giftCardCode ? (
+            <div className="flex justify-between items-center text-sm mt-2">
+              <span className="text-green-600">Gift Card ({giftCardCode})</span>
+              <div className="flex items-center gap-2">
+                <span className="text-green-600">-Rs. {giftCardAmount.toFixed(2)}</span>
+                <button
+                  type="button"
+                  onClick={handleRemoveGiftCard}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={giftCardInput}
+                  onChange={(e) => setGiftCardInput(e.target.value)}
+                  placeholder="Enter code"
+                  className="flex-1 p-1 border border-gray-300 rounded text-sm bg-white text-black"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyGiftCard}
+                  disabled={giftCardValidating}
+                  className="px-3 py-1 bg-black text-white rounded text-sm disabled:opacity-50"
+                >
+                  {giftCardValidating ? "Checking..." : "Apply"}
+                </button>
+              </div>
+              {giftCardError && (
+                <p className="text-red-600 text-xs mt-1">{giftCardError}</p>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Shipping section with enhanced info - Same as desktop */}
         <div className="flex justify-between mb-2">

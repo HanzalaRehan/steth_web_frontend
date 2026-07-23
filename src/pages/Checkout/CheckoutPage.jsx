@@ -36,7 +36,9 @@ const CheckoutPage = () => {
     discountAmount: 0,
     discountReasons: [],
     pointsUsed: 0,
-    shippingCharges: 0 // Add shipping charges here
+    shippingCharges: 0, // Add shipping charges here
+    giftCardCode: '',
+    giftCardAmount: 0
   });
   
   const [validationErrors, setValidationErrors] = useState([])
@@ -212,7 +214,9 @@ const CheckoutPage = () => {
       discountAmount: data.discountAmount,
       discountReasons: data.discountReasons,
       pointsUsed: data.pointsUsed,
-      shippingCharges: data.shippingCharges || 0 // Store shipping charges from OrderSummary
+      shippingCharges: data.shippingCharges || 0, // Store shipping charges from OrderSummary
+      giftCardCode: data.giftCardCode || '',
+      giftCardAmount: data.giftCardAmount || 0
     });
   }
 
@@ -279,10 +283,11 @@ const CheckoutPage = () => {
       const shippingAmount = subtotalAmount >= 5000 ? 0 : (discountInfo.shippingCharges || 0);
       const discountAmount = discountInfo.discountAmount || 0;
       const pointsUsedAmount = Number(discountInfo.pointsUsed) || 0;
-      
+      const giftCardAmountApplied = Number(discountInfo.giftCardAmount) || 0;
+
       const totalDiscountAmount = discountAmount + pointsUsedAmount;
       const finalTotal = subtotalAmount + shippingAmount - totalDiscountAmount;
-  
+
       const orderData = {
         customerInfo: {
           email: checkoutDetails.customerInfo.contactInfo.email,
@@ -300,6 +305,8 @@ const CheckoutPage = () => {
           reasons: discountInfo.discountReasons,
           pointsUsed: pointsUsedAmount
         },
+        giftCardCode: discountInfo.giftCardCode || '',
+        giftCardAmountApplied,
         paymentMethod,
       };
   
