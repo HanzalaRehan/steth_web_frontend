@@ -20,6 +20,8 @@ import ProductDetail from '../pages/ProductDetailPage/ProductDetail';
 import ColorProductsPage from '../pages/ColorProduct/ColorProductPage';
 import TermsAndConditions from '../pages/TermsAndConditions/TermsAndConditions';
 import AdminRoute from '../pages/Login&Signup/AdminRoute';
+import AdminLayout from '../pages/Admin/AdminLayout';
+import Dashboard from '../pages/Admin/Dashboard/Dashboard';
 
 const AppRouter = () => {
   return (
@@ -57,10 +59,12 @@ const AppRouter = () => {
       {/* Cart route */}
       <Route path="/cart"  element={<Cart/>} />
 
-      {/* Admin section - guarded by role. Placeholder until Phase 4 ports
-          the real AdminLayout + screens over this route tree. */}
+      {/* Admin section - guarded by role. More screens land here as
+          Phase 4 ports them over from Steth_admin_Panel. */}
       <Route element={<AdminRoute />}>
-        <Route path="/admin" element={<div className="p-8">Admin section — screens land in Phase 4.</div>} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+        </Route>
       </Route>
 
       {/* 404 route - must be last */}
