@@ -3,13 +3,15 @@
 import { useState, useEffect, useRef } from "react"
 import { ChevronDown } from "lucide-react"
 import gsap from "gsap"
-import { Link } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
+import { API_BASE_URL } from "../../../config/api"
 
 export default function ProductPage() {
   // State for products
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [searchParams] = useSearchParams()
 
   // Filter states
   const [colorFilter, setColorFilter] = useState("All")
@@ -131,9 +133,21 @@ export default function ProductPage() {
     const fetchProducts = async () => {
       try {
         setLoading(true)
-        // Replace with your actual endpoint
-        const response = await fetch('https://steth-backend.onrender.com/api/products?gender=Women')
-        
+        // categoryRef/colorRefs/fabric come from the navbar megamenu's
+        // "Shop By" links (issue #23) - additive on top of the existing
+        // client-side CATEGORY/COLOR/SIZE/STYLE filter bar below, which
+        // still works as a secondary refinement on whatever this narrows
+        // down first.
+        const params = new URLSearchParams({ gender: "Women" })
+        const categoryRef = searchParams.get("categoryRef")
+        const colorRefs = searchParams.get("colorRefs")
+        const fabric = searchParams.get("fabric")
+        if (categoryRef) params.set("categoryRef", categoryRef)
+        if (colorRefs) params.set("colorRefs", colorRefs)
+        if (fabric) params.set("fabric", fabric)
+
+        const response = await fetch(`${API_BASE_URL}/api/products?${params.toString()}`)
+
         if (!response.ok) {
           throw new Error('Failed to fetch products')
         }
@@ -196,7 +210,7 @@ export default function ProductPage() {
     }
 
     fetchProducts()
-  }, [])
+  }, [searchParams])
 
   // Apply filters
   useEffect(() => {
