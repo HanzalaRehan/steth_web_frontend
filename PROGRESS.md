@@ -82,3 +82,37 @@ src/pages/Womenpage/Components/WomenBestSellers.jsx
 
 ### What's next
 Per the master plan's Part D: B.1 data model work (Fabric/Category/Color/Vendor/Shipment), then the auth/UX cluster (login/signup rebuild, header rebuild), then navbar/footer rebuild — all separate future sessions. `npm run build`'s bundle-size warning (>500kB, mentioned every build) is pre-existing, not something this session introduced or was asked to address.
+
+---
+
+## Session: Part B.1 — admin CRUD for Fabric/Category/Color/Product/Inventory/Vendor/Shipment (2026-07-23)
+
+Backend half of this session added the new Fabric/Category/Color/Vendor/Shipment models + CRUD + an atomic Shipment-receive endpoint (see `Steth_web_backend`'s PROGRESS.md for the schema decisions). This repo's half: 5 new admin screens + rewiring the existing Product Add/Update flow onto the real data instead of hardcoded arrays. Commits in order (`git log`): Fabric/Category/Colors/Vendor screens → Inventory screen → nav/route wiring → ProductAdd/ProductUpdate/ProductImages rewiring.
+
+### 5 new screens, `src/pages/Admin/`
+| Screen | Notes |
+|---|---|
+| `Fabric/Fabric.jsx` | Composition builder: repeatable material/percentage rows, running total shown live, submit disabled until it sums to 100 — mirrors the backend's own `pre('validate')` check, doesn't replace it. |
+| `Category/Category.jsx` | Simple list CRUD (name only). |
+| `Colors/Colors.jsx` | Card grid + swatch upload, matching `ColorTiles.jsx`'s existing hover-to-delete grid pattern. Named **"Colors"**, distinct from the pre-existing **"Color Tiles"** nav item (unrelated `ColorTile` model for homepage swatches) — same name would've been confusing in the sidebar. |
+| `Vendor/Vendor.jsx` | Simple list CRUD (name/contact/email/phone/address). Backend gates all its routes to `admin`+`warehouse_manager`, not just `admin`. |
+| `Inventory/Inventory.jsx` | Two tabs: Stock Levels (per-product color/size table, inline stock edit against the existing absolute-value `updateInventory` endpoint) and Receive Shipment (vendor select + repeatable product/color/size/pieces line items, posts to the new atomic `POST /api/shipments`). |
+
+Nav: 5 new `NAV_ITEMS`/`PAGE_TITLES` entries in `AdminLayout.jsx`. Routes: 5 new `<Route>` entries in `Router.jsx`, all inside the existing `AdminRoute`-guarded `/admin` tree — no new unguarded route shipped.
+
+**Frontend RBAC gap, not introduced this session but worth flagging now that it's load-bearing:** `AdminRoute.jsx`'s `ALLOWED_ROLES` is `['admin']` only — the *entire* `/admin/*` section, not just these 5 new screens, is client-side-gated to `admin` regardless of what the backend permits. That means a `warehouse_manager` user (a role that exists specifically so Vendor/Shipment/Inventory can be delegated, per the backend RBAC session) can't reach any `/admin/*` screen at all today, even though the backend correctly allows their role on Vendor/Shipment routes. This is a pre-existing limitation from the RBAC session, not something this session's 5 new routes changed — flagging it here because Part B.1 is the first time it actually matters (the previous 19 screens were all admin-only in practice anyway). Widening `AdminRoute` to accept `warehouse_manager` for specific routes wasn't requested this session and touches every existing screen's access model, not just the new ones — worth its own explicit decision, not a side effect.
+
+### Product Add/Update rewiring
+`ProductAdd.jsx`/`ProductUpdate.jsx`: Category and Color dropdowns now fetch from `/api/categories`/`/api/colors` instead of hardcoded arrays; a new optional Fabric dropdown fetches from `/api/fabrics`. A new Attributes picker (repeatable name/icon-URL rows) was added to both. Gender enum narrows to `Men`/`Women`/`Unisex` in both forms. Submission now sends `categoryRef`, `fabric`, `colorRefs`, and `attributes` alongside the pre-existing `category`/`colors` strings — additive, nothing that already worked stops working.
+
+**Real bug fixed in passing:** `ProductUpdate.jsx`'s `GENDERS` constant had lowercase values (`'men'`/`'women'`) while the schema enum is capitalized (`'Men'`/`'Women'`) — every actual dropdown selection would have failed server-side validation on save; only the "custom gender" free-text fallback happened to work, which is presumably why this hadn't been noticed. Fixed to match the schema exactly, and removed the "custom gender" escape hatch entirely now that the enum is a hard 3-value set — keeping it would let admins bypass the narrowing you just asked for.
+
+`ProductImages.jsx` (the image-upload screen shown right after creating a product) gets a new panel, shown only when the product's gender is `Unisex`: per-color Men/Women image-set upload, hitting a new backend endpoint (`POST /:id/images/variant/:color/:gender`) that writes into `Product.variants` rather than the existing `colorImages`.
+
+**Scope call, not done:** `ProductUpdateImages.jsx` — the separate, narrower screen for uploading images to colors newly added during a product *update* (not creation) — was **not** extended with the same per-gender panel. It only receives the newly-added colors via route state, not the product's gender, and wiring that through was judged lower-value than the primary create-flow screen every new product actually goes through. If a Unisex product needs per-gender images added to a color introduced after initial creation, that has to go through direct API calls today, not this screen. Flag if you want this closed.
+
+### Verification
+`npm run lint`: 0 errors/warnings in every file touched this session (confirmed via `grep` against the full lint run's output — the 68 pre-existing issues elsewhere in the repo are all in files this session never opened). `npm run build`: succeeded, 2075 modules (up from 2070 in the prior session), only the pre-existing >500kB bundle-size warning. Live click-through against the running admin UI wasn't done — same sandbox DB-connectivity gap as the backend (see its PROGRESS.md); static verification (lint + build + manual trace against the confirmed backend response shapes) is what's actually been done here.
+
+### What's next
+Optional: extend `ProductUpdateImages.jsx` with the same per-gender variant panel if that gap above turns out to matter in practice. Widening `AdminRoute` for `warehouse_manager` if you want that role to actually reach Vendor/Shipment/Inventory, per the gap flagged above. Otherwise, next per the master plan is the auth/UX cluster (login/signup rebuild, header rebuild) and navbar/footer rebuild.
