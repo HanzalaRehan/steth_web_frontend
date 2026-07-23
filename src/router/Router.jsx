@@ -19,6 +19,7 @@ import CartPage from '../pages/Cart/Cart';
 import ProductDetail from '../pages/ProductDetailPage/ProductDetail';
 import ColorProductsPage from '../pages/ColorProduct/ColorProductPage';
 import TermsAndConditions from '../pages/TermsAndConditions/TermsAndConditions';
+import AdminRoute from '../pages/Login&Signup/AdminRoute';
 
 const AppRouter = () => {
   return (
@@ -55,7 +56,13 @@ const AppRouter = () => {
 
       {/* Cart route */}
       <Route path="/cart"  element={<Cart/>} />
-      
+
+      {/* Admin section - guarded by role. Placeholder until Phase 4 ports
+          the real AdminLayout + screens over this route tree. */}
+      <Route element={<AdminRoute />}>
+        <Route path="/admin" element={<div className="p-8">Admin section — screens land in Phase 4.</div>} />
+      </Route>
+
       {/* 404 route - must be last */}
       <Route path="*" element={<div>Page not found</div>} />
     </Routes>

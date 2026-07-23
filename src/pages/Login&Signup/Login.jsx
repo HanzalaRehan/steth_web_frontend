@@ -6,32 +6,7 @@ import { Eye, EyeOff, ArrowRight, Mail, Lock, X } from "lucide-react"
 import { useNavigate, useLocation } from 'react-router-dom'
 import Header from "../../components/Header"
 import { AuthContext } from "./AuthContext" // Assuming you have an AuthContext
-
-// Helper function to decode JWT (without verification)
-const decodeJWT = (token) => {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(atob(base64));
-  } catch (e) {
-    return null;
-  }
-};
-
-// Check if token is expired
-const isTokenExpired = (token) => {
-  const decoded = decodeJWT(token);
-  return decoded?.exp && decoded.exp * 1000 < Date.now();
-};
-
-// Save token with expiration check
-const saveToken = (token) => {
-  if (isTokenExpired(token)) {
-    localStorage.removeItem('accessToken');
-    throw new Error('Token is expired');
-  }
-  localStorage.setItem('accessToken', token);
-};
+import { API_BASE_URL } from "../../config/api"
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -44,7 +19,7 @@ const Login = () => {
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false)
 
   // Get global auth state from context
-  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext)
+  const { setIsLoggedIn, login, checkAuthenticated } = useContext(AuthContext)
   
   // React Router hooks - moved inside component
   const navigate = useNavigate()
@@ -60,38 +35,15 @@ const Login = () => {
   const errorRef = useRef(null)
   const successRef = useRef(null)
 
-  // Check token validity on component mount
+  // Check token validity on component mount (AuthContext already handles
+  // clearing an expired token / updating isLoggedIn+user as a side effect;
+  // this just drives the page-local "session expired" message).
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      if (isTokenExpired(token)) {
-        localStorage.removeItem('accessToken');
-        setIsLoggedIn(false);
-        setError("Your session has expired. Please log in again.");
-      } else {
-        setIsLoggedIn(true);
-        // Optional: Redirect if already logged in
-        // navigate("/");
-      }
-    } else {
-      setIsLoggedIn(false);
+    const hadToken = !!localStorage.getItem('accessToken');
+    if (hadToken && !checkAuthenticated()) {
+      setError("Your session has expired. Please log in again.");
     }
-  }, [setIsLoggedIn]);
-
-  // Set up a recurring timer to check token expiration every minute
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const token = localStorage.getItem('accessToken');
-      if (token && isTokenExpired(token)) {
-        localStorage.removeItem('accessToken');
-        setIsLoggedIn(false);
-        // If user is in a protected route, you might want to redirect them
-        // and show a message that their session has expired
-      }
-    }, 60000); // Check every minute
-
-    return () => clearInterval(intervalId); // Cleanup interval on unmount
-  }, [setIsLoggedIn]);
+  }, [checkAuthenticated]);
 
   // Load Google OAuth script
   useEffect(() => {
@@ -169,7 +121,7 @@ const Login = () => {
       setGoogleLoading(true);
       console.log("Google ID token received");
       
-      const result = await fetch('https://steth-backend.onrender.com/api/users/google-auth', {
+      const result = await fetch(`${API_BASE_URL}/api/users/google-auth`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -178,26 +130,21 @@ const Login = () => {
           id_token: response.credential
         }),
       });
-      
+
       const data = await result.json();
-      
+
       if (!result.ok) {
         throw new Error(data.message || 'Google authentication failed');
       }
-  
-      // Check if user is admin first
+
+      login(data.accessToken);
+
       if (data.role === 'admin') {
-        setSuccessMessage("Admin login successful! Redirecting to admin panel...");
-        // Don't save token for admin users
+        setSuccessMessage("Admin login successful! Redirecting...");
         setTimeout(() => {
-          // Encode the token to make it URL-safe
-          const encodedToken = encodeURIComponent(data.accessToken);
-          window.location.href = `https://steth-admin-panel.vercel.app/?token=${encodedToken}`;
-        }, 2000);
+          navigate("/admin");
+        }, 1500);
       } else {
-        // Save token with expiration check for non-admin users
-        saveToken(data.accessToken);
-        setIsLoggedIn(true); // Update global auth state
         setSuccessMessage("Authentication successful! Redirecting to home page...");
         setTimeout(() => {
           const from = location.state?.from;
@@ -208,7 +155,7 @@ const Login = () => {
           }
         }, 2000);
       }
-  
+
     } catch (error) {
       console.error("Google authentication error:", error);
       setError("Failed to authenticate with Google. Please try again.");
@@ -288,7 +235,7 @@ const Login = () => {
     }
   
     try {
-      const response = await fetch('https://steth-backend.onrender.com/api/users/login', {
+      const response = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -298,26 +245,21 @@ const Login = () => {
           password
         })
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
       }
-  
-      // Check if user is admin first
+
+      login(data.accessToken);
+
       if (data.role === 'admin') {
-        setSuccessMessage("Admin login successful! Redirecting to admin panel...");
-        // Don't save token for admin users
+        setSuccessMessage("Admin login successful! Redirecting...");
         setTimeout(() => {
-          // Encode the token to make it URL-safe
-          const encodedToken = encodeURIComponent(data.accessToken);
-          window.location.href = `https://steth-admin-panel.vercel.app/?token=${encodedToken}`;
-        }, 2000);
+          navigate("/admin");
+        }, 1500);
       } else {
-        // Save token with expiration check for non-admin users
-        saveToken(data.accessToken);
-        setIsLoggedIn(true); // Update global auth state
         setSuccessMessage(data.message || "Login successful! Redirecting to home page...");
         setTimeout(() => {
           const from = location.state?.from;
@@ -328,7 +270,7 @@ const Login = () => {
           }
         }, 2000);
       }
-  
+
     }  catch (err) {
       localStorage.removeItem('accessToken');
       setIsLoggedIn(false);
@@ -349,7 +291,7 @@ const Login = () => {
     setError("")
 
     try {
-      const response = await fetch('https://steth-backend.onrender.com/api/users/password-forgot', {
+      const response = await fetch(`${API_BASE_URL}/api/users/password-forgot`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
