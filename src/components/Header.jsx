@@ -5,10 +5,16 @@ import gsap from "gsap"
 import logo from "../assets/logo.png"
 import { AuthContext } from "../pages/Login&Signup/AuthContext"
 import { API_BASE_URL } from "../config/api"
+import { useCatalogTaxonomy } from "../hooks/useCatalogTaxonomy"
+import MegaMenu from "./Navbar/MegaMenu"
+import AboutDropdown from "./Navbar/AboutDropdown"
 
 const Header = ({ className = "" }) => {
   const { isLoggedIn, openAuthPanel } = useContext(AuthContext)
+  const { fabrics, categories, colors, loading: taxonomyLoading } = useCatalogTaxonomy()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [activeDropdown, setActiveDropdown] = useState(null) // 'Women' | 'Men' | 'About' | null
+  const [mobileExpandedSection, setMobileExpandedSection] = useState(null) // 'Women' | 'Men' | 'About' | null
   const [cartCount, setCartCount] = useState(0)
   const headerRef = useRef(null)
   const logoRef = useRef(null)
@@ -48,8 +54,13 @@ const Header = ({ className = "" }) => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
+    setMobileExpandedSection(null)
     // Prevent body scroll when menu is open
     document.body.style.overflow = isMenuOpen ? "auto" : "hidden"
+  }
+
+  const toggleMobileSection = (section) => {
+    setMobileExpandedSection((prev) => (prev === section ? null : section))
   }
 
   // Clean up effect
@@ -272,17 +283,63 @@ const Header = ({ className = "" }) => {
               never overlap the logo or icons regardless of viewport width
               (the old absolute-centered nav could, since it ignored its
               siblings' actual widths entirely). */}
-          <nav className="hidden lg:flex justify-center items-center gap-x-[clamp(0.75rem,2vw,2.5rem)] min-w-0 px-2 overflow-hidden">
-            {["Women", "Men", "Students", "About STETH"].map((item, index) => (
+          <nav className="hidden lg:flex justify-center items-center gap-x-[clamp(0.75rem,2vw,2.5rem)] min-w-0 px-2 overflow-visible">
+            <div
+              className="relative"
+              onMouseEnter={() => setActiveDropdown("Women")}
+              onMouseLeave={() => setActiveDropdown((prev) => (prev === "Women" ? null : prev))}
+              ref={(el) => (navItemsRef.current[0] = el)}
+            >
               <a
-                key={item}
-                href={item === "About STETH" ? "/aboutus" : `/${item.toLowerCase().replace(" ", "-")}`}
+                href="/women"
                 className="text-gray-700 hover:text-gray-900 transition-colors text-xs md:text-sm lg:text-base font-medium whitespace-nowrap"
-                ref={(el) => (navItemsRef.current[index] = el)}
               >
-                {item}
+                Women
               </a>
-            ))}
+              {activeDropdown === "Women" && (
+                <MegaMenu gender="Women" categories={categories} fabrics={fabrics} colors={colors} loading={taxonomyLoading} />
+              )}
+            </div>
+
+            <div
+              className="relative"
+              onMouseEnter={() => setActiveDropdown("Men")}
+              onMouseLeave={() => setActiveDropdown((prev) => (prev === "Men" ? null : prev))}
+              ref={(el) => (navItemsRef.current[1] = el)}
+            >
+              <a
+                href="/men"
+                className="text-gray-700 hover:text-gray-900 transition-colors text-xs md:text-sm lg:text-base font-medium whitespace-nowrap"
+              >
+                Men
+              </a>
+              {activeDropdown === "Men" && (
+                <MegaMenu gender="Men" categories={categories} fabrics={fabrics} colors={colors} loading={taxonomyLoading} />
+              )}
+            </div>
+
+            <a
+              href="/rewards"
+              className="text-gray-700 hover:text-gray-900 transition-colors text-xs md:text-sm lg:text-base font-medium whitespace-nowrap"
+              ref={(el) => (navItemsRef.current[2] = el)}
+            >
+              Rewards
+            </a>
+
+            <div
+              className="relative"
+              onMouseEnter={() => setActiveDropdown("About")}
+              onMouseLeave={() => setActiveDropdown((prev) => (prev === "About" ? null : prev))}
+              ref={(el) => (navItemsRef.current[3] = el)}
+            >
+              <a
+                href="/aboutus"
+                className="text-gray-700 hover:text-gray-900 transition-colors text-xs md:text-sm lg:text-base font-medium whitespace-nowrap"
+              >
+                About STETH
+              </a>
+              {activeDropdown === "About" && <AboutDropdown />}
+            </div>
           </nav>
 
           <div className="flex items-center justify-end space-x-2 lg:space-x-4 mr-0 lg:mr-10">
@@ -548,27 +605,85 @@ const Header = ({ className = "" }) => {
 
             {/* Simplified Mobile Menu */}
             <div className="h-[calc(100vh-120px)] overflow-y-auto px-4 py-4 bg-white">
-              <nav className="space-y-4 sm:space-y-6">
-                <a
-                  href="/women"
-                  className="block text-base sm:text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2"
-                >
-                  WOMENS
+              <nav className="space-y-2 sm:space-y-3">
+                {["Women", "Men"].map((gender) => (
+                  <div key={gender} className="border-b border-gray-100">
+                    <button
+                      type="button"
+                      onClick={() => toggleMobileSection(gender)}
+                      className="w-full flex items-center justify-between text-base sm:text-lg font-medium py-3 text-black rounded px-2"
+                    >
+                      {gender.toUpperCase()}
+                      <span className="text-sm">{mobileExpandedSection === gender ? "−" : "+"}</span>
+                    </button>
+                    {mobileExpandedSection === gender && (
+                      <div className="pb-4 px-2 space-y-4">
+                        <div>
+                          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Shop By Color</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {colors.map((color) => (
+                              <a
+                                key={color._id}
+                                href={`/${gender.toLowerCase()}?colorRefs=${color._id}`}
+                                className="flex items-center gap-1.5 text-sm text-gray-700 py-1"
+                              >
+                                <span
+                                  className="w-3.5 h-3.5 rounded-sm inline-block border border-gray-200 shrink-0"
+                                  style={{ backgroundColor: color.hexCode }}
+                                />
+                                {color.name}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Shop By Fabric</h4>
+                          <div className="flex flex-col gap-1">
+                            {fabrics.map((fabric) => (
+                              <a key={fabric._id} href={`/${gender.toLowerCase()}?fabric=${fabric._id}`} className="text-sm text-gray-700 py-1">
+                                {fabric.name}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Shop By Category</h4>
+                          <div className="flex flex-col gap-1">
+                            {categories.map((category) => (
+                              <a key={category._id} href={`/${gender.toLowerCase()}?categoryRef=${category._id}`} className="text-sm text-gray-700 py-1">
+                                {category.name}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                        <a href={`/${gender.toLowerCase()}`} className="block text-sm font-medium text-black underline py-1">
+                          Shop all {gender}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                <a href="/rewards" className="block text-base sm:text-lg font-medium py-3 text-black hover:bg-gray-100 transition-colors rounded px-2 border-b border-gray-100">
+                  REWARDS
                 </a>
-                <a
-                  href="/men"
-                  className="block text-base sm:text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2"
-                >
-                  MENS
-                </a>
-                
-                <a href="/students" className="block text-base sm:text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2">
-                  STUDENTS
-                </a>
-                
-                <a href="/aboutus" className="block text-base sm:text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2">
-                  ABOUT US
-                </a>
+
+                <div className="border-b border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => toggleMobileSection("About")}
+                    className="w-full flex items-center justify-between text-base sm:text-lg font-medium py-3 text-black rounded px-2"
+                  >
+                    ABOUT STETH
+                    <span className="text-sm">{mobileExpandedSection === "About" ? "−" : "+"}</span>
+                  </button>
+                  {mobileExpandedSection === "About" && (
+                    <div className="pb-4 px-2 flex flex-col gap-2">
+                      <a href="/aboutus#our-story" className="text-sm text-gray-700 py-1">Our Story</a>
+                      <a href="/blog" className="text-sm text-gray-700 py-1">Blog</a>
+                    </div>
+                  )}
+                </div>
 
                 <div className="pt-4 border-t border-gray-200">
                   {!isLoggedIn ? (
