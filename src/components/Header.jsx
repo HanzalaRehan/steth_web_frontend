@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useContext } from "react"
 import gsap from "gsap"
 import logo from "../assets/logo.png"
+import { AuthContext } from "../pages/Login&Signup/AuthContext"
+import { API_BASE_URL } from "../config/api"
 
 const Header = ({ className = "" }) => {
+  const { isLoggedIn, openAuthPanel } = useContext(AuthContext)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState("Women")
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [cartCount, setCartCount] = useState(0)
   const headerRef = useRef(null)
   const logoRef = useRef(null)
@@ -19,26 +20,7 @@ const Header = ({ className = "" }) => {
   const [searchResults, setSearchResults] = useState([])
   const [isSearching, setIsSearching] = useState(false)
   const [showResults, setShowResults] = useState(false)
-  const [isSearchActive, setIsSearchActive] = useState(false)
   const [isSearchOverlayActive, setIsSearchOverlayActive] = useState(false)
-
-  // Check if user is logged in on component mount and when token changes
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      const token = localStorage.getItem("accessToken")
-      setIsLoggedIn(!!token)
-    }
-
-    // Check initial login status
-    checkLoginStatus()
-
-    // Listen for storage changes to update login status
-    window.addEventListener("storage", checkLoginStatus)
-
-    return () => {
-      window.removeEventListener("storage", checkLoginStatus)
-    }
-  }, [])
 
   // Add effect to track cart items count
   useEffect(() => {
@@ -167,11 +149,14 @@ const Header = ({ className = "" }) => {
       )
     })
 
+    // Opacity-only fade-in - animating `width` here used to permanently
+    // override the Tailwind width class with an inline style once the
+    // tween finished (GSAP sets inline styles, which beat any CSS class),
+    // silently undoing whatever responsive width rule was in place.
     gsap.fromTo(
       searchRef.current,
-      { width: "0%", opacity: 0 },
+      { opacity: 0 },
       {
-        width: "100%",
         opacity: 1,
         duration: 0.8,
         delay: 0.7,
@@ -227,7 +212,7 @@ const Header = ({ className = "" }) => {
 
     setIsSearching(true)
     try {
-      const response = await fetch("https://steth-backend.onrender.com/api/products")
+      const response = await fetch(`${API_BASE_URL}/api/products`)
       const data = await response.json()
 
       if (data.success && data.data) {
@@ -273,158 +258,21 @@ const Header = ({ className = "" }) => {
 
   return (
     <>
-      <style jsx>{`
-/* Custom responsive styles */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .search-container {
-    width: 160px !important;
-  }
-  .nav-spacing {
-    gap: 1rem !important;
-  }
-  .logo-text {
-    font-size: 1.25rem !important;
-  }
-}
-
-/* Specific fix for 770px-880px range */
-@media (min-width: 770px) and (max-width: 880px) {
-  .search-container {
-    width: 140px !important;
-    margin-right: 1rem !important;
-  }
-  .icons-container {
-    margin-left: auto !important;
-  }
-  .logo-container {
-    margin-right: auto !important;
-  }
-}
-
-/* NEW: Fix for 1025px-1110px overlap issue */
-@media (min-width: 1000px) and (max-width: 1110px) {
-  .search-container {
-    max-width: 130px !important;
-  }
-  .nav-spacing {
-    gap: 0.6rem !important; /* Reduced from default spacing */
-  }
-  .logo-text {
-    font-size: 1rem !important;
-  }
-  /* Reduce navigation font size to save space */
-  .nav-spacing a {
-    font-size: 0.875rem !important; /* 14px */
-  }
-  /* Tighten header padding */
-  .header-padding {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-  }
-  /* Reduce logo spacing */
-  .logo-container {
-    margin-left: 0 !important;
-  }
-  .icons-container {
-    margin-right: 0 !important;
-  }
-}
-
-/* Updated: Unified styles for 1024px-1284px range */
-@media (min-width: 1024px) and (max-width: 1284px) {
-  .search-container {
-    width: 180px !important;
-  }
-  .nav-spacing {
-    gap: 1.5rem !important;
-  }
-  .logo-text {
-    font-size: 1.5rem !important;
-  }
-  .nav-spacing a {
-    font-size: 0.9rem !important;
-  }
-  .header-padding {
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
-  }
-  .logo-container {
-    margin-left: 0 !important;
-  }
-  .icons-container {
-    margin-right: 0 !important;
-  }
-}
-
-/* Updated: Unified styles for 1285px-1400px range */
-@media (min-width: 1285px) and (max-width: 1400px) {
-  .search-container {
-    width: 180px !important;
-    max-width: 180px !important;
-  }
-  .nav-spacing {
-    gap: 1.5rem !important;
-  }
-  .nav-spacing a {
-    font-size: 0.9rem !important;
-  }
-  .logo-text {
-    font-size: 1.5rem !important;
-  }
-  .header-padding {
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
-  }
-  .logo-container {
-    margin-left: 0 !important;
-  }
-  .icons-container {
-    margin-right: 0 !important;
-  }
-}
-
-@media (min-width: 1279px) and (max-width: 1535px) {
-  .search-container {
-    width: 210px !important;
-  }
-  .nav-spacing {
-    gap: 1rem !important;
-  }
-}
-
-@media (min-width: 1536px) {
-  .search-container {
-    width: 256px !important;
-  }
-}
-
-/* Compact header for small laptops */
-@media (min-width: 768px) and (max-width: 1279px) {
-  .header-padding {
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
-  }
-  .logo-container {
-    margin-left: 0 !important;
-  }
-  .icons-container {
-    margin-right: 0 !important;
-  }
-}
-      `}</style>
-      
       <header ref={headerRef} className={`w-full z-50 sticky top-0 ${className}`}>
         {/* Desktop Header */}
-        <div className="hidden md:flex items-center justify-between py-3 lg:py-4 border-b bg-white shadow-md header-padding px-4 lg:px-10">
+        <div className="hidden md:grid grid-cols-[auto_1fr_auto] items-center py-3 lg:py-4 border-b bg-white shadow-md px-[clamp(1rem,2vw,2.5rem)]">
           <div className="flex items-center space-x-4 lg:space-x-8">
-            <a href="/" className="flex items-center logo-container ml-0 lg:ml-10" ref={logoRef}>
+            <a href="/" className="flex items-center ml-0 lg:ml-10" ref={logoRef}>
               <img src={logo || "/placeholder.svg"} alt="STETH Logo" className="h-14 lg:h-20 w-auto" />
-              <h1 className="text-xl lg:text-3xl logo-text text-black">STETH</h1>
+              <h1 className="text-xl lg:text-3xl text-black">STETH</h1>
             </a>
           </div>
 
-          {/* Center Navigation - More responsive */}
-          <nav className="hidden lg:flex justify-center nav-spacing space-x-4 lg:space-x-6 xl:space-x-10 absolute left-1/2 transform -translate-x-1/2 z-10">
+          {/* Center Navigation - lives in its own grid column, so it can
+              never overlap the logo or icons regardless of viewport width
+              (the old absolute-centered nav could, since it ignored its
+              siblings' actual widths entirely). */}
+          <nav className="hidden lg:flex justify-center items-center gap-x-[clamp(0.75rem,2vw,2.5rem)] min-w-0 px-2 overflow-hidden">
             {["Women", "Men", "Students", "About STETH"].map((item, index) => (
               <a
                 key={item}
@@ -437,7 +285,7 @@ const Header = ({ className = "" }) => {
             ))}
           </nav>
 
-          <div className="flex items-center space-x-2 lg:space-x-4 icons-container mr-0 lg:mr-10">
+          <div className="flex items-center justify-end space-x-2 lg:space-x-4 mr-0 lg:mr-10">
             {/* Hamburger Menu for 770px-880px */}
             <button 
               onClick={toggleMenu} 
@@ -450,7 +298,7 @@ const Header = ({ className = "" }) => {
 
             {/* Desktop Search - Responsive sizing */}
             {!isSearchOverlayActive ? (
-              <div className="relative search-container w-40 md:w-48 lg:w-64" ref={searchRef}>
+              <div className="relative w-[clamp(140px,16vw,256px)] shrink-0" ref={searchRef}>
                 <input
                   type="text"
                   placeholder="Search"
@@ -618,13 +466,14 @@ const Header = ({ className = "" }) => {
                   </svg>
                 </a>
               ) : (
-                <a
-                  href="/login"
+                <button
+                  type="button"
+                  onClick={() => openAuthPanel("login")}
                   className="px-3 lg:px-4 py-1.5 lg:py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors text-xs lg:text-sm font-medium"
                   title="Login"
                 >
                   Login
-                </a>
+                </button>
               )}
               <a href="/cart" className="hover:text-gray-900 transition-colors relative" title="Cart">
                 <svg className="h-5 lg:h-6 w-5 lg:w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -723,12 +572,16 @@ const Header = ({ className = "" }) => {
 
                 <div className="pt-4 border-t border-gray-200">
                   {!isLoggedIn ? (
-                    <a
-                      href="/login"
-                      className="block text-base sm:text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false)
+                        openAuthPanel("login")
+                      }}
+                      className="block w-full text-left text-base sm:text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2"
                     >
                       LOGIN
-                    </a>
+                    </button>
                   ) : (
                     <a
                       href="/profile"
