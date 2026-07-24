@@ -290,3 +290,35 @@ Mid-session, a `git stash` issued as part of a lint-baseline comparison (matchin
 
 ### What's next
 Live-verify once a stable session is available: checkout prefill for a real logged-in user with/without a saved address, and for a guest; the save-address checkbox round-tripping through to `GET /api/users/profile`; the account overlay opening from all three entry points (Header desktop icon, Header mobile menu, Footer "My Orders") at both viewports; the Orders tab against real order data with a real `statusHistory` (needs the backend's own live-DB gap closed first, per its `PROGRESS.md`); Cancel Order's eligibility gating against a real `Shipped`/`Delivered` order. `Profile.jsx`'s removal means `/profile` no longer renders a page directly — confirm no other code still imports it directly (checked via grep at deletion time, found none, but worth a final look once the dev server is reachable again).
+
+---
+
+## Session: Order management admin UI + tracking — Part B.1's order workflow (2026-07-24)
+
+Backend half of this session (statusHistory-adjacent bugfix, label endpoints, bulk endpoints) is documented in the backend's own `PROGRESS.md`. This entry covers the admin dashboard rewrite. Plan mode was used for the state machine and label-generation architecture, per your instruction — the state machine matches your brief and the master plan's own recommendation exactly, no correction needed.
+
+### `OrdersList.jsx` — full rewrite, same route
+Replaced the old single flat, paginated table (every status mixed together, only a "Details" link) with a six-tab dashboard (`Pending`/`Confirmed`/`Processing`/`Shipped`/`Delivered`/`Cancelled`) using the already-ported shadcn `Tabs` (`src/components/ui/tabs.jsx`). Each tab fetches `GET /api/orders/all?status=<Tab>` independently and caches its own orders/pagination/loading state, so switching tabs doesn't refetch data already loaded. No shadcn `Checkbox` was ported in Phase 3, so row/select-all checkboxes are plain native `<input type="checkbox">`, matching the pattern already used this session's earlier work (`DeliveryForm.jsx`'s save-address checkbox).
+
+Per-tab row actions, driven by one `TAB_CONFIG` object rather than duplicated per-tab JSX:
+- **Pending**: Confirm, Cancel.
+- **Confirmed**: Print Label (single), Shipped (direct shortcut, skips Processing) — plus **Print All Labels** at the tab's top, independent of row selection, targeting every order currently in the tab.
+- **Processing**: Shipped.
+- **Shipped**: Deliver.
+- **Delivered / Cancelled**: read-only, no actions, no checkboxes.
+
+Selection (a `Set` of order IDs) resets on tab switch. A bulk-action bar appears above the table whenever selection is non-empty, offering whichever actions `TAB_CONFIG` says are valid for the active tab — calling the new `bulk-update-status` or `bulk-generate-labels` endpoints depending on the action.
+
+`OrderUpdateStatus.jsx` (the per-order detail/manual-override screen, reached via each row's existing "Details" link) is untouched — still a valid escape hatch alongside the new tab flow, not a duplicate of it.
+
+**No changes needed in `AccountOverlay.jsx`** (the customer-facing tracking timeline, built last session) — it already renders generically from whatever `statusHistory` contains and already covers all six statuses in its color map. New transitions from either the admin tabs or the label endpoint show up there automatically; this session's remaining verification gap is confirming that live, not building anything new there.
+
+### Verification
+`npm run lint`: clean on `OrdersList.jsx`, first attempt.
+
+`npm run build`: succeeded, only the pre-existing bundle-size warning.
+
+**Live browser click-through wasn't completed this session** — same standing sandbox limitation as the backend side: no reachable dev/staging database to place a real order against, and the production backend has none of this project's work deployed to it. Static verification (clean lint, clean build, and a careful manual trace of `TAB_CONFIG`'s row/bulk actions against the backend's actual endpoint contracts) is what's actually been done here.
+
+### What's next
+Once a reachable backend exists: walk a real order through every tab via the new UI, confirm the account overlay's timeline reflects each transition live, confirm bulk select/select-all works across at least two orders in one tab (per your explicit verification ask), confirm "Print All Labels" actually opens each generated PDF and that a partial-failure batch still shows the successful ones. Consider whether `OrdersList.jsx`'s per-tab fetch-and-cache approach needs a manual refresh affordance if an order's status changes from a different browser tab/admin session while this one is open - not built this session, since it wasn't asked for and the existing screens don't have this either.
