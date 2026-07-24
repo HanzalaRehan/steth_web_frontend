@@ -410,3 +410,26 @@ Scoped `npm run lint` across every file touched this session: one real bug caugh
 
 ### What's next
 Live-verify once the Browser pane is reachable again: the color-tile hover cursor/scale, the route-transition fade on a real navigation, the Hero skeleton's brief visibility on a throttled connection, the Shop Women/Shop Men buttons landing with the products section visible (not hidden) below the header at both mobile and desktop widths, and a DevTools Performance/FPS recording of homepage scroll to confirm the `scrub`/global-kill fixes actually moved the needle (per your explicit ask to verify #2 with profiling, not just by feel - not done this session since the Browser pane wasn't reachable). Get your sign-off on the testimonials/trust-badge plan above, then build both.
+
+---
+
+## Session: Issue #22 — Rewards page shell (2026-07-24)
+
+You explicitly hadn't given program rules (earn rate, redemption options, tiers) yet and said to build shell-only if so - this is shell-only. No redemption logic, no invented numbers.
+
+### `Rewards.jsx` — full rewrite, same route
+Replaced the earlier "coming soon" placeholder (built during the navbar/footer session purely so `/rewards` wasn't a dead link) with the real shell:
+- **Logged in**: fetches `GET /api/users/profile` (same call `AccountOverlay.jsx`'s Profile tab already makes) and displays `rewardPoints` prominently plus a "First order complete" badge when `firstOrderPlaced` is true. No new backend endpoint needed - this field pair was already in the existing response.
+- **Logged out**: shows a plain "Sign in to see your reward points balance" prompt with a button calling `openAuthPanel('login')` (the same `AuthContext` panel every other page already uses) - no error state, no broken fetch attempt, matching your explicit "handle a logged-out visitor gracefully" requirement.
+- **"How It Works"**: deliberately generic placeholder copy ("every account earns points on purchases automatically... redemption options are being finalized") - no earn rate, no redemption value, no tier language. Commented in the source as pending real copy from you, per your explicit instruction not to invent numbers that would look official to a customer.
+- **Extension point**: a comment block marking exactly where redemption UI (a "Redeem" button, a list of options with point costs) goes once rules exist, wired to the matching backend extension-point comment in `user.routes.js` (see the backend's own `PROGRESS.md`). Nothing speculative built.
+
+Navbar (`Header.jsx`, issue #23) and footer (`Footer.jsx`, issue #24) already link to `/rewards` from an earlier session - no changes needed there. `AccountOverlay.jsx`'s "For You" tab already links here too, with no stale "coming soon" copy of its own to update.
+
+### Verification
+`npm run lint` on `Rewards.jsx` - clean, first attempt. Manually traced both branches: logged-out renders the login prompt with zero fetch attempts and zero errors (confirmed by reading the effect's early-return guard); logged-in fetches and displays the real balance, with a loading state and an error state (network/non-200 response) both handled distinctly rather than silently swallowed. One AuthContext timing note worth recording (not a bug, matches existing site-wide behavior): `AuthContext`'s `isLoggedIn` starts `false` and flips true after its own mount effect reads `localStorage` - so an already-logged-in user could see a one-render-tick flash of the login prompt before it corrects itself. No other page in this codebase accounts for this either (checked `AccountOverlay.jsx`), so left consistent with existing behavior rather than adding special handling only here.
+
+**Live browser click-through wasn't attempted this session** - same standing sandbox limitation as the immediately preceding session (Browser pane navigation was being denied there; not re-attempted here since nothing about that environment issue changed).
+
+### What's next
+Once you provide the actual program rules: fill in the real "How It Works" copy (replacing the generic placeholder), and build the redemption endpoint + UI at the two extension points already left in place (`user.routes.js` backend, `Rewards.jsx` frontend) rather than starting from scratch. Live-verify the logged-in/logged-out rendering and the login-prompt button actually opening the auth panel once the Browser pane is reachable again.
