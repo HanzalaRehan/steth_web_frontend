@@ -4,12 +4,14 @@ import { useState, useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { X, ChevronLeft, ChevronRight, Check, Plus, Minus, Maximize2, Minimize2 } from "lucide-react"
 import { useNavigate, useSearchParams } from "react-router-dom"
+import { useCartDrawer } from "../../../context/CartDrawerContext"
 import sizeChartImage0 from "/src/assets/sizes/Size chart -images-0.jpg";
 import sizeChartImage1 from "/src/assets/sizes/Size chart -images-1.jpg";
 import careInstructionsImage from "/src/assets/sizes/Care Instructions.jpg";
 
 export default function ProductDetail({ product }) {
   const navigate = useNavigate()
+  const { openCartDrawer } = useCartDrawer()
   const [searchParams] = useSearchParams()
   
   // Get color from URL and set it as initial selected color
@@ -24,8 +26,11 @@ export default function ProductDetail({ product }) {
   const [quantity, setQuantity] = useState(1)
   const [validationError, setValidationError] = useState("")
   const [isDragging, setIsDragging] = useState(false)
-  const [successMessage, setSuccessMessage] = useState("")
-  const [cartItems, setCartItems] = useState([])
+  // #14 - brief on-button confirmation, replacing the old separate green
+  // message box. See PROGRESS.md for why a toast/snackbar was deliberately
+  // skipped here (the #16 cart drawer opening is the "big" confirmation;
+  // this stays as the small in-place one so the two don't double up).
+  const [justAdded, setJustAdded] = useState(false)
   // Auto-select color if only one color or color from URL
   const [isColorSelected, setIsColorSelected] = useState(!!colorFromUrl || (product?.colors?.length === 1))
   
@@ -39,7 +44,6 @@ export default function ProductDetail({ product }) {
 
   const productRef = useRef(null)
   const lightboxRef = useRef(null)
-  const successMessageRef = useRef(null)
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
   const [mouseStart, setMouseStart] = useState(null)
@@ -158,7 +162,7 @@ const preloadImages = (imageUrls) => {
 
     checkMobile()
     window.addEventListener("resize", checkMobile)
- 
+
     // GSAP animations
     gsap.from(productRef.current, {
       // Animation properties can be added here
@@ -166,6 +170,36 @@ const preloadImages = (imageUrls) => {
 
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
+
+  // #11 - keyboard gallery nav. Scoped to this component's lifetime (only
+  // mounted on the product detail route, never globally) rather than a
+  // page-wide listener. Reuses handleSlide, the same index-advance logic
+  // driving thumbnail clicks and the lightbox arrow buttons.
+  useEffect(() => {
+    if (displayImages.length <= 1) return
+
+    const handleKeyDown = (e) => {
+      const tag = document.activeElement?.tagName
+      if (tag === "INPUT" || tag === "TEXTAREA") return
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault()
+        handleSlide("prev")
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault()
+        handleSlide("next")
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+    // handleSlide is intentionally omitted here: it's redefined every render
+    // from these same three values, so listing it would only re-bind the
+    // listener more often without changing behavior - and since it's
+    // declared later in this component, referencing it directly in this
+    // array (evaluated during render) would hit the temporal dead zone.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayImages, currentImageIndex, isLoadingImages])
 
   const openLightbox = (index) => {
     setCurrentImageIndex(index)
@@ -370,10 +404,12 @@ const onTouchEnd = () => {
     return true
   }
 
-  const validateAndAddToBag = () => {
-    // Reset success message
-    setSuccessMessage("")
-    
+  // Shared by "Add to Bag" and "Shop Now" (#15) - builds the cart item and
+  // writes it to localStorage, the single source of truth the whole cart
+  // mechanism (Header badge, Cart.jsx, CartDrawer.jsx) reads from. Returns
+  // the constructed item on success, null on failure, and does not itself
+  // decide what UI confirmation (if any) should follow - callers do that.
+  const addItemToCart = () => {
     // Auto-select first color if only one color exists and none is selected
     let colorToUse = selectedColor
     if (!colorToUse && product.colors && product.colors.length === 1) {
@@ -381,21 +417,17 @@ const onTouchEnd = () => {
       setSelectedColor(colorToUse)
       setIsColorSelected(true)
     }
-    
-    console.log("Validation Before")
-    // Validate inputs
+
     if (!validateInputs()) {
-      console.log("Validation Failed")
-      return
+      return null
     }
-    console.log("Validation After")
 
     // Get selected color object for complete information
     const selectedColorObj = product.colors.find(color => color.name === colorToUse)
-    
+
     // Find an appropriate image to use (use first image or default)
     const productImage = displayImages.length > 0 ? displayImages[0].url : ""
-    
+
     // Create item object with ALL required information
     const item = {
       id: product._id,
@@ -415,7 +447,9 @@ const onTouchEnd = () => {
       sizeInventory: colorToUse ? sizeInventory[colorToUse] : {}
     }
 
-    // GTM ADD TO CART EVENT
+    // GTM/Meta ADD TO CART EVENT - fired once per real add (previously
+    // pushed twice: once here, once again after the localStorage write,
+    // double-counting every add-to-cart in analytics).
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
       event: "add_to_cart",
@@ -433,9 +467,7 @@ const onTouchEnd = () => {
         ]
       }
     });
-    console.log("Add to Cart fired!")
     if (window.fbq) {
-      console.log("fbq active")
       window.fbq('track', 'AddToCart', {
         content_name: item.name,
         content_ids: [item.id],
@@ -448,11 +480,11 @@ const onTouchEnd = () => {
     try {
       // Read existing cart items
       const existingCart = JSON.parse(localStorage.getItem('cartItems') || '[]')
-    
+
       // Check if item already exists in cart
       const existingItemIndex = existingCart.findIndex(
-        cartItem => cartItem.id === item.id && 
-                    cartItem.colorName === item.colorName && 
+        cartItem => cartItem.id === item.id &&
+                    cartItem.colorName === item.colorName &&
                     cartItem.size === item.size
       )
 
@@ -467,80 +499,42 @@ const onTouchEnd = () => {
 
       // Save updated cart
       localStorage.setItem('cartItems', JSON.stringify(existingCart))
-      
-      // Dispatch cart updated event
+
+      // Dispatch cart updated event - the single mechanism Header.jsx's cart
+      // badge, Cart.jsx, and CartDrawer.jsx all listen for.
       window.dispatchEvent(new Event('cartUpdated'))
 
-      // GTM ADD TO CART EVENT
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({
-        event: "add_to_cart",
-        ecommerce: {
-          currency: "PKR",
-          value: item.price * item.quantity,
-          items: [
-            {
-              item_id: item.id,
-              item_name: item.name,
-              price: item.price,
-              quantity: item.quantity,
-              item_variant: `${item.colorName} - ${item.size}`
-            }
-          ]
-        }
-      });
-      
-      // Clear error if any
       setValidationError("")
+      return item
     } catch (error) {
       console.error("Error adding to cart:", error)
       setValidationError("Failed to add item to cart")
-    }
-
-    // Show success message with animation
-    setSuccessMessage("Item added to bag successfully!")
-    if (successMessageRef.current) {
-      gsap.fromTo(
-        successMessageRef.current, 
-        { opacity: 0, y: -20 }, 
-        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
-      )
-      
-      // Auto hide after 3 seconds
-      setTimeout(() => {
-        gsap.to(successMessageRef.current, { 
-          opacity: 0, 
-          y: -20, 
-          duration: 0.5, 
-          ease: "power2.in",
-          onComplete: () => setSuccessMessage("")
-        })
-      }, 3000)
+      return null
     }
   }
 
-  const proceedToCheckout = () => {
-    // First validate cart has items
-    if (!cartItems.length) {
-      setValidationError("Your bag is empty. Please add items first.")
-      return
-    }
-    
-    // Then validate current selections in case user wants to add the current item
-    if (validateInputs()) {
-      // Ask user if they want to add current item to cart before proceeding
-      const addCurrentItem = window.confirm("Do you want to add the current item to your bag before checkout?")
-      
-      if (addCurrentItem) {
-        validateAndAddToBag()
-      }
-      
-      // Navigate to checkout page with cart data
-      console.log("Proceeding to checkout with items:", cartItems)
-      
-      // Use React Router's navigate to go to checkout page
-      navigate('/checkout')
-    }
+  const validateAndAddToBag = () => {
+    const item = addItemToCart()
+    if (!item) return
+
+    // #14 - brief success state on the button itself, plus opening the #16
+    // cart drawer. No toast/snackbar here on purpose: the drawer is itself
+    // strong visual confirmation (shows the actual item, not just a
+    // message) - firing a toast too would be a second, redundant
+    // confirmation for the same click.
+    setJustAdded(true)
+    setTimeout(() => setJustAdded(false), 2000)
+    openCartDrawer()
+  }
+
+  // #15 - "Shop Now": add the current selection to the cart, then go
+  // straight to checkout. Deliberately skips the button success-state and
+  // the cart drawer - the page is navigating away immediately, so either
+  // would just flash and vanish before being visible.
+  const handleShopNow = () => {
+    const item = addItemToCart()
+    if (!item) return
+    navigate('/checkout')
   }
 
   // Check if a size is available for the selected color
@@ -813,9 +807,9 @@ const onTouchEnd = () => {
             <div className="mb-4 lg:mb-6">
               <div className="flex justify-between items-center mb-2 md:mb-3">
                 <p className="font-medium text-base md:text-lg">SIZE</p>
-                <button 
+                <button
                   onClick={() => setIsSizeChartOpen(true)}
-                  className="text-gray-600 bg-white underline text-sm md:text-base"
+                  className="px-3 py-1.5 border border-gray-300 rounded-full text-xs md:text-sm font-medium text-gray-700 bg-white hover:border-black hover:text-black transition-colors"
                 >
                   Size Chart
                 </button>
@@ -824,24 +818,33 @@ const onTouchEnd = () => {
                 {product.sizes.map((size) => {
                   const sizeAvailable = isSizeAvailable(size.name);
                   const sizeStock = getSizeStock(size.name);
-                  
+                  // #12 - both "never stocked for this color" (!sizeAvailable)
+                  // and "stocked but sold out" (sizeStock === 0) now get the
+                  // exact same unavailable treatment instead of one silently
+                  // never actually rendering the label (the old sizeAvailable
+                  // && sizeStock === 0 check was unreachable in practice,
+                  // since sizeAvailable is itself derived from stock > 0).
+                  const isUnavailable = !sizeAvailable || sizeStock === 0;
+
                   return (
                     <button
                       key={size._id}
                       className={`w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 flex items-center justify-center border text-sm md:text-base ${
-                        selectedSize === size.name 
-                          ? "border-black bg-white text-black" // CHANGED: Remove bg-black text-white, keep bg-white text-black
-                          : "border-gray-300 bg-white text-black" // ADDED: Explicit bg-white text-black for unselected
+                        selectedSize === size.name
+                          ? "border-black bg-white text-black"
+                          : isUnavailable
+                          ? "border-gray-200 bg-gray-100 text-gray-400 line-through"
+                          : "border-gray-300 bg-white text-black"
                       } ${
-                        (!sizeAvailable || sizeStock === 0)
-                          ? "opacity-60 cursor-not-allowed" 
-                          : "hover:border-black" // CHANGED: Remove bg-white text-black from here since it's now explicit above
+                        isUnavailable
+                          ? "opacity-60 cursor-not-allowed"
+                          : "hover:border-black"
                       } text-center relative rounded-md transition-all`}
-                      onClick={() => sizeAvailable && sizeStock > 0 && setSelectedSize(size.name)}
-                      disabled={!sizeAvailable || sizeStock === 0}
+                      onClick={() => !isUnavailable && setSelectedSize(size.name)}
+                      disabled={isUnavailable}
                     >
                       {size.name}
-                      {sizeAvailable && sizeStock === 0 && (
+                      {isUnavailable && (
                         <span className="absolute -bottom-6 left-0 right-0 text-xs text-red-500">
                           Out of stock
                         </span>
@@ -852,7 +855,7 @@ const onTouchEnd = () => {
               </div>
             </div>
 
-  
+
             {/* Quantity Selector */}
             <div className="mb-4 lg:mb-6">
               <p className="font-medium mb-2 md:mb-3 text-base md:text-lg">QUANTITY</p>
@@ -882,24 +885,31 @@ const onTouchEnd = () => {
               </div>
             )}
             
-            {/* Success Message */}
-            {successMessage && (
-              <div 
-                className="mb-4 lg:mb-6 bg-green-100 text-green-800 p-3 border border-green-200 rounded-md"
-                ref={successMessageRef}
-              >
-                {successMessage}
-              </div>
-            )}
-  
             {/* Add to Bag Button */}
-            <button 
-              className="w-full py-4 md:py-5 bg-black text-white font-medium mb-4 lg:mb-6 rounded-none hover:bg-gray-800 transition-colors text-base md:text-lg"
+            <button
+              className={`w-full py-4 md:py-5 font-medium mb-4 lg:mb-6 rounded-none transition-colors text-base md:text-lg flex items-center justify-center gap-2 ${
+                justAdded ? "bg-green-600 text-white" : "bg-black text-white hover:bg-gray-800"
+              }`}
               onClick={validateAndAddToBag}
             >
-              ADD TO BAG
+              {justAdded ? (
+                <>
+                  <Check size={18} /> ADDED
+                </>
+              ) : (
+                "ADD TO BAG"
+              )}
             </button>
-  
+
+            {/* #15 - Shop Now: add current selection to cart, go straight
+                to checkout */}
+            <button
+              className="w-full py-4 md:py-5 border border-black text-black bg-white font-medium mb-4 lg:mb-6 rounded-none hover:bg-gray-50 transition-colors text-base md:text-lg"
+              onClick={handleShopNow}
+            >
+              SHOP NOW
+            </button>
+
             {/* Product Info */}
             <p className="text-center text-gray-600 text-sm md:text-base mb-4 lg:mb-6">
               {product.material || ""}
@@ -1024,9 +1034,9 @@ const onTouchEnd = () => {
             <div className="mb-8">
               <div className="flex justify-between items-center mb-3">
                 <p className="font-medium">SIZE</p>
-                <button 
+                <button
                   onClick={() => setIsSizeChartOpen(true)}
-                  className="text-gray-600 underline bg-white"
+                  className="px-3 py-1 border border-gray-300 rounded-full text-xs font-medium text-gray-700 bg-white hover:border-black hover:text-black transition-colors"
                 >
                   Size Chart
                 </button>
@@ -1035,30 +1045,31 @@ const onTouchEnd = () => {
                 {product.sizes.map((size) => {
                   const sizeAvailable = isSizeAvailable(size.name);
                   const sizeStock = getSizeStock(size.name);
-                  
+                  const isUnavailable = !sizeAvailable || sizeStock === 0;
+
                   return (
                     <button
                       key={size._id}
                       className={`w-10 h-10 flex items-center justify-center border ${
-                        selectedSize === size.name 
-                          ? "border-black" 
-                          : "border-gray-300"
+                        selectedSize === size.name
+                          ? "border-black bg-white text-black"
+                          : isUnavailable
+                          ? "border-gray-200 bg-gray-100 text-gray-400 line-through"
+                          : "border-gray-300 bg-white text-black"
                       } ${
-                        (!sizeAvailable || sizeStock === 0)
-                          ? "opacity-60 cursor-not-allowed" 
-                          : "bg-white text-black"
+                        isUnavailable ? "opacity-60 cursor-not-allowed" : ""
                       } text-center relative rounded-md`}
-                      onClick={() => sizeAvailable && sizeStock > 0 && setSelectedSize(size.name)}
-                      disabled={!sizeAvailable || sizeStock === 0}
+                      onClick={() => !isUnavailable && setSelectedSize(size.name)}
+                      disabled={isUnavailable}
                     >
                       {size.name}
-                      {sizeAvailable && sizeStock === 0 && <span className="block text-xs">Out of stock</span>}
+                      {isUnavailable && <span className="block text-xs text-red-500">Out of stock</span>}
                     </button>
                   );
                 })}
               </div>
             </div>
-  
+
             {/* Quantity Selector */}
             <div className="mb-8">
               <p className="font-medium mb-3">QUANTITY</p>
@@ -1084,23 +1095,30 @@ const onTouchEnd = () => {
               <div className="mb-6 text-red-500 text-sm">{validationError}</div>
             )}
             
-            {/* Success Message */}
-            {successMessage && (
-              <div 
-                className="mb-6 bg-green-100 text-green-800 p-2 border border-green-200"
-                ref={successMessageRef}
-              >
-                {successMessage}
-              </div>
-            )}
-  
-            <button 
-              className="w-full py-4 bg-black text-white rounded-none font-medium text-sm mb-4"
+            <button
+              className={`w-full py-4 rounded-none font-medium text-sm mb-4 transition-colors flex items-center justify-center gap-2 ${
+                justAdded ? "bg-green-600 text-white" : "bg-black text-white hover:bg-gray-800"
+              }`}
               onClick={validateAndAddToBag}
             >
-              ADD TO BAG
+              {justAdded ? (
+                <>
+                  <Check size={16} /> ADDED
+                </>
+              ) : (
+                "ADD TO BAG"
+              )}
             </button>
-  
+
+            {/* #15 - Shop Now: add current selection to cart, go straight
+                to checkout */}
+            <button
+              className="w-full py-4 rounded-none font-medium text-sm mb-4 border border-black text-black bg-white hover:bg-gray-50 transition-colors"
+              onClick={handleShopNow}
+            >
+              SHOP NOW
+            </button>
+
             <p className="text-center text-gray-600 text-sm mb-6">{product.material || ""}</p>
   
             <p className="text-center text-sm font-medium">FREE SHIPPING FOR Rs.5000+ ORDERS AND FREE RETURNS</p>
