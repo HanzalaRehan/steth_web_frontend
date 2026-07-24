@@ -1,5 +1,5 @@
 // src/routes/AppRouter.js
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 
@@ -20,30 +20,6 @@ import ProductDetail from '../pages/ProductDetailPage/ProductDetail';
 import ColorProductsPage from '../pages/ColorProduct/ColorProductPage';
 import TermsAndConditions from '../pages/TermsAndConditions/TermsAndConditions';
 import AdminRoute from '../pages/Login&Signup/AdminRoute';
-import AdminLayout from '../pages/Admin/AdminLayout';
-import Dashboard from '../pages/Admin/Dashboard/Dashboard';
-import ProductManagementHub from '../pages/Admin/ProductManagement/ProductManagementHub';
-import ProductList from '../pages/Admin/ProductManagement/ProductList';
-import ProductAdd from '../pages/Admin/ProductManagement/ProductAdd';
-import ProductDelete from '../pages/Admin/ProductManagement/ProductDelete';
-import ProductUpdate from '../pages/Admin/ProductManagement/ProductUpdate';
-import ProductImages from '../pages/Admin/ProductManagement/ProductImages';
-import ProductUpdateImages from '../pages/Admin/ProductManagement/ProductUpdateImages';
-import CustomersAlsoBought from '../pages/Admin/ProductManagement/CustomersAlsoBought';
-import CustomersAlsoBoughtEdit from '../pages/Admin/ProductManagement/CustomersAlsoBoughtEdit';
-import StudentApprovalList from '../pages/Admin/StudentApproval/StudentApprovalList';
-import StudentApprovalDetail from '../pages/Admin/StudentApproval/StudentApprovalDetail';
-import OrdersList from '../pages/Admin/Orders/OrdersList';
-import OrderUpdateStatus from '../pages/Admin/Orders/OrderUpdateStatus';
-import HeroImages from '../pages/Admin/HeroImages/HeroImages';
-import ColorTiles from '../pages/Admin/ColorTiles/ColorTiles';
-import Newsletter from '../pages/Admin/Newsletter/Newsletter';
-import Settings from '../pages/Admin/Settings/Settings';
-import FabricPage from '../pages/Admin/Fabric/Fabric';
-import CategoryPage from '../pages/Admin/Category/Category';
-import ColorsPage from '../pages/Admin/Colors/Colors';
-import VendorPage from '../pages/Admin/Vendor/Vendor';
-import InventoryPage from '../pages/Admin/Inventory/Inventory';
 import Rewards from '../pages/Rewards/Rewards';
 import GiftCards from '../pages/GiftCards/GiftCards';
 import BlogList from '../pages/Blog/BlogList';
@@ -51,9 +27,49 @@ import BlogDetail from '../pages/Blog/BlogDetail';
 import PrivacyPolicy from '../pages/PrivacyPolicy/PrivacyPolicy';
 import FAQs from '../pages/FAQs/FAQs';
 import Affiliate from '../pages/Affiliate/Affiliate';
-import MarketingDashboard from '../pages/Admin/Marketing/MarketingDashboard';
-import DiscountCodes from '../pages/Admin/DiscountCodes/DiscountCodes';
-import Affiliates from '../pages/Admin/Affiliates/Affiliates';
+
+// Part B.5 - every Admin/* page (plus the AdminLayout shell) is lazy-loaded
+// so storefront customers never download any of it - previously these were
+// all static imports shipped in the single main bundle regardless of
+// whether a visitor ever hits /admin/*. This is also what makes the
+// existing "not part of the customer-facing bundle" comments on
+// MarketingDashboard.jsx's rrweb-player import and vite.config.js's
+// optimizeDeps note actually true, rather than aspirational.
+const AdminLayout = lazy(() => import('../pages/Admin/AdminLayout'));
+const Dashboard = lazy(() => import('../pages/Admin/Dashboard/Dashboard'));
+const ProductManagementHub = lazy(() => import('../pages/Admin/ProductManagement/ProductManagementHub'));
+const ProductList = lazy(() => import('../pages/Admin/ProductManagement/ProductList'));
+const ProductAdd = lazy(() => import('../pages/Admin/ProductManagement/ProductAdd'));
+const ProductDelete = lazy(() => import('../pages/Admin/ProductManagement/ProductDelete'));
+const ProductUpdate = lazy(() => import('../pages/Admin/ProductManagement/ProductUpdate'));
+const ProductImages = lazy(() => import('../pages/Admin/ProductManagement/ProductImages'));
+const ProductUpdateImages = lazy(() => import('../pages/Admin/ProductManagement/ProductUpdateImages'));
+const CustomersAlsoBought = lazy(() => import('../pages/Admin/ProductManagement/CustomersAlsoBought'));
+const CustomersAlsoBoughtEdit = lazy(() => import('../pages/Admin/ProductManagement/CustomersAlsoBoughtEdit'));
+const StudentApprovalList = lazy(() => import('../pages/Admin/StudentApproval/StudentApprovalList'));
+const StudentApprovalDetail = lazy(() => import('../pages/Admin/StudentApproval/StudentApprovalDetail'));
+const OrdersList = lazy(() => import('../pages/Admin/Orders/OrdersList'));
+const OrderUpdateStatus = lazy(() => import('../pages/Admin/Orders/OrderUpdateStatus'));
+const HeroImages = lazy(() => import('../pages/Admin/HeroImages/HeroImages'));
+const ColorTiles = lazy(() => import('../pages/Admin/ColorTiles/ColorTiles'));
+const Newsletter = lazy(() => import('../pages/Admin/Newsletter/Newsletter'));
+const Settings = lazy(() => import('../pages/Admin/Settings/Settings'));
+const FabricPage = lazy(() => import('../pages/Admin/Fabric/Fabric'));
+const CategoryPage = lazy(() => import('../pages/Admin/Category/Category'));
+const ColorsPage = lazy(() => import('../pages/Admin/Colors/Colors'));
+const VendorPage = lazy(() => import('../pages/Admin/Vendor/Vendor'));
+const InventoryPage = lazy(() => import('../pages/Admin/Inventory/Inventory'));
+const MarketingDashboard = lazy(() => import('../pages/Admin/Marketing/MarketingDashboard'));
+const DiscountCodes = lazy(() => import('../pages/Admin/DiscountCodes/DiscountCodes'));
+const Affiliates = lazy(() => import('../pages/Admin/Affiliates/Affiliates'));
+
+// Minimal fallback - admin is an internal tool, not a storefront-facing
+// screen, so a plain loading state (not a branded skeleton) is enough.
+const AdminLoading = () => (
+  <div className="min-h-screen flex items-center justify-center bg-black text-white">
+    Loading...
+  </div>
+);
 
 const AppRouter = () => {
   const location = useLocation();
@@ -80,15 +96,15 @@ const AppRouter = () => {
 
       {/* Women's page route */}
       <Route path="/women" element={<WomenPage />} />
-      
+
       {/* Checkout page route */}
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/color-products/:colorName" element={<ColorProductsPage />} />
-      
+
       {/* Product detail routes */}
       <Route path="/product/:productId" element={<ProductDetail/>} />
       <Route path="/profile"  element={<AccountRedirect tab="profile"/>} />
-      
+
       {/* Auth routes */}
       <Route path="/login"  element={<AuthRedirect mode="login" />} />
       <Route path="/signup"  element={<AuthRedirect mode="signup" />} />
@@ -114,9 +130,15 @@ const AppRouter = () => {
       <Route path="/faqs" element={<FAQs />} />
       <Route path="/affiliate" element={<Affiliate />} />
 
-      {/* Admin section - guarded by role. Ported from Steth_admin_Panel. */}
+      {/* Admin section - guarded by role. Ported from Steth_admin_Panel.
+          Part B.5 - Suspense-wrapped since every element above is now
+          React.lazy(); the fallback only ever shows for admin visitors. */}
       <Route element={<AdminRoute />}>
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route path="/admin" element={
+          <Suspense fallback={<AdminLoading />}>
+            <AdminLayout />
+          </Suspense>
+        }>
           <Route index element={<Dashboard />} />
           <Route path="product-management" element={<ProductManagementHub />} />
           <Route path="product-management/list" element={<ProductList />} />
@@ -148,7 +170,11 @@ const AppRouter = () => {
       {/* Marketing dashboard (B.3) - Admin + Marketer, separate guard from
           the admin-only block above since it's a wider role set. */}
       <Route element={<AdminRoute allowedRoles={['admin', 'marketer']} />}>
-        <Route path="/admin/marketing" element={<AdminLayout />}>
+        <Route path="/admin/marketing" element={
+          <Suspense fallback={<AdminLoading />}>
+            <AdminLayout />
+          </Suspense>
+        }>
           <Route index element={<MarketingDashboard />} />
         </Route>
       </Route>

@@ -5,6 +5,7 @@ import { gsap } from "gsap"
 import { X, ChevronLeft, ChevronRight, Check, Plus, Minus, Maximize2, Minimize2 } from "lucide-react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { useCartDrawer } from "../../../context/CartDrawerContext"
+import { getImageUrl } from "../../../utils/imageUrl"
 import sizeChartImage0 from "/src/assets/sizes/Size chart -images-0.jpg";
 import sizeChartImage1 from "/src/assets/sizes/Size chart -images-1.jpg";
 import careInstructionsImage from "/src/assets/sizes/Care Instructions.jpg";
@@ -726,7 +727,7 @@ const onTouchEnd = () => {
                   {preloadedImages.has(displayImages[currentImageIndex]?.url) ? (
                     <img
                       ref={mainImageRef}
-                      src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
+                      src={getImageUrl(displayImages[currentImageIndex]?.url, { width: 800 }) || "/placeholder.svg"}
                       alt={displayImages[currentImageIndex]?.alt || product.name}
                       className="w-full h-full object-contain absolute top-0 left-0 cursor-pointer"
                       onClick={() => openLightbox(currentImageIndex)}
@@ -987,7 +988,7 @@ const onTouchEnd = () => {
                 {preloadedImages.has(displayImages[currentImageIndex]?.url) ? (
                   <img
                     ref={mainImageRef}
-                    src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
+                    src={getImageUrl(displayImages[currentImageIndex]?.url, { width: 800 }) || "/placeholder.svg"}
                     alt={displayImages[currentImageIndex]?.alt || product.name}
                     className="w-full h-full object-cover select-none pointer-events-none"
                     draggable={false}
@@ -1163,7 +1164,7 @@ const onTouchEnd = () => {
   
           {displayImages.length > 0 && (
             <img
-              src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
+              src={getImageUrl(displayImages[currentImageIndex]?.url, { width: 1200 }) || "/placeholder.svg"}
               alt={displayImages[currentImageIndex]?.alt || product.name}
               className="lightbox-image max-h-[80vh] max-w-[80vw]"
               loading="lazy"

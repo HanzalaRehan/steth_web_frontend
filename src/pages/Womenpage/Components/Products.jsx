@@ -5,6 +5,7 @@ import { ChevronDown } from "lucide-react"
 import gsap from "gsap"
 import { Link, useSearchParams } from "react-router-dom"
 import { API_BASE_URL } from "../../../config/api"
+import { getImageUrl } from "../../../utils/imageUrl"
 
 export default function ProductPage() {
   // State for products
@@ -424,7 +425,7 @@ export default function ProductPage() {
   {/* Product image */}
   <div className="bg-gray-100 overflow-hidden mb-3 aspect-[3/4]">
     <img
-      src={product.primaryImage || "/placeholder.svg"}
+      src={getImageUrl(product.primaryImage, { width: 500 }) || "/placeholder.svg"}
       alt={`${product.name} - ${product.color}`}
       className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
       loading="lazy"

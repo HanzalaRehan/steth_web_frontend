@@ -23,8 +23,12 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    // rrweb-player's dynamic import (Marketing dashboard's session-replay
-    // viewer) otherwise fails Rollup resolution in production builds.
+    // Pre-bundles rrweb-player (MarketingDashboard.jsx's session-replay
+    // viewer) - originally added because Rollup failed to resolve it when
+    // it was a dynamic import; it's a static import today (imported inside
+    // MarketingDashboard.jsx, which Router.jsx now lazy-loads as a whole -
+    // Part B.5), but this entry is left in place defensively since it's
+    // harmless and previously fixed a real production-build failure.
     include: ['rrweb-player'],
   },
   server: {

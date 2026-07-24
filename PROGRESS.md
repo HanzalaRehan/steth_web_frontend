@@ -433,3 +433,43 @@ Navbar (`Header.jsx`, issue #23) and footer (`Footer.jsx`, issue #24) already li
 
 ### What's next
 Once you provide the actual program rules: fill in the real "How It Works" copy (replacing the generic placeholder), and build the redemption endpoint + UI at the two extension points already left in place (`user.routes.js` backend, `Rewards.jsx` frontend) rather than starting from scratch. Live-verify the logged-in/logged-out rendering and the login-prompt button actually opening the auth panel once the Browser pane is reachable again.
+
+---
+
+## Session: Part B.5 — Performance optimization pass (2026-07-25)
+
+Dedicated audit pass, measurement-driven per your instruction: before-build first, then changes, then after-build, numbers below. Checked earlier sessions' `PROGRESS.md` first for perf work already done so this session doesn't redo it - rrweb's storefront lazy-load (analytics session) and the #2 ScrollTrigger/scroll-lag audit (polish-cluster session) were both already handled; not touched again here. Backend caching/indexes/pagination/compression are documented in the backend's own `PROGRESS.md`.
+
+### Admin bundle code-splitting (`src/router/Router.jsx`, `src/pages/Admin/AdminLayout.jsx`)
+All 27 `pages/Admin/*` imports (26 pages + the `AdminLayout` shell) were static top-level imports - meaning every storefront customer downloaded the entire admin panel, including `recharts` and `rrweb-player` (both admin-only libraries), regardless of whether they ever visited `/admin/*`. Converted every one to `React.lazy(() => import(...))`, with a two-tier `<Suspense>` setup: an outer boundary around `<AdminLayout>` itself (catches the shell's own lazy load) and an inner one inside `AdminLayout.jsx` wrapping just its `<Outlet/>` (catches each child admin page's lazy load without re-suspending the whole sidebar/header on every admin-to-admin navigation - a small extra polish pass since this affects the actual admin users' day-to-day UX, not just bundle size). Also fixed two now-stale comments this made accurate: `MarketingDashboard.jsx`'s claim that it "isn't part of the customer-facing bundle" (previously false - now true, since the component itself is the thing being lazy-loaded) and `vite.config.js`'s `optimizeDeps.include: ['rrweb-player']` comment (referenced a dynamic-import resolution issue that no longer applies since that import is static - left the config entry in place defensively since it's harmless and previously fixed a real build failure, just corrected the prose).
+
+### ImageKit transformation params (`src/utils/imageUrl.js`, new)
+Confirmed via research: zero ImageKit transform usage anywhere in this frontend before this session - every `<img>` used the raw, full-size stored URL. Built `getImageUrl(url, {width, quality})`, which appends ImageKit's `?tr=w-<width>,q-<quality>,f-auto` to any URL hosted on `ik.imagekit.io` (confirmed that's the actual domain via `server.js`'s own CSP `img-src` directive) and returns anything else (local assets, `/placeholder.svg`, blob preview URLs) unchanged - safe to apply broadly without special-casing every non-ImageKit call site individually. Applied to the highest-traffic image call sites: all three `Hero.jsx` files (mobile/desktop hero images), the four live best-seller card components (`Homepage`/`Womenpage`'s `WomenBestSellers.jsx`, `Homepage`/`Menspage`'s `MensBestSeller.jsx` - confirmed which of the several near-identical copies across Home/Women/Men are actually imported vs. dead before touching any of them), the Women's/Men's catalog grid (`Products.jsx` x2), the product detail gallery and lightbox (`DetailSection.jsx`, three `<img>` call sites - gallery images capped tighter than the lightbox's zoomed view, which gets a larger width for zoom quality), and the homepage color-tile carousel background images.
+
+**Confirmed dead, not touched** (matches this session's "don't fix unused code" convention from earlier sessions): `Homepage/Components/BestSellers.jsx` and all three `SellersDesign2.jsx` copies (Home/Women/Men) are imported nowhere - verified via grep before assuming they needed the same fix.
+
+### Minification (confirmed, not assumed)
+`vite.config.js`'s `build` block never sets `minify` explicitly - Vite defaults to `esbuild` minification in production builds regardless, confirmed by reading the config rather than assuming. No change needed; this was already active.
+
+### Compression / gzip-brotli
+Backend-side (gzip via the `compression` package) is documented in the backend's own `PROGRESS.md`. This repo's own static assets are served via Vercel, which applies brotli automatically at the hosting/CDN layer - platform-level, nothing to configure in this codebase.
+
+### Before/after bundle size (production build, `npm run build`)
+| | Before | After | Change |
+|---|---|---|---|
+| Main storefront JS bundle | 1,833.97 kB / 537.15 kB gzip | 885.76 kB / 264.79 kB gzip | **-51.7% raw / -50.7% gzip** |
+| Admin (`MarketingDashboard` chunk: recharts + rrweb-player) | *(included in main bundle above)* | 613.48 kB / 185.01 kB gzip, own chunk | now admin/marketer-only weight |
+| Every other admin page | *(included in main bundle above)* | own small chunk, 2-15 kB each | now admin-only weight |
+| rrweb (storefront recorder, already split in an earlier session) | 181.60 kB / 57.59 kB gzip | 181.60 kB / 57.59 kB gzip | unchanged |
+
+Storefront customers now download roughly **half** the JS they did before this session - the entire admin panel (every page, plus its two heaviest dependencies) no longer ships to anyone who isn't actually an admin/marketer visiting `/admin/*`.
+
+### Verification
+Scoped `npm run lint` across every file touched this session: clean on every actual change made; remaining output is 100% pre-existing, already-documented-elsewhere issues in files touched only incidentally (`ColorTileCarousal.jsx`, `MensBestSeller.jsx`/`WomenBestSellers.jsx`'s unused Swiper callback params, `Menspage/Components/Products.jsx`'s unused image imports, `DetailSection.jsx`'s unused state setters) - not fixed, per this project's standing practice.
+
+Ran two full production builds (before and after) to get the bundle-size comparison above, both succeeded clean.
+
+**Lighthouse/WebPageTest was not achievable this session, disclosed honestly rather than skipped silently.** Two independent attempts: the Browser pane's `navigate` call returned "navigation denied" against a local dev server (same failure mode as the immediately preceding session); a separate attempt running `vite preview` directly via the CLI and hitting it with `curl` also failed to connect even though Vite reported the port as already bound. Both point to a sandbox-level networking restriction on this session, on top of the already-established limitation that this sandbox can't reach the live MongoDB Atlas cluster (meaning even a reachable local server would show empty/loading states for every catalog/product-detail/checkout page anyway - a Lighthouse "Performance" score under those conditions wouldn't measure real content-paint behavior in any case). The bundle-size before/after above is the concrete, honest substitute for the "show me both sets of numbers" ask - it directly quantifies this session's single highest-leverage change (admin code-splitting) without depending on infrastructure this sandbox can't reach.
+
+### What's next
+Once a reachable environment exists: run the actual Lighthouse/WebPageTest pass this session couldn't (home, catalog, product detail, checkout - matching your original ask exactly), confirm the two-tier Suspense loading states look right in a real browser (not just traced from code), confirm the ImageKit `?tr=` params actually produce smaller/faster-loading images in the Network tab (not just that the URL is correctly formed), and confirm code-splitting didn't introduce any admin-navigation regression (e.g. a lazy chunk failing to load on a flaky connection - React.lazy's default behavior on a failed dynamic import throws, uncaught, which would show a blank page; consider an error boundary around the Suspense trees if that becomes a real issue in practice, not built speculatively here since it wasn't asked for).

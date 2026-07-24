@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import axios from "axios";
+import { getImageUrl } from "../../../utils/imageUrl";
 
 // Register ScrollTrigger with GSAP
 gsap.registerPlugin(ScrollTrigger);
@@ -128,13 +129,13 @@ const Hero = () => {
         <div ref={imageRef} className="relative w-full h-full">
           {/* Mobile Image */}
           <img
-            src={images.mobile}
+            src={getImageUrl(images.mobile, { width: 800 })}
             alt="Medical professionals in scrubs"
             className="md:hidden w-full h-full object-cover object-center"
           />
           {/* Desktop Image */}
           <img
-            src={images.web}
+            src={getImageUrl(images.web, { width: 1600 })}
             alt="Medical professionals in scrubs"
             className="hidden md:block w-full h-full object-cover object-center"
           />

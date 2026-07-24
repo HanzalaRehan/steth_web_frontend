@@ -4,6 +4,7 @@ import { FreeMode, Mousewheel } from 'swiper/modules';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
+import { getImageUrl } from '../../../utils/imageUrl';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -21,8 +22,10 @@ const ProductCard = ({ product }) => {
 
   // Add fallback image URL
   const defaultImageUrl = "/placeholder.svg";
-  const primaryImage = product.defaultImages?.[0]?.url || defaultImageUrl;
-  const secondaryImage = product.defaultImages?.[1]?.url || primaryImage;
+  const primaryImage = getImageUrl(product.defaultImages?.[0]?.url || defaultImageUrl, { width: 500 });
+  const secondaryImage = product.defaultImages?.[1]?.url
+    ? getImageUrl(product.defaultImages[1].url, { width: 500 })
+    : primaryImage;
 
   useEffect(() => {
     const card = cardRef.current;

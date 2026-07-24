@@ -53,9 +53,10 @@ const MarketingDashboard = () => {
 
   // Loads and renders a session's rrweb events via rrweb-player. Statically
   // imported (unlike the storefront's own `rrweb` recorder, which is
-  // dynamically imported per B.5's lazy-load note) - this admin screen
-  // isn't part of the customer-facing bundle at all, so there's no
-  // storefront cost either way.
+  // dynamically imported per B.5's lazy-load note) - this component itself
+  // is now React.lazy()-loaded from Router.jsx (Part B.5's admin
+  // code-splitting), so rrweb-player only ever downloads as part of that
+  // same lazy chunk, never in the storefront's main bundle.
   useEffect(() => {
     if (!selectedSessionId || !playerContainerRef.current) return
 

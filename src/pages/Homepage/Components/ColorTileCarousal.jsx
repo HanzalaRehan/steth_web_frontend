@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useNavigate } from "react-router-dom"
+import { getImageUrl } from "../../../utils/imageUrl"
 
 // Register GSAP plugins
 if (typeof window !== "undefined") {
@@ -271,7 +272,7 @@ const ColorTileCarousel = () => {
                   <div
                     className="absolute inset-0 w-full h-full transition-transform duration-300 ease-out group-hover:scale-[1.03]"
                     style={{
-                      backgroundImage: `url(${tile.imageUrl})`,
+                      backgroundImage: `url(${getImageUrl(tile.imageUrl, { width: 1200 })})`,
                       backgroundSize: 'contain',
                       backgroundPosition: 'center',
                       backgroundRepeat: 'no-repeat',

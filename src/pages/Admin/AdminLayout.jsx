@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext, Suspense } from "react"
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import {
@@ -243,7 +243,15 @@ const AdminLayout = () => {
               )}
             </div>
           </div>
-          <Outlet />
+          {/* Part B.5 - each admin page below is React.lazy() (see
+              Router.jsx); this inner Suspense keeps the sidebar/header
+              stable and only shows a loading state in the content area
+              while navigating between admin pages, rather than the outer
+              Suspense (which only needs to catch AdminLayout's own load)
+              blanking the whole shell on every page change. */}
+          <Suspense fallback={<div className="animate-pulse text-gray-500">Loading...</div>}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

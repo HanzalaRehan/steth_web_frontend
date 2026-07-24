@@ -4,6 +4,7 @@ import { FreeMode, Mousewheel } from 'swiper/modules';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useNavigate } from 'react-router-dom';
+import { getImageUrl } from '../../../utils/imageUrl';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -145,7 +146,7 @@ const ProductCard = ({ product }) => {
         {/* Base Image */}
         {product.defaultImages && product.defaultImages[0] && (
           <img
-            src={product.defaultImages[0].url}
+            src={getImageUrl(product.defaultImages[0].url, { width: 500 })}
             alt={product.defaultImages[0].alt}
             className="absolute inset-0 w-full h-full object-cover object-center z-10"
             style={{
@@ -159,7 +160,7 @@ const ProductCard = ({ product }) => {
         {/* Hover Image */}
         {product.defaultImages && product.defaultImages[1] && (
           <img
-            src={product.defaultImages[1].url}
+            src={getImageUrl(product.defaultImages[1].url, { width: 500 })}
             alt={product.defaultImages[1].alt}
             className="absolute inset-0 w-full h-full object-cover object-center z-9"
             style={{
