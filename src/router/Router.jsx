@@ -12,7 +12,7 @@ import AuthRedirect from '../pages/Login&Signup/AuthRedirect';
 import OTP from '../pages/Login&Signup/OTP';
 import PasswordRecovery from '../pages/Login&Signup/Password-Recovery'
 import AboutUs from '../pages/AboutUs/AboutUs';
-import Profile from '../pages/Profile/Profile';
+import AccountRedirect from '../pages/Login&Signup/AccountRedirect';
 import StudentVerification from '../pages/Student/Student';
 import CartPage from '../pages/Cart/Cart';
 import ProductDetail from '../pages/ProductDetailPage/ProductDetail';
@@ -69,7 +69,7 @@ const AppRouter = () => {
       
       {/* Product detail routes */}
       <Route path="/product/:productId" element={<ProductDetail/>} />
-      <Route path="/profile"  element={<Profile/>} />
+      <Route path="/profile"  element={<AccountRedirect tab="profile"/>} />
       
       {/* Auth routes */}
       <Route path="/login"  element={<AuthRedirect mode="login" />} />

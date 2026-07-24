@@ -1,7 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../pages/Login&Signup/AuthContext';
+import { useAccountOverlay } from '../context/AccountContext';
 
 const AwesomeHumansFooter = () => {
+  const { isLoggedIn, openAuthPanel } = useContext(AuthContext);
+  const { openAccountOverlay } = useAccountOverlay();
+
+  const handleMyOrdersClick = (e) => {
+    e.preventDefault();
+    if (isLoggedIn) {
+      openAccountOverlay('orders');
+    } else {
+      openAuthPanel('login');
+    }
+  };
+
   return (
     <footer className="bg-black text-white">
       <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-20">
@@ -57,7 +71,7 @@ const AwesomeHumansFooter = () => {
               <h4 className="font-semibold mb-4">HELP</h4>
               <ul className="space-y-2">
                 <li><Link to="/faqs" className="text-gray-400 hover:text-white">FAQs</Link></li>
-                <li><Link to="/profile" className="text-gray-400 hover:text-white">My Orders</Link></li>
+                <li><a href="/profile" onClick={handleMyOrdersClick} className="text-gray-400 hover:text-white">My Orders</a></li>
                 <li><Link to="/students" className="text-gray-400 hover:text-white">Student Program</Link></li>
                 <li><Link to="/rewards" className="text-gray-400 hover:text-white">Loyalty Program</Link></li>
                 <li><Link to="/affiliate" className="text-gray-400 hover:text-white">Affiliate Program</Link></li>

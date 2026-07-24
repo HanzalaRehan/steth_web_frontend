@@ -7,12 +7,14 @@ import { AuthContext } from "../pages/Login&Signup/AuthContext"
 import { API_BASE_URL } from "../config/api"
 import { useCatalogTaxonomy } from "../hooks/useCatalogTaxonomy"
 import { useCartDrawer } from "../context/CartDrawerContext"
+import { useAccountOverlay } from "../context/AccountContext"
 import MegaMenu from "./Navbar/MegaMenu"
 import AboutDropdown from "./Navbar/AboutDropdown"
 
 const Header = ({ className = "" }) => {
   const { isLoggedIn, openAuthPanel } = useContext(AuthContext)
   const { openCartDrawer } = useCartDrawer()
+  const { openAccountOverlay } = useAccountOverlay()
   const { fabrics, categories, colors, loading: taxonomyLoading } = useCatalogTaxonomy()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState(null) // 'Women' | 'Men' | 'About' | null
@@ -514,7 +516,15 @@ const Header = ({ className = "" }) => {
 
             <div className="flex items-center space-x-2 lg:space-x-4" ref={iconsRef}>
               {isLoggedIn ? (
-                <a href="/profile" className="hover:text-gray-900 transition-colors" title="Profile">
+                <a
+                  href="/profile"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    openAccountOverlay("profile")
+                  }}
+                  className="hover:text-gray-900 transition-colors"
+                  title="Profile"
+                >
                   <svg className="h-5 lg:h-6 w-5 lg:w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
@@ -715,9 +725,13 @@ const Header = ({ className = "" }) => {
                       LOGIN
                     </button>
                   ) : (
-                    <a
-                      href="/profile"
-                      className="flex items-center text-base sm:text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false)
+                        openAccountOverlay("profile")
+                      }}
+                      className="w-full flex items-center text-base sm:text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2"
                     >
                       <svg className="h-5 w-5 sm:h-6 sm:w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
@@ -728,7 +742,7 @@ const Header = ({ className = "" }) => {
                         />
                       </svg>
                       PROFILE
-                    </a>
+                    </button>
                   )}
                   <a
                     href="/cart"

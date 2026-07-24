@@ -6,16 +6,21 @@ import { AuthProvider } from '../src/pages/Login&Signup/AuthContext';
 import AuthPanel from './components/AuthPanel/AuthPanel';
 import { CartDrawerProvider } from './context/CartDrawerContext';
 import CartDrawer from './components/CartDrawer/CartDrawer';
+import { AccountProvider } from './context/AccountContext';
+import AccountOverlay from './components/AccountOverlay/AccountOverlay';
 
 function App() {
   return (
     <AuthProvider>
       <CartDrawerProvider>
-        <BrowserRouter>
-          <AppRouter />
-          <AuthPanel />
-          <CartDrawer />
-        </BrowserRouter>
+        <AccountProvider>
+          <BrowserRouter>
+            <AppRouter />
+            <AuthPanel />
+            <CartDrawer />
+            <AccountOverlay />
+          </BrowserRouter>
+        </AccountProvider>
       </CartDrawerProvider>
     </AuthProvider>
   );
