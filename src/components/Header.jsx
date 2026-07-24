@@ -6,11 +6,13 @@ import logo from "../assets/logo.png"
 import { AuthContext } from "../pages/Login&Signup/AuthContext"
 import { API_BASE_URL } from "../config/api"
 import { useCatalogTaxonomy } from "../hooks/useCatalogTaxonomy"
+import { useCartDrawer } from "../context/CartDrawerContext"
 import MegaMenu from "./Navbar/MegaMenu"
 import AboutDropdown from "./Navbar/AboutDropdown"
 
 const Header = ({ className = "" }) => {
   const { isLoggedIn, openAuthPanel } = useContext(AuthContext)
+  const { openCartDrawer } = useCartDrawer()
   const { fabrics, categories, colors, loading: taxonomyLoading } = useCatalogTaxonomy()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState(null) // 'Women' | 'Men' | 'About' | null
@@ -532,7 +534,15 @@ const Header = ({ className = "" }) => {
                   Login
                 </button>
               )}
-              <a href="/cart" className="hover:text-gray-900 transition-colors relative" title="Cart">
+              <a
+                href="/cart"
+                onClick={(e) => {
+                  e.preventDefault()
+                  openCartDrawer()
+                }}
+                className="hover:text-gray-900 transition-colors relative"
+                title="Cart"
+              >
                 <svg className="h-5 lg:h-6 w-5 lg:w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -565,7 +575,14 @@ const Header = ({ className = "" }) => {
           </a>
 
           <div className="flex items-center px-3">
-            <a href="/cart" className="relative">
+            <a
+              href="/cart"
+              onClick={(e) => {
+                e.preventDefault()
+                openCartDrawer()
+              }}
+              className="relative"
+            >
               <svg className="h-6 w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
