@@ -250,3 +250,43 @@ What I did get a clean, stable render of before the instability set in: the desk
 
 ### What's next
 Retry the full interactive click-through (keyboard nav, add-to-cart → drawer, drawer quantity sync with `/cart`, Shop Now → checkout) once a stable dev-server session is available — this is a real, not-yet-closed verification gap, not a formality. Both viewports (375px mobile, desktop ≥1400px) still need checking; only desktop was reached before the instability. If the HMR-remount pattern recurs in a future session, it's worth checking whether it's this sandbox's WebSocket proxying specifically (the console error named that directly) rather than assuming it's the same root cause as the slow-I/O pattern from the prior session.
+
+---
+
+## Session: Checkout/account cluster — issues #17, #18, #20 (2026-07-24)
+
+Confirmed prerequisites A1/A4 were already done (per the backend's `PROGRESS.md`) before starting. Plan mode was used for the `statusHistory` schema handling and the account-overlay routing/layout restructure, per your instruction.
+
+**Correction to the master plan's own text, worth flagging**: issue #18 describes linking "For You" toward "the rewards page, which doesn't exist yet" — it does now (`/rewards`, a Coming Soon placeholder built in the navbar/footer session). Linked there instead of nowhere.
+
+**Contact-us decision (your call, per the brief)**: a `mailto:` link with the order ID in the subject, matching the exact pattern `Affiliate.jsx` already uses — not a new support-form endpoint.
+
+### #17
+One-line label change, `CheckoutPage.jsx`: "Pay now" → "Checkout".
+
+### #18 — account overlay
+Same architecture as the two existing slide-overs (`AuthPanel`/`AuthContext`, `CartDrawer`/`CartDrawerContext`) — a new `AccountContext.jsx` (`isOpen`/`activeTab`/`openAccountOverlay(tab)`) mounted at the `App.jsx` root alongside the other two, and `AccountOverlay.jsx` (right-side slide-over, same `AnimatePresence`+backdrop+Escape+scroll-lock shell as `CartDrawer.jsx`). Three tabs: **For You** (placeholder linking to `/rewards`), **Orders** (fetches `GET /api/orders/my-orders`, compact cards expanding to show the `statusHistory` timeline, a Cancel Order button rendered only when `orderStatus` is `Pending`/`Processing` — mirrors the backend's own eligibility check so the button is never shown in a state where clicking it would just 400 — and the `mailto:` contact link), **Profile** (same info the old `Profile.jsx` showed: avatar, username, email, reward points, logout — deliberately not adding a new username/password-edit form here, that wasn't asked for).
+
+Opening the overlay while logged out calls `openAuthPanel('login')` instead of showing an empty account view.
+
+**Routing**: `Profile.jsx` (the old full-page version) is deleted outright, the same way `Login.jsx`/`SignUp.jsx` were retired when `AuthPanel` replaced them. `/profile` stays registered purely for back-compat, now pointing at a new `AccountRedirect.jsx` (mirrors `AuthRedirect.jsx` exactly — opens the overlay, redirects to `/`). `Header.jsx`'s profile icon (desktop + mobile menu) and `Footer.jsx`'s "My Orders" link both convert from `<a href="/profile">` navigation to handlers calling `openAccountOverlay()` directly, guarding on `isLoggedIn` the same way the cart icon already does.
+
+### #20 — checkout prefill + save-address
+`ContactForm.jsx` was already fetching the user's profile on mount to prefill name/email (confirmed while researching this — the actual gap was narrower than the plan doc implied). `DeliveryForm.jsx` gets the same profile-fetch pattern added: finds `addresses.find(a => a.isDefault)`, falling back to the last array entry if none is flagged default, prefills `address`/`city`. No-op for guests (same `if (!token) return` guard `ContactForm` already uses) and for logged-in users with an empty `addresses` array (nothing found, form stays blank).
+
+**Bug caught and fixed during implementation, not shipped**: the prefill effect's `setFormData` call didn't originally notify the parent (`CheckoutPage`'s `checkoutDetails`) — meaning a user who submitted without touching the visibly-prefilled fields would have failed checkout validation against the parent's still-empty state, despite the form looking correctly filled in. Fixed by having the prefill effect call the same `notifyParent` the manual-edit path already uses.
+
+New "Save this address to my profile" checkbox in `DeliveryForm.jsx`, shown only when logged in, riding along in the existing `onDeliveryInfoChange` payload as `saveAddress`. `CheckoutPage.jsx`'s `handleSubmitOrder` fires a follow-up `PUT /api/users/update-account` after the order itself has already succeeded, wrapped in its own try/catch so a failure there never affects the (already-successful) order — this is a profile nicety, not part of the checkout transaction.
+
+### A near-miss worth recording
+Mid-session, a `git stash` issued as part of a lint-baseline comparison (matching a pattern used successfully in earlier sessions) hit this machine's own resource contention (several other apps running — VS Code, another AI coding tool, the Claude desktop app itself) and the whole command chain was killed by a timeout **before the matching `git stash pop` could run**, leaving this session's uncommitted work stashed. Caught immediately via `git status`/`git stash list`, confirmed the stash still existed un-dropped, and recovered cleanly (`git stash pop`, verified file-by-file against the stash diff before dropping it) — no work was actually lost, but it's worth noting `git stash` for lint-comparison purposes is riskier on a loaded machine than it looked in earlier sessions, and is avoided for the rest of this entry's verification below in favor of `git show HEAD:<path>` (read-only, no working-tree mutation).
+
+### Verification
+`npm run lint`: clean across every touched/new file. One real error caught and fixed during the session (not shipped): `AccountOverlay.jsx`'s tab-icon `.map()` used a renamed destructure (`icon: Icon`) that ESLint's `no-unused-vars` flagged despite the JSX clearly using it — restructured to a plain `const TabIcon = tab.icon` inside the callback body, which resolved it cleanly (likely a rule-detection quirk with that specific destructure-rename-in-JSX pattern, not a real dead-code issue). Remaining warnings/errors are all pre-existing and confirmed unrelated: `CheckoutPage.jsx`'s three unused-var errors (present in every lint sweep of this file across every session so far), `DeliveryForm.jsx`'s missing-dependency warning (the effect it flags was untouched — I only added a second, separate effect), and `AccountContext.jsx`'s fast-refresh warning (the same one already accepted on `AuthContext.jsx`/`CartDrawerContext.jsx` for the identical reason).
+
+`npm run build`: succeeded clean, only the pre-existing bundle-size warning.
+
+**Live browser click-through was not completed this session.** After the build finished, both the Browser-pane tooling and, separately, the dev server itself became unresponsive (a plain `curl` to `localhost:3000` timed out, and shortly after even a local `node --check`/`wc -l` on unrelated files timed out) — this traces to the machine being genuinely under load from several other concurrently-running applications, not a code issue. Static verification (clean lint, clean build, and a careful manual trace of `DeliveryForm.jsx`'s prefill/save-address flow and `AccountOverlay.jsx`'s tab/timeline/cancel-eligibility logic against the backend's actual response shapes) is what's actually been done here — disclosed plainly rather than claimed as a live pass that didn't happen.
+
+### What's next
+Live-verify once a stable session is available: checkout prefill for a real logged-in user with/without a saved address, and for a guest; the save-address checkbox round-tripping through to `GET /api/users/profile`; the account overlay opening from all three entry points (Header desktop icon, Header mobile menu, Footer "My Orders") at both viewports; the Orders tab against real order data with a real `statusHistory` (needs the backend's own live-DB gap closed first, per its `PROGRESS.md`); Cancel Order's eligibility gating against a real `Shipped`/`Delivered` order. `Profile.jsx`'s removal means `/profile` no longer renders a page directly — confirm no other code still imports it directly (checked via grep at deletion time, found none, but worth a final look once the dev server is reachable again).
