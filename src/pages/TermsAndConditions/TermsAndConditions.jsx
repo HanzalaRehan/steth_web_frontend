@@ -79,7 +79,7 @@ const TermsAndConditions = () => {
     if (!pageRef.current) return;
 
     // Create a context to prevent conflicts
-    gsap.context(() => {
+    const ctx = gsap.context(() => {
       // Initial animations
       const tl = gsap.timeline();
 
@@ -112,9 +112,7 @@ const TermsAndConditions = () => {
       );
     }, pageRef);
 
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
+    return () => ctx.revert();
   }, []);
 
   const addToRefs = (el) => {

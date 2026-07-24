@@ -30,11 +30,12 @@ const Hero = () => {
   useEffect(() => {
     if (!heroRef.current) return
     
-    // Clear any existing animations
-    gsap.context(() => {
+    // #2 - capture the context so cleanup can revert only this effect's
+    // own animations (ctx.revert()), not every ScrollTrigger on the page.
+    const ctx = gsap.context(() => {
       // Create a new timeline
       const tl = gsap.timeline()
-      
+
       // Set initial states
       gsap.set(heroRef.current.querySelector("h1"), { y: 50, opacity: 0 })
       gsap.set(heroRef.current.querySelector("p"), { y: 30, opacity: 0 })
@@ -57,10 +58,7 @@ const Hero = () => {
       )
     }, heroRef)
 
-    // Cleanup function
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
-    }
+    return () => ctx.revert()
   }, [])
 
   return (
@@ -87,7 +85,7 @@ const OurStory = () => {
     if (!storyRef.current) return
 
     // Create a context to prevent conflicts
-    gsap.context(() => {
+    const ctx = gsap.context(() => {
       // Set initial states
       gsap.set(storyRef.current.querySelector("h2"), { y: 50, opacity: 0 })
       gsap.set(storyRef.current.querySelectorAll("p"), { y: 30, opacity: 0 })
@@ -126,9 +124,7 @@ const OurStory = () => {
       })
     }, storyRef)
 
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
-    }
+    return () => ctx.revert()
   }, [])
 
   return (
@@ -174,7 +170,7 @@ const CoreValues = () => {
   useEffect(() => {
     if (!valuesRef.current) return
 
-    gsap.context(() => {
+    const ctx = gsap.context(() => {
       const elements = valuesRef.current.querySelectorAll(".value-item")
       
       // Set initial states
@@ -216,9 +212,7 @@ const CoreValues = () => {
       })
     }, valuesRef)
 
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
-    }
+    return () => ctx.revert()
   }, [])
 
   const values = [
@@ -414,7 +408,7 @@ const Contact = () => {
 
     if (!contactRef.current) return
 
-    gsap.context(() => {
+    const ctx = gsap.context(() => {
       // Set initial states
       gsap.set(contactRef.current.querySelector("h2"), { y: 50, opacity: 0 })
       gsap.set(contactRef.current.querySelectorAll(".contact-info"), { y: 30, opacity: 0 })
@@ -454,9 +448,7 @@ const Contact = () => {
       })
     }, contactRef)
 
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
-    }
+    return () => ctx.revert()
   }, [])
 
   // Handle input changes
@@ -609,7 +601,7 @@ const CTA = () => {
   useEffect(() => {
     if (!ctaRef.current) return
 
-    gsap.context(() => {
+    const ctx = gsap.context(() => {
       // Set initial states
       gsap.set(ctaRef.current.querySelector("h2"), { y: 30, opacity: 0 })
       gsap.set(ctaRef.current.querySelector("p"), { y: 20, opacity: 0 })
@@ -650,9 +642,7 @@ const CTA = () => {
       })
     }, ctaRef)
 
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
-    }
+    return () => ctx.revert()
   }, [])
 
   return (

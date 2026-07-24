@@ -211,6 +211,19 @@ const ColorTileCarousel = () => {
     }
   }, [isTouching, isAnimating])
 
+  // #2 - React attaches JSX onTouchMove as a non-passive listener (so it
+  // can support preventDefault), which forces the browser to wait on the
+  // handler before it can start scroll compositing. This handler never
+  // calls preventDefault, so it's attached manually here as passive:true
+  // instead - removed from the JSX below.
+  useEffect(() => {
+    const node = carouselRef.current
+    if (!node) return
+
+    node.addEventListener("touchmove", handleTouchMove, { passive: true })
+    return () => node.removeEventListener("touchmove", handleTouchMove)
+  }, [])
+
   if (isLoading) {
     return (
       <div className="relative w-full bg-white py-8 my-20">
@@ -237,22 +250,26 @@ const ColorTileCarousel = () => {
         ref={carouselRef}
         className="relative w-full flex flex-col items-center justify-center"
         onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
         <div className="relative w-full min-h-[300px] sm:min-h-[400px] md:min-h-[500px] overflow-hidden">
           {colorTiles.map((tile, index) => (
             <div
               key={tile._id}
-              className={`color-tile absolute inset-0 mx-4 sm:mx-8 md:mx-12 flex justify-center items-center
+              className={`color-tile absolute inset-0 mx-4 sm:mx-8 md:mx-12 flex justify-center items-center cursor-pointer group
                           ${index !== activeIndex && index !== prevIndex ? "opacity-0" : "opacity-100"}`}
               style={{ zIndex: index === activeIndex ? 5 : index === prevIndex ? 10 : 0 }}
               onClick={() => handleColorTileClick(tile.colorName)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") handleColorTileClick(tile.colorName)
+              }}
             >
               <div className="w-full h-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-5xl relative overflow-hidden">
                 <div className="w-full h-full flex items-center justify-center relative">
-                  <div 
-                    className="absolute inset-0 w-full h-full"
+                  <div
+                    className="absolute inset-0 w-full h-full transition-transform duration-300 ease-out group-hover:scale-[1.03]"
                     style={{
                       backgroundImage: `url(${tile.imageUrl})`,
                       backgroundSize: 'contain',

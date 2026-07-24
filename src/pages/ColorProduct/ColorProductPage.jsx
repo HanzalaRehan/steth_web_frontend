@@ -300,13 +300,16 @@ export default function ColorProductsPage() {
   // Cleanup function for page unmount
   useEffect(() => {
     return () => {
-      // Kill all GSAP animations and ScrollTriggers on unmount
+      // #2 - this component never creates a ScrollTrigger instance (no
+      // `scrollTrigger:` config anywhere in its animation timeline above),
+      // so ScrollTrigger.getAll().kill() here did nothing for this page's
+      // own animations - it only ever killed OTHER components' still-active
+      // ScrollTriggers the moment this page unmounted. Removed; the
+      // gsap.killTweensOf("*") guard below still cleans up this page's own
+      // in-flight tweens.
       try {
         if (typeof gsap !== 'undefined') {
           gsap.killTweensOf("*")
-          if (typeof ScrollTrigger !== 'undefined') {
-            ScrollTrigger.getAll().forEach(trigger => trigger.kill())
-          }
         }
       } catch (error) {
         console.warn('GSAP cleanup failed:', error)

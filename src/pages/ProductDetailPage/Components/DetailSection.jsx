@@ -49,6 +49,7 @@ export default function ProductDetail({ product }) {
   const [mouseStart, setMouseStart] = useState(null)
   const [mouseEnd, setMouseEnd] = useState(null)
   const mainImageRef = useRef(null)
+  const swipeContainerRef = useRef(null)
   const [preloadedImages, setPreloadedImages] = useState(new Set())
 
 // Add this function to preload images
@@ -265,6 +266,18 @@ const onTouchEnd = () => {
       handleSwipeEnd(touchEnd)
     }
   }
+
+  // #2 - onTouchMove never calls preventDefault, so it's attached here as
+  // a native passive:true listener instead of a JSX prop (React attaches
+  // JSX onTouchMove as non-passive by default). Re-attaches whenever the
+  // mobile/desktop gallery swaps which container is actually mounted.
+  useEffect(() => {
+    const node = swipeContainerRef.current
+    if (!node) return
+    const handleTouchMove = (e) => onTouchMove(e)
+    node.addEventListener('touchmove', handleTouchMove, { passive: true })
+    return () => node.removeEventListener('touchmove', handleTouchMove)
+  }, [isMobile])
 
 // REPLACE your existing onMouseDown
   const onMouseDown = (e) => {
@@ -700,10 +713,10 @@ const onTouchEnd = () => {
           <div className="mb-4 relative">
             {displayImages.length > 0 ? (
                 <>
-                  <div 
+                  <div
+                  ref={swipeContainerRef}
                   className="w-full max-w-md mx-auto aspect-[3/4] relative overflow-hidden"
                     onTouchStart={onTouchStart}
-                    onTouchMove={onTouchMove}
                     onTouchEnd={onTouchEnd}
                     onMouseDown={onMouseDown}
                   onMouseMove={onMouseMove}
@@ -960,14 +973,14 @@ const onTouchEnd = () => {
           {/* Main Image */}
           <div className="flex-1 relative mr-20 ml-10">
             {displayImages.length > 0 ? (
-                <div 
+                <div
+                  ref={swipeContainerRef}
                   className="relative w-[95%] h-[80%] cursor-grab active:cursor-grabbing select-none"
                 onMouseDown={onMouseDown}
                 onMouseMove={onMouseMove}
                 onMouseUp={onMouseUp}
                 onMouseLeave={onMouseLeave}
                   onTouchStart={onTouchStart}
-                  onTouchMove={onTouchMove}
                   onTouchEnd={onTouchEnd}
                 style={{ userSelect: 'none' }}
                 >

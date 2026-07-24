@@ -38,89 +38,104 @@ const Hero = () => {
   }, []);
 
   useEffect(() => {
-    // Initial animations
-    const tl = gsap.timeline();
+    // #2 - scoped to this component with gsap.context() instead of the
+    // previous `ScrollTrigger.getAll().forEach(kill)` cleanup, which
+    // killed every ScrollTrigger on the page (including ones owned by
+    // sibling homepage sections), not just this component's own.
+    const ctx = gsap.context(() => {
+      // Initial animations
+      const tl = gsap.timeline();
 
-    // Animate hero container
-    tl.fromTo(
-      heroRef.current,
-      { opacity: 0 },
-      { opacity: 1, duration: 0.8, ease: "power2.inOut" }
-    );
+      // Animate hero container
+      tl.fromTo(
+        heroRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.8, ease: "power2.inOut" }
+      );
 
-    // Animate background image
-    tl.fromTo(
-      imageRef.current,
-      { scale: 1.1, opacity: 0 },
-      { scale: 1, opacity: 1, duration: 1, ease: "power2.out" },
-      "-=0.4"
-    );
+      // Animate background image
+      tl.fromTo(
+        imageRef.current,
+        { scale: 1.1, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 1, ease: "power2.out" },
+        "-=0.4"
+      );
 
-    // Animate content
-    tl.fromTo(
-      contentRef.current,
-      { y: 50, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, ease: "back.out(1.7)" },
-      "-=0.6"
-    );
+      // Animate content
+      tl.fromTo(
+        contentRef.current,
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, ease: "back.out(1.7)" },
+        "-=0.6"
+      );
 
-    // Animate heading 
-    tl.fromTo(
-      headingRef.current,
-      { scale: 0.8, opacity: 0 },
-      { scale: 1, opacity: 1, duration: 0.6, ease: "back.out(1.7)" },
-      "-=0.5"
-    );
+      // Animate heading
+      tl.fromTo(
+        headingRef.current,
+        { scale: 0.8, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.6, ease: "back.out(1.7)" },
+        "-=0.5"
+      );
 
-    // Animate description
-    tl.fromTo(
-      descRef.current,
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
-      "-=0.4"
-    );
+      // Animate description
+      tl.fromTo(
+        descRef.current,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+        "-=0.4"
+      );
 
-    // Animate buttons
-    tl.fromTo(
-      buttonsRef.current,
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
-      "-=0.3"
-    );
+      // Animate buttons
+      tl.fromTo(
+        buttonsRef.current,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+        "-=0.3"
+      );
 
-    // ScrollTrigger for parallax effect
-    gsap.to(imageRef.current, {
-      y: 50,
-      scrollTrigger: {
-        trigger: heroRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: true
-      }
-    });
+      // ScrollTrigger for parallax effect - targets the shared image
+      // wrapper (imageRef, moved off the mobile-only <img>) so the effect
+      // is actually visible on desktop too, not just running invisibly
+      // against a display:none element. will-change is toggled on only
+      // while the trigger is actually active, not left on permanently.
+      gsap.to(imageRef.current, {
+        y: 50,
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+          onToggle: (self) => {
+            imageRef.current.style.willChange = self.isActive ? "transform" : "auto";
+          }
+        }
+      });
+    }, heroRef);
 
-    // Clean up ScrollTrigger on component unmount
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
+    return () => ctx.revert();
   }, []);
 
   return (
     <section ref={heroRef} className="relative w-full h-[90vh] md:h-auto md:aspect-[16/9] font-poppins overflow-hidden">
+      {/* #4 - loading skeleton while the API-fetched image URLs are still
+          empty, instead of an empty <img> with nothing visible. */}
+      {!images.web && !images.mobile && (
+        <div className="absolute inset-0 w-full h-full bg-gray-200 animate-pulse" />
+      )}
+
       {/* Hero Background with responsive images */}
       <div className="absolute inset-0 w-full h-full">
-        <div className="relative w-full h-full">
+        <div ref={imageRef} className="relative w-full h-full">
           {/* Mobile Image */}
-          <img 
-            ref={imageRef}
-            src={images.mobile} 
-            alt="Medical professionals in scrubs" 
+          <img
+            src={images.mobile}
+            alt="Medical professionals in scrubs"
             className="md:hidden w-full h-full object-cover object-center"
           />
           {/* Desktop Image */}
-          <img 
-            src={images.web} 
-            alt="Medical professionals in scrubs" 
+          <img
+            src={images.web}
+            alt="Medical professionals in scrubs"
             className="hidden md:block w-full h-full object-cover object-center"
           />
           {/* Enhanced gradient overlay for better text visibility */}

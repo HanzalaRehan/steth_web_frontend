@@ -1,6 +1,7 @@
 // src/routes/AppRouter.js
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion as Motion } from 'framer-motion';
 
 // Import your page components
 import Homepage from '../pages/Homepage/Homepage';
@@ -55,11 +56,25 @@ import DiscountCodes from '../pages/Admin/DiscountCodes/DiscountCodes';
 import Affiliates from '../pages/Admin/Affiliates/Affiliates';
 
 const AppRouter = () => {
+  const location = useLocation();
+
   return (
-    <Routes>
+    // #4 - route-transition wrapper. framer-motion was already a
+    // dependency but nothing used AnimatePresence anywhere; wrapping the
+    // whole route tree in one keyed motion.div (rather than editing every
+    // individual page component) fades between routes on navigation.
+    <AnimatePresence mode="wait">
+      <Motion.div
+        key={location.pathname}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25, ease: "easeInOut" }}
+      >
+        <Routes location={location}>
       {/* Homepage as root path */}
       <Route path="/" element={<Homepage />} />
-      
+
       {/* Men's page route */}
       <Route path="/men" element={<MensPage />} />
 
@@ -140,7 +155,9 @@ const AppRouter = () => {
 
       {/* 404 route - must be last */}
       <Route path="*" element={<div>Page not found</div>} />
-    </Routes>
+        </Routes>
+      </Motion.div>
+    </AnimatePresence>
   );
 };
 
