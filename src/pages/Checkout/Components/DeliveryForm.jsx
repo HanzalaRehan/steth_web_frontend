@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { API_BASE_URL } from "../../../config/api"
 
 const DeliveryForm = ({ data = {}, onDeliveryInfoChange = () => {} }) => {
   const extractDeliveryInfo = () => {
@@ -21,12 +22,59 @@ const DeliveryForm = ({ data = {}, onDeliveryInfoChange = () => {} }) => {
     city: "",
   })
 
+  // #20 - "is there a token" here means "is anyone logged in", so this is a
+  // no-op for guests. Only shown/used when true.
+  const [hasAccount, setHasAccount] = useState(false)
+  const [saveAddress, setSaveAddress] = useState(false)
+
   useEffect(() => {
     const deliveryInfo = extractDeliveryInfo()
     if (Object.keys(deliveryInfo).length > 0) {
       setFormData(prev => ({ ...prev, ...deliveryInfo }))
     }
   }, [data])
+
+  // #20 - prefill from the user's saved default (or most recent) address.
+  // Mirrors ContactForm.jsx's existing profile-fetch pattern exactly.
+  useEffect(() => {
+    const fetchSavedAddress = async () => {
+      const token = localStorage.getItem('accessToken')
+      if (!token) return
+      setHasAccount(true)
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (!response.ok) return
+
+        const data = await response.json()
+        const addresses = data.user?.addresses || []
+        if (addresses.length === 0) return
+
+        const savedAddress = addresses.find(a => a.isDefault) || addresses[addresses.length - 1]
+        if (!savedAddress) return
+
+        setFormData(prev => {
+          const updated = {
+            ...prev,
+            address: prev.address || savedAddress.addressLine1 || "",
+            city: prev.city || savedAddress.city || ""
+          }
+          // Prefilling alone doesn't go through updateFormData, so the
+          // parent (CheckoutPage's checkoutDetails) needs its own nudge -
+          // otherwise a user who submits without touching the visibly
+          // prefilled fields would fail validation against empty state.
+          notifyParent(updated, saveAddress)
+          return updated
+        })
+      } catch (error) {
+        console.error("Error loading saved address:", error)
+      }
+    }
+
+    fetchSavedAddress()
+  }, [])
 
   const validateField = (field, value) => {
     let error = ""
@@ -48,15 +96,21 @@ const DeliveryForm = ({ data = {}, onDeliveryInfoChange = () => {} }) => {
     const updatedData = { ...formData, [field]: value }
     validateField(field, value)
     setFormData(updatedData)
-    notifyParent(updatedData)
+    notifyParent(updatedData, saveAddress)
   }
 
-  const notifyParent = (deliveryData) => {
+  const handleSaveAddressToggle = (checked) => {
+    setSaveAddress(checked)
+    notifyParent(formData, checked)
+  }
+
+  const notifyParent = (deliveryData, saveAddressValue) => {
     onDeliveryInfoChange({
       customerInfo: {
         deliveryInfo: {
           address: deliveryData.address,
           city: deliveryData.city,
+          saveAddress: saveAddressValue,
         }
       }
     })
@@ -91,6 +145,18 @@ const DeliveryForm = ({ data = {}, onDeliveryInfoChange = () => {} }) => {
         </div>
         {errors.city && <p className="text-xs text-red-500 mt-1">{errors.city}</p>}
       </div>
+
+      {hasAccount && (
+        <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={saveAddress}
+            onChange={(e) => handleSaveAddressToggle(e.target.checked)}
+            className="w-4 h-4"
+          />
+          Save this address to my profile
+        </label>
+      )}
     </div>
   )
 }

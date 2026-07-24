@@ -378,7 +378,34 @@ const CheckoutPage = () => {
         // Clear cart
         localStorage.removeItem('cartItems');
         window.dispatchEvent(new Event('cartUpdated'));
-        
+
+        // #20 - "save this address to my profile", fired only after the
+        // order itself has actually succeeded. Wrapped in its own try/catch
+        // so a failure here never affects the (already successful) order -
+        // this is a profile nicety, not part of the checkout transaction.
+        if (isLoggedIn && checkoutDetails.customerInfo.deliveryInfo.saveAddress) {
+          try {
+            const accessToken = localStorage.getItem('accessToken');
+            await fetch('https://steth-backend.onrender.com/api/users/update-account', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+              },
+              body: JSON.stringify({
+                address: {
+                  fullName: checkoutDetails.customerInfo.contactInfo.name,
+                  addressLine1: checkoutDetails.customerInfo.deliveryInfo.address,
+                  city: checkoutDetails.customerInfo.deliveryInfo.city,
+                  phoneNumber: checkoutDetails.customerInfo.contactInfo.phoneNumber,
+                }
+              })
+            });
+          } catch (saveAddressError) {
+            console.error("Error saving address to profile:", saveAddressError);
+          }
+        }
+
         // Show success message and set order ID
         setOrderSuccess(true);
         setOrderId(result.order.orderId);
@@ -519,7 +546,7 @@ const CheckoutPage = () => {
                   Processing...
                 </span>
               ) : (
-                "Pay now"
+                "Checkout"
               )}
             </button>
             <p className="text-xs md:text-sm text-gray-500 mt-4">
