@@ -19,6 +19,9 @@ import {
   Droplet,
   Truck,
   Warehouse,
+  LineChart,
+  Ticket,
+  Handshake,
 } from "lucide-react"
 import { API_BASE_URL } from "../../config/api"
 import { AuthContext } from "../Login&Signup/AuthContext"
@@ -37,7 +40,12 @@ const NAV_ITEMS = [
   { to: "/admin/vendors", label: "Vendor", icon: Truck },
   { to: "/admin/inventory", label: "Inventory", icon: Warehouse },
   { to: "/admin/newsletter", label: "Newsletter", icon: Mail },
+  { to: "/admin/discount-codes", label: "Discount Codes", icon: Ticket },
+  { to: "/admin/affiliates", label: "Affiliates", icon: Handshake },
   { to: "/admin/settings", label: "Settings", icon: Settings },
+  // Admin + Marketer (B.3) - the only item visible to a Marketer, whose
+  // role isn't allowed into any of the admin-only items above.
+  { to: "/admin/marketing", label: "Marketing", icon: LineChart, roles: ["admin", "marketer"] },
 ]
 
 const PAGE_TITLES = {
@@ -54,6 +62,9 @@ const PAGE_TITLES = {
   "/admin/inventory": "Inventory Management",
   "/admin/newsletter": "Newsletter Management",
   "/admin/settings": "Settings",
+  "/admin/discount-codes": "Discount Codes",
+  "/admin/affiliates": "Affiliate Marketing",
+  "/admin/marketing": "Marketing Dashboard",
 }
 
 const AdminLayout = () => {
@@ -113,6 +124,13 @@ const AdminLayout = () => {
     if (item.exact) return location.pathname === item.to
     return location.pathname.startsWith(item.to)
   }
+
+  // Items default to admin-only unless they declare roles explicitly (B.3 -
+  // the Marketing item allows marketer too). Shows everything while
+  // userData is still loading rather than flashing an empty sidebar.
+  const visibleNavItems = isLoading
+    ? NAV_ITEMS
+    : NAV_ITEMS.filter((item) => (item.roles || ["admin"]).includes(userData?.role))
 
   const handleLogout = () => {
     logout()
@@ -177,7 +195,7 @@ const AdminLayout = () => {
           </div>
 
           <nav className="space-y-2 px-2 flex-1 overflow-y-auto">
-            {NAV_ITEMS.map((item) => {
+            {visibleNavItems.map((item) => {
               const ItemIcon = item.icon
               return (
                 <Link key={item.to} to={item.to} onClick={closeSidebar}>

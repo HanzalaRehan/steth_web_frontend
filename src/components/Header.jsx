@@ -10,6 +10,7 @@ import { useCartDrawer } from "../context/CartDrawerContext"
 import { useAccountOverlay } from "../context/AccountContext"
 import MegaMenu from "./Navbar/MegaMenu"
 import AboutDropdown from "./Navbar/AboutDropdown"
+import { trackSearch } from "../lib/analytics"
 
 const Header = ({ className = "" }) => {
   const { isLoggedIn, openAuthPanel } = useContext(AuthContext)
@@ -226,6 +227,7 @@ const Header = ({ className = "" }) => {
     if (!query.trim()) return
 
     setIsSearching(true)
+    trackSearch(window.location.pathname, query.trim())
     try {
       const response = await fetch(`${API_BASE_URL}/api/products`)
       const data = await response.json()

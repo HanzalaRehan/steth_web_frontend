@@ -2,14 +2,15 @@ import { useContext, useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 
-const ALLOWED_ROLES = ['admin'];
+const DEFAULT_ALLOWED_ROLES = ['admin'];
 
 /**
  * Protected route component for the /admin/* section.
  * Redirects to login if not authenticated, or home if authenticated
- * but the logged-in user's role isn't allowed in.
+ * but the logged-in user's role isn't allowed in. Defaults to admin-only;
+ * pass allowedRoles to widen it (e.g. the Marketing dashboard, B.3).
  */
-const AdminRoute = () => {
+const AdminRoute = ({ allowedRoles = DEFAULT_ALLOWED_ROLES }) => {
   const { checkAuthenticated, loading, user } = useContext(AuthContext);
   const [isAuth, setIsAuth] = useState(null);
 
@@ -34,8 +35,8 @@ const AdminRoute = () => {
   }
 
   // Authenticated but wrong role - this is client-side hiding only, the
-  // real enforcement is server-side (auth+isAdmin on every admin route).
-  if (!user || !ALLOWED_ROLES.includes(user.role)) {
+  // real enforcement is server-side (auth+isAdmin/authorize on every route).
+  if (!user || !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
   }
 

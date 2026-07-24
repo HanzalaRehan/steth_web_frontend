@@ -3,7 +3,13 @@ import { X, Info } from "lucide-react"
 import { API_BASE_URL } from "../../../config/api"
 
 export default function OrderSummary({ onDiscountCodeChange, onRemoveProduct, onDiscountUpdate, deliveryInfo }) {
+  // "Applied" discount code (drives the calculate-discount call below) vs
+  // the raw text field draft - mirrors the gift card input/applied split
+  // in this same file.
   const [discountCode, setDiscountCode] = useState("")
+  const [discountCodeDraft, setDiscountCodeDraft] = useState("")
+  const [discountCodeError, setDiscountCodeError] = useState("")
+  const [discountSource, setDiscountSource] = useState("automatic")
   const [cartItems, setCartItems] = useState([])
   const [totalPrice, setTotalPrice] = useState(0)
   const [discounts, setDiscounts] = useState({ amount: 0, reasons: [] })
@@ -25,6 +31,7 @@ export default function OrderSummary({ onDiscountCodeChange, onRemoveProduct, on
   const prevDiscountsRef = useRef(null);
   const prevPointsToUseRef = useRef(pointsToUse);
   const prevTotalPriceRef = useRef(totalPrice);
+  const prevDiscountCodeRef = useRef(discountCode);
 
   const FLAT_SHIPPING_RATE = 200;
   const FREE_SHIPPING_THRESHOLD = 5000;
@@ -92,23 +99,24 @@ export default function OrderSummary({ onDiscountCodeChange, onRemoveProduct, on
       
       // Check if we need to recalculate by comparing with previous values
       if (
-        prevTotalPriceRef.current === totalPrice && 
+        prevTotalPriceRef.current === totalPrice &&
         prevPointsToUseRef.current === pointsToUse &&
+        prevDiscountCodeRef.current === discountCode &&
         prevDiscountsRef.current !== null
       ) {
         return; // Skip calculation if nothing has changed
       }
-      
+
       try {
         setIsLoading(true);
         const token = localStorage.getItem('accessToken');
-        
+
         if (!token) {
           setDiscounts({ amount: 0, reasons: [], pointsDiscount: 0 });
           setIsLoading(false);
           return;
         }
-        
+
         const response = await fetch('https://steth-backend.onrender.com/api/orders/calculate-discount', {
           method: 'POST',
           headers: {
@@ -117,26 +125,34 @@ export default function OrderSummary({ onDiscountCodeChange, onRemoveProduct, on
           },
           body: JSON.stringify({
             subtotal: totalPrice,
-            pointsToUse: pointsToUse
+            pointsToUse: pointsToUse,
+            discountCode: discountCode || undefined
           })
         });
-        
+
         const data = await response.json();
-        
+
         if (response.ok) {
           setDiscounts({
             amount: data.discountAmount || 0,
             reasons: data.discountReason ? data.discountReason.split(' + ') : [],
             pointsDiscount: data.pointsDiscount || 0
           });
+          setDiscountSource(data.discountSource || 'automatic');
+          setDiscountCodeError(
+            discountCode && data.discountSource === 'invalid_code'
+              ? 'Invalid, expired, or inactive code'
+              : ''
+          );
         } else {
           setDiscounts({ amount: 0, reasons: [], pointsDiscount: 0, error: data.message });
         }
-        
+
         // Update refs with current values
         prevTotalPriceRef.current = totalPrice;
         prevPointsToUseRef.current = pointsToUse;
-        
+        prevDiscountCodeRef.current = discountCode;
+
       } catch (error) {
         console.error("Error calculating discounts:", error);
         setDiscounts({ amount: 0, reasons: [], pointsDiscount: 0, error: error.message });
@@ -144,9 +160,9 @@ export default function OrderSummary({ onDiscountCodeChange, onRemoveProduct, on
         setIsLoading(false);
       }
     }
-    
+
     calculateDiscounts();
-  }, [cartItems.length, totalPrice, pointsToUse]);
+  }, [cartItems.length, totalPrice, pointsToUse, discountCode]);
 
   const calculateShipping = () => {
     if (totalPrice >= FREE_SHIPPING_THRESHOLD) {
@@ -236,11 +252,23 @@ export default function OrderSummary({ onDiscountCodeChange, onRemoveProduct, on
     }
   }, [discounts, pointsToUse, totalPrice, deliveryInfo, onDiscountUpdate, giftCardCode, giftCardAmount]);
 
-  const handleDiscountCodeSubmit = (e) => {
-    e.preventDefault()
-    if (onDiscountCodeChange) {
-      onDiscountCodeChange(discountCode)
+  const handleApplyDiscountCode = () => {
+    const code = discountCodeDraft.trim().toUpperCase()
+    if (!code) {
+      setDiscountCodeError("Enter a discount code")
+      return
     }
+    setDiscountCodeError("")
+    setDiscountCode(code)
+    if (onDiscountCodeChange) onDiscountCodeChange(code)
+  }
+
+  const handleRemoveDiscountCode = () => {
+    setDiscountCode("")
+    setDiscountCodeDraft("")
+    setDiscountCodeError("")
+    setDiscountSource("automatic")
+    if (onDiscountCodeChange) onDiscountCodeChange("")
   }
 
   const handleRemoveProduct = (id, colorName, size) => {
@@ -395,6 +423,48 @@ export default function OrderSummary({ onDiscountCodeChange, onRemoveProduct, on
             )}
           </div>
         )}
+
+        {/* Discount code section */}
+        <div className="mt-4 mb-2">
+          <span className="text-[#333333] font-medium">DISCOUNT CODE</span>
+          {discountCode ? (
+            <div className="flex justify-between items-center text-sm mt-2">
+              <span className="text-green-600">
+                Code ({discountCode}){discountSource === 'code' ? ' applied' : ' entered - your account discount is better'}
+              </span>
+              <button
+                type="button"
+                onClick={handleRemoveDiscountCode}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          ) : (
+            <div className="mt-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={discountCodeDraft}
+                  onChange={(e) => setDiscountCodeDraft(e.target.value)}
+                  placeholder="Enter code"
+                  className="flex-1 p-1 border border-gray-300 rounded text-sm bg-white text-black"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyDiscountCode}
+                  disabled={isLoading}
+                  className="px-3 py-1 bg-black text-white rounded text-sm disabled:opacity-50"
+                >
+                  Apply
+                </button>
+              </div>
+              {discountCodeError && (
+                <p className="text-red-600 text-xs mt-1">{discountCodeError}</p>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Gift card section */}
         <div className="mt-4 mb-2">

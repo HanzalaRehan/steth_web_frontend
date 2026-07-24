@@ -13,6 +13,7 @@ import MobileOrderSummary from "./Components/MobileOrderSummary.jsx"
 import Footer from "../../components/Footer"
 import { AuthContext } from '../Login&Signup/AuthContext';
 import { useIsMobile } from "./hooks/use-mobile"
+import { trackFormSubmit } from "../../lib/analytics"
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger)
@@ -299,7 +300,7 @@ const CheckoutPage = () => {
         shippingCharges: shippingAmount,
         total: finalTotal,
         discount: totalDiscountAmount,
-        discountCode: checkoutDetails.customerInfo.discountCode || '',
+        discountCodeInput: checkoutDetails.customerInfo.discountCode || '',
         discountInfo: {
           amount: discountAmount,
           reasons: discountInfo.discountReasons,
@@ -352,6 +353,7 @@ const CheckoutPage = () => {
       const result = await response.json();
   
       if (result.success) {
+        trackFormSubmit(window.location.pathname, 'checkout')
         // Add purchase event to Google Analytics
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({

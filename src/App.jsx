@@ -8,6 +8,7 @@ import { CartDrawerProvider } from './context/CartDrawerContext';
 import CartDrawer from './components/CartDrawer/CartDrawer';
 import { AccountProvider } from './context/AccountContext';
 import AccountOverlay from './components/AccountOverlay/AccountOverlay';
+import AnalyticsListener from './components/Analytics/AnalyticsListener';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <CartDrawerProvider>
         <AccountProvider>
           <BrowserRouter>
+            <AnalyticsListener />
             <AppRouter />
             <AuthPanel />
             <CartDrawer />

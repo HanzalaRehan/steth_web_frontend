@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { trackFormSubmit } from '../lib/analytics';
 
 export default function NewsletterSignup() {
   const [email, setEmail] = useState('');
@@ -39,6 +40,7 @@ export default function NewsletterSignup() {
         }
 
         setSubmitted(true);
+        trackFormSubmit(window.location.pathname, 'newsletter');
       } catch (error) {
         console.error('Error subscribing to newsletter:', error);
         setError(error.message || 'Failed to subscribe. Please try again.');

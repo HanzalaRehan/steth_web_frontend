@@ -50,6 +50,9 @@ import BlogDetail from '../pages/Blog/BlogDetail';
 import PrivacyPolicy from '../pages/PrivacyPolicy/PrivacyPolicy';
 import FAQs from '../pages/FAQs/FAQs';
 import Affiliate from '../pages/Affiliate/Affiliate';
+import MarketingDashboard from '../pages/Admin/Marketing/MarketingDashboard';
+import DiscountCodes from '../pages/Admin/DiscountCodes/DiscountCodes';
+import Affiliates from '../pages/Admin/Affiliates/Affiliates';
 
 const AppRouter = () => {
   return (
@@ -122,6 +125,16 @@ const AppRouter = () => {
           <Route path="inventory" element={<InventoryPage />} />
           <Route path="newsletter" element={<Newsletter />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="discount-codes" element={<DiscountCodes />} />
+          <Route path="affiliates" element={<Affiliates />} />
+        </Route>
+      </Route>
+
+      {/* Marketing dashboard (B.3) - Admin + Marketer, separate guard from
+          the admin-only block above since it's a wider role set. */}
+      <Route element={<AdminRoute allowedRoles={['admin', 'marketer']} />}>
+        <Route path="/admin/marketing" element={<AdminLayout />}>
+          <Route index element={<MarketingDashboard />} />
         </Route>
       </Route>
 

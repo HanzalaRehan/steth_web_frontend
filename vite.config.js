@@ -22,6 +22,11 @@ export default defineConfig({
       }
     }
   },
+  optimizeDeps: {
+    // rrweb-player's dynamic import (Marketing dashboard's session-replay
+    // viewer) otherwise fails Rollup resolution in production builds.
+    include: ['rrweb-player'],
+  },
   server: {
     port: 3000,
     strictPort: true,
