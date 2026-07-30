@@ -1,23 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Award, Gift, Percent, CreditCard, ShoppingBag, Star } from 'lucide-react';
+import { Award, Gift, Percent } from 'lucide-react';
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
 
 const RewardsCTA = () => {
   const cardRefs = useRef([]);
-  const buttonRefs = useRef([]);
-  const sliderRef = useRef(null);
 
   useEffect(() => {
     // Card animations
     cardRefs.current.forEach((card, index) => {
       gsap.fromTo(
-        card, 
-        { 
-          opacity: 0, 
+        card,
+        {
+          opacity: 0,
           y: 50,
           scale: 0.9
         },
@@ -31,65 +29,6 @@ const RewardsCTA = () => {
         }
       );
     });
-
-    // Button hover animations
-    buttonRefs.current.forEach((button) => {
-      const shine = button.querySelector('.button-shine');
-      
-      button.addEventListener('mouseenter', () => {
-        gsap.to(button, {
-          scale: 1.05,
-          duration: 0.3,
-          ease: "power2.out"
-        });
-        gsap.to(shine, {
-          x: '100%',
-          duration: 0.6,
-          ease: "power2.inOut"
-        });
-      });
-
-      button.addEventListener('mouseleave', () => {
-        gsap.to(button, {
-          scale: 1,
-          duration: 0.3,
-          ease: "power2.out"
-        });
-        gsap.to(shine, {
-          x: '-100%',
-          duration: 0.6,
-          ease: "power2.inOut"
-        });
-      });
-    });
-
-    // Text Slider Animation
-    const slider = sliderRef.current;
-    if (!slider) return;
-
-    const sliderContent = slider.querySelector('.slider-content');
-    if (!sliderContent) return;
-
-    // Clone the content for seamless loop
-    const originalContent = sliderContent.innerHTML;
-    sliderContent.innerHTML = originalContent + originalContent;
-
-    // Create the infinite scroll animation with increased speed
-    const tl = gsap.timeline({
-      repeat: -1,
-      defaults: { ease: "none" }
-    });
-
-    tl.to(sliderContent, {
-      x: "-50%",
-      duration: 8, // Reduced from 15 to 8 for faster animation
-      ease: "none"
-    });
-
-    // Cleanup
-    return () => {
-      tl.kill();
-    };
   }, []);
 
   const rewardTiers = [
@@ -125,24 +64,6 @@ const RewardsCTA = () => {
         "Accumulate across multiple orders"
       ],
       bgColor: "bg-[#3A506B]"
-    }
-  ];
-
-  const additionalBenefits = [
-    {
-      icon: <CreditCard className="w-8 h-8 text-indigo-600" />,
-      title: "Cashback Rewards",
-      description: "Up to 3% cashback on all purchases"
-    },
-    {
-      icon: <ShoppingBag className="w-8 h-8 text-pink-600" />,
-      title: "Free Shipping",
-      description: "Free shipping on orders over 2000 PKR"
-    },
-    {
-      icon: <Star className="w-8 h-8 text-yellow-600" />,
-      title: "Birthday Bonus",
-      description: "Special 15% discount during your birthday month"
     }
   ];
 
@@ -204,9 +125,6 @@ const RewardsCTA = () => {
           ))}
         </div>
       </div>
-
-      {/* Text Slider - Full width without any padding */}
-     
     </div>
   );
 };

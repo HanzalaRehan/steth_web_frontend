@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import axios from "axios";
 import { getImageUrl } from "../../../utils/imageUrl";
+import { API_BASE_URL } from "../../../config/api";
 
 // Register ScrollTrigger with GSAP
 gsap.registerPlugin(ScrollTrigger);
@@ -23,11 +24,11 @@ const Hero = () => {
     // Fetch hero images
     const fetchHeroImages = async () => {
       try {
-        const response = await axios.get('https://steth-backend.onrender.com/api/hero-images/home');
+        const response = await axios.get(`${API_BASE_URL}/api/hero-images/home`);
         if (response.data.success) {
           setImages({
-            web: response.data.data.web.imageUrl,
-            mobile: response.data.data.mobile.imageUrl
+            web: response.data.data.web?.imageUrl || "",
+            mobile: response.data.data.mobile?.imageUrl || ""
           });
         }
       } catch (error) {
@@ -117,7 +118,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section ref={heroRef} className="relative w-full h-[90vh] md:h-auto md:aspect-[16/9] font-poppins overflow-hidden">
+    <section ref={heroRef} className="relative w-full h-[100svh] md:h-[85vh] font-poppins overflow-hidden">
       {/* #4 - loading skeleton while the API-fetched image URLs are still
           empty, instead of an empty <img> with nothing visible. */}
       {!images.web && !images.mobile && (
@@ -139,32 +140,32 @@ const Hero = () => {
             alt="Medical professionals in scrubs"
             className="hidden md:block w-full h-full object-cover object-center"
           />
-          {/* Enhanced gradient overlay for better text visibility */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50"></div>
-          {/* Additional shadow overlay */}
-          <div className="absolute inset-0 shadow-inner-2xl bg-black/20"></div>
+          {/* Single, lighter bottom-anchored scrim - lets the photo read
+              clearly (the editorial-photography direction) while keeping
+              enough contrast under the copy block. */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
         </div>
       </div>
-      
+
       {/* Hero Content Overlay */}
-      <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
-        <div 
-          ref={contentRef} 
-          className=" py-6 sm:py-8 md:py-12 px-4 sm:px-6 md:px-8 rounded-2xl max-w-3xl mx-auto transform hover:scale-105 transition-transform duration-300"
+      <div className="relative h-full flex flex-col items-center justify-end text-center px-4 pb-16 sm:pb-20 md:pb-24">
+        <div
+          ref={contentRef}
+          className="max-w-3xl mx-auto"
         >
-          <h1 
-            ref={headingRef} 
-            className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 md:mb-8 text-white drop-shadow-lg"
+          <h1
+            ref={headingRef}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-white drop-shadow-lg text-balance"
           >
             THE STETH SET
           </h1>
-          <p 
-            ref={descRef} 
-            className="text-base sm:text-lg md:text-lg lg:text-xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-white leading-relaxed px-2 sm:px-4 drop-shadow-md"
+          <p
+            ref={descRef}
+            className="text-base sm:text-lg md:text-xl max-w-xl mx-auto mb-8 sm:mb-10 text-white leading-relaxed px-2 sm:px-4 drop-shadow-md"
           >
-            Conquer the day in our premium scrubs, crafted to be softer than your consultant's heart.
+            Premium scrubs, crafted to be softer than your consultant's heart.
           </p>
-          <div 
+          <div
             ref={buttonsRef} 
             className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center px-2 sm:px-4"
           >
@@ -231,12 +232,6 @@ const Hero = () => {
               <div className="button-shine absolute inset-0 bg-gradient-to-r from-transparent via-black/10 to-transparent -translate-x-full"></div>
             </a>
           </div>
-          <p 
-            ref={descRef} 
-            className="text-base sm:text-lg md:text-lg lg:text-xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-white leading-relaxed px-2 sm:px-4 drop-shadow-md mt-5"
-          >
-            For doctors, by doctors
-          </p>
         </div>
       </div>
     </section>

@@ -111,7 +111,7 @@ const Dashboard = () => {
             <ShoppingBag className="h-6 w-6 text-blue-600" />
           </div>
           <div>
-            <p className="text-sm text-gray-400">Total Orders</p>
+            <p className="text-sm text-gray-500">Total Orders</p>
             <h3 className="text-2xl font-bold">{dashboardData?.totalOrders || 0}</h3>
             <p className="text-xs text-green-500">All orders</p>
           </div>
@@ -121,7 +121,7 @@ const Dashboard = () => {
             <TrendingUp className="h-6 w-6 text-green-600" />
           </div>
           <div>
-            <p className="text-sm text-gray-400">Revenue</p>
+            <p className="text-sm text-gray-500">Revenue</p>
             <h3 className="text-2xl font-bold">{formatCurrency(dashboardData?.revenue?.totalRevenue || 0)}</h3>
             <p className="text-xs text-green-500">Avg. {formatCurrency(dashboardData?.revenue?.averageOrderValue || 0)}/order</p>
           </div>
@@ -131,7 +131,7 @@ const Dashboard = () => {
             <Users className="h-6 w-6 text-purple-600" />
           </div>
           <div>
-            <p className="text-sm text-gray-400">Student Users</p>
+            <p className="text-sm text-gray-500">Student Users</p>
             <h3 className="text-2xl font-bold">{dashboardData?.studentUserCount || 0}</h3>
             <p className="text-xs text-green-500">Verified students</p>
           </div>
@@ -141,9 +141,9 @@ const Dashboard = () => {
             <Award className="h-6 w-6 text-amber-600" />
           </div>
           <div>
-            <p className="text-sm text-gray-400">Reward Points</p>
+            <p className="text-sm text-gray-500">Reward Points</p>
             <h3 className="text-2xl font-bold">{dashboardData?.totalPointsEarned || 0}</h3>
-            <p className="text-xs text-gray-400">{dashboardData?.totalPointsUsed || 0} points used</p>
+            <p className="text-xs text-gray-500">{dashboardData?.totalPointsUsed || 0} points used</p>
           </div>
         </Card>
       </div>
@@ -155,27 +155,27 @@ const Dashboard = () => {
         </div>
 
         <div className="mt-6 grid md:grid-cols-3 gap-4">
-          <div className="bg-gray-900 p-4 rounded-lg">
-            <p className="text-gray-400 text-sm">Total Revenue</p>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-gray-500 text-sm">Total Revenue</p>
             <h3 className="text-2xl font-bold mt-1">{formatCurrency(dashboardData?.revenue?.totalRevenue || 0)}</h3>
             <div className="flex items-center text-green-500 text-sm mt-1">
               <span>Current total</span>
             </div>
           </div>
-          <div className="bg-gray-900 p-4 rounded-lg">
-            <p className="text-gray-400 text-sm">Student Discounts</p>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-gray-500 text-sm">Student Discounts</p>
             <h3 className="text-2xl font-bold mt-1">{formatCurrency(dashboardData?.studentDiscounts?.totalAmount || 0)}</h3>
             <div className="flex items-center text-amber-500 text-sm mt-1">
               <span>{dashboardData?.studentDiscounts?.count || 0} orders</span>
-              <span className="text-gray-400 ml-2">with student discount</span>
+              <span className="text-gray-500 ml-2">with student discount</span>
             </div>
           </div>
-          <div className="bg-gray-900 p-4 rounded-lg">
-            <p className="text-gray-400 text-sm">First Order Discounts</p>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-gray-500 text-sm">First Order Discounts</p>
             <h3 className="text-2xl font-bold mt-1">{formatCurrency(dashboardData?.firstOrderDiscounts?.totalAmount || 0)}</h3>
             <div className="flex items-center text-blue-500 text-sm mt-1">
               <span>{dashboardData?.firstOrderDiscounts?.count || 0}</span>
-              <span className="text-gray-400 ml-2">first time customers</span>
+              <span className="text-gray-500 ml-2">first time customers</span>
             </div>
           </div>
         </div>
@@ -186,22 +186,22 @@ const Dashboard = () => {
           <h2 className="text-lg font-semibold mb-4">Best Selling Products</h2>
           <div className="space-y-4">
             {bestSellingProducts.map((product) => (
-              <div key={product._id} className="flex items-center border-b border-gray-800 pb-3">
-                <div className="h-16 w-16 bg-gray-800 rounded-md mr-4 flex items-center justify-center">
-                  <ShoppingBag className="h-6 w-6 text-gray-600" />
+              <div key={product._id} className="flex items-center border-b border-gray-200 pb-3">
+                <div className="h-16 w-16 bg-gray-200 rounded-md mr-4 flex items-center justify-center">
+                  <ShoppingBag className="h-6 w-6 text-gray-500" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium">{product.name}</h3>
-                  <p className="text-sm text-gray-400">{product.unitsSold} units sold</p>
+                  <p className="text-sm text-gray-500">{product.unitsSold} units sold</p>
                 </div>
                 <div className="text-right">
                   <p className="font-semibold">₨ {product.revenue.toLocaleString()}</p>
-                  <p className="text-xs text-gray-400">Revenue</p>
+                  <p className="text-xs text-gray-500">Revenue</p>
                 </div>
               </div>
             ))}
             {bestSellingProducts.length === 0 && (
-              <div className="text-center py-4 text-gray-400">
+              <div className="text-center py-4 text-gray-500">
                 No bestselling products data available
               </div>
             )}
@@ -212,24 +212,24 @@ const Dashboard = () => {
           <h2 className="text-lg font-semibold mb-4">Recent Student Verifications</h2>
           <div className="space-y-4">
             {studentVerifications.map((verification) => (
-              <div key={verification._id} className="flex items-center border-b border-gray-800 pb-3">
-                <div className="h-12 w-12 bg-gray-800 rounded-full mr-4 flex items-center justify-center">
-                  <Users className="h-5 w-5 text-gray-600" />
+              <div key={verification._id} className="flex items-center border-b border-gray-200 pb-3">
+                <div className="h-12 w-12 bg-gray-200 rounded-full mr-4 flex items-center justify-center">
+                  <Users className="h-5 w-5 text-gray-500" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium">{verification.name === "N/A" ? "Unknown Student" : verification.name}</h3>
-                  <p className="text-sm text-gray-400">{verification.institutionName}</p>
+                  <p className="text-sm text-gray-500">{verification.institutionName}</p>
                 </div>
                 <div className="text-right">
                   <p className={`text-sm ${verification.status === "Approved" ? "text-green-500" : "text-amber-500"}`}>
                     {verification.status}
                   </p>
-                  <p className="text-xs text-gray-400">{formatDate(verification.verificationDate)}</p>
+                  <p className="text-xs text-gray-500">{formatDate(verification.verificationDate)}</p>
                 </div>
               </div>
             ))}
             {studentVerifications.length === 0 && (
-              <div className="text-center py-4 text-gray-400">
+              <div className="text-center py-4 text-gray-500">
                 No student verifications available
               </div>
             )}

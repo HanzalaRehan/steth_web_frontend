@@ -23,6 +23,7 @@ const ColorsPage = () => {
   const [name, setName] = useState("")
   const [hexCode, setHexCode] = useState("#000000")
   const [selectedImage, setSelectedImage] = useState(null)
+  const [featuredOnHomepage, setFeaturedOnHomepage] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [colors, setColors] = useState([])
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -62,6 +63,7 @@ const ColorsPage = () => {
       const formData = new FormData()
       formData.append("name", name.trim())
       formData.append("hexCode", hexCode)
+      formData.append("featuredOnHomepage", featuredOnHomepage)
       if (selectedImage) formData.append("image", selectedImage)
 
       const response = await fetch(`${API_BASE_URL}/api/colors`, {
@@ -79,6 +81,7 @@ const ColorsPage = () => {
       setName("")
       setHexCode("#000000")
       setSelectedImage(null)
+      setFeaturedOnHomepage(false)
       const fileInput = document.querySelector('input[type="file"]')
       if (fileInput) fileInput.value = ""
 
@@ -87,6 +90,32 @@ const ColorsPage = () => {
       toast.error(error.message || "Failed to add color")
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleToggleFeatured = async (color) => {
+    // Optimistic update so the checkbox feels immediate; refetch reconciles
+    // with the server response (and rolls back on failure).
+    const nextValue = !color.featuredOnHomepage
+    setColors((prev) => prev.map((c) => (c._id === color._id ? { ...c, featuredOnHomepage: nextValue } : c)))
+
+    try {
+      const formData = new FormData()
+      formData.append("featuredOnHomepage", nextValue)
+
+      const response = await fetch(`${API_BASE_URL}/api/colors/${color._id}`, {
+        method: "PUT",
+        headers: authHeader(),
+        body: formData,
+      })
+
+      const data = await response.json()
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to update color")
+      }
+    } catch (error) {
+      toast.error(error.message || "Failed to update homepage flag")
+      fetchColors()
     }
   }
 
@@ -169,6 +198,19 @@ const ColorsPage = () => {
               />
             </div>
 
+            <div className="flex items-center gap-2">
+              <input
+                id="featuredOnHomepage"
+                type="checkbox"
+                checked={featuredOnHomepage}
+                onChange={(e) => setFeaturedOnHomepage(e.target.checked)}
+                className="h-4 w-4 cursor-pointer"
+              />
+              <Label htmlFor="featuredOnHomepage" className="cursor-pointer font-normal">
+                Show on homepage carousel
+              </Label>
+            </div>
+
             <Button type="submit" disabled={isLoading || !name.trim() || !hexCode}>
               {isLoading ? "Adding..." : "Add Color"}
             </Button>
@@ -198,6 +240,15 @@ const ColorsPage = () => {
                   </div>
                   <span className="font-medium">{color.name}</span>
                   <span className="text-xs text-gray-500">{color.hexCode}</span>
+                  <label className="flex items-center gap-1.5 text-xs text-gray-500 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!!color.featuredOnHomepage}
+                      onChange={() => handleToggleFeatured(color)}
+                      className="h-3.5 w-3.5 cursor-pointer"
+                    />
+                    On homepage
+                  </label>
                 </div>
               ))}
             </div>

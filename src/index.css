@@ -8,76 +8,46 @@
   html {
     font-family: 'Poppins', sans-serif;
   }
+
+  /* Previously re-injected by Homepage.jsx/MensPage.jsx/WomenPage.jsx on
+     every mount via a useEffect-appended <style> block (removed - it also
+     carried a dead @font-face pointing at /fonts/ files that don't exist
+     in this repo; Poppins is actually loaded by the @import above).
+     Deliberately NOT porting the original block's `height: 100%` - combined
+     with `overflow-x: hidden` it makes the browser auto-compute
+     `overflow-y: auto` on #root (a CSS overflow-computed-value rule: a
+     non-visible overflow-x forces the other axis off `visible` too), which
+     turns #root into its own internal scroll container instead of the
+     window. That breaks every GSAP ScrollTrigger animation sitewide (they
+     track window scroll, which then never fires) - confirmed live via
+     Homepage's scrollHeight collapsing to exactly the viewport height.
+     `min-h-screen` on each page's own wrapper div already provides full
+     height coverage without this footgun. */
+  html,
+  body,
+  #root {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+  }
 }
 
-:root {
+.font-poppins {
   font-family: 'Poppins', sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
+/* The block that used to live here (:root color-scheme/color/background,
+   raw `a`/`button`/`h1` element selectors, the `prefers-color-scheme`
+   override) was 100% untouched `create-vite` scaffold CSS - never part of
+   the real design system. It's what caused DESIGN.md mismatch #5 (the
+   `#646cff` link-blue leaking onto the Cart breadcrumb) and, discovered in
+   this session, the raw `button { background-color: #1a1a1a }` rule
+   fighting shadcn's ghost-variant buttons (which rely on being
+   transparent) in the admin sidebar. Removed rather than patched, since
+   nothing in the real app intentionally depends on it - Tailwind's own
+   Preflight reset (via `@tailwind base` above) already covers the
+   legitimate parts (margin resets etc). */
 
 /* shadcn/ui theme variables, ported from Steth_admin_Panel's
    styles/globals.css for the /admin/* section's components. Only the
@@ -85,28 +55,39 @@ button:focus-visible {
    `body { @apply bg-background text-foreground }` rule, which would
    repaint the whole storefront's body. AdminLayout applies
    `bg-background text-foreground` on its own root element instead, so
-   the effect stays scoped to /admin/*. */
+   the effect stays scoped to /admin/*.
+   Re-themed to DESIGN.md's storefront palette (design-alignment session):
+   originally a dark/orange shadcn default that never matched the
+   storefront's actual light black-on-white brand. Values below map
+   directly to DESIGN.md's documented tokens - white surface, black
+   primary text/buttons, gray-50/gray-100 muted backgrounds, gray-200
+   borders (matching AuthPanel's "light gray border" reference), gray-700
+   for secondary text. --destructive intentionally left unchanged - it's
+   a self-contained dark-red/white pair that reads fine regardless of the
+   surrounding theme, and isn't a color DESIGN.md documents from the
+   storefront. --radius also left unchanged per DESIGN.md's note that the
+   shadcn button radius already matches the storefront's measured 6px. */
 @layer base {
   :root {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 20.5 90.2% 48.2%;
-    --primary-foreground: 60 9.1% 97.8%;
-    --secondary: 12 6.5% 15.1%;
-    --secondary-foreground: 60 9.1% 97.8%;
-    --muted: 12 6.5% 15.1%;
-    --muted-foreground: 24 5.4% 63.9%;
-    --accent: 12 6.5% 15.1%;
-    --accent-foreground: 60 9.1% 97.8%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 210 20% 98%;
+    --muted-foreground: 215 19% 27%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 60 9.1% 97.8%;
-    --border: 12 6.5% 15.1%;
-    --input: 12 6.5% 15.1%;
-    --ring: 20.5 90.2% 48.2%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 0 0% 0%;
     --radius: 0.5rem;
   }
 }

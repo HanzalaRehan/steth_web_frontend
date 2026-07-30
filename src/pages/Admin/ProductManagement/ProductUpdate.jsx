@@ -70,6 +70,7 @@ const ProductUpdate = () => {
     selectedSizes: [],
     colorSizeInventory: [],
     attributes: [],
+    isBestSeller: false,
   })
 
   const [availableColors, setAvailableColors] = useState([])
@@ -153,6 +154,7 @@ const ProductUpdate = () => {
             stock: item.stock,
           })) || [],
           attributes: productData.attributes || [],
+          isBestSeller: productData.isBestSeller || false,
         })
       } catch (error) {
         setResponseMessage({ text: "Error loading product data", type: "error" })
@@ -246,6 +248,7 @@ const ProductUpdate = () => {
       categoryRef: categoryObj?._id,
       fabric: formData.fabric || undefined,
       gender: formData.gender === "custom" ? formData.customGender : formData.gender,
+      isBestSeller: formData.isBestSeller,
       material: formData.material === "custom" ? formData.customMaterial : formData.material,
       attributes: formData.attributes.filter((a) => a.name.trim()),
       colors: uniqueColors,
@@ -428,6 +431,16 @@ const ProductUpdate = () => {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="space-y-2 flex items-end">
+                    <label className="flex items-center gap-2 text-sm font-medium">
+                      <input
+                        type="checkbox"
+                        checked={formData.isBestSeller}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, isBestSeller: e.target.checked }))}
+                      />
+                      Best Seller (shown in the Men's/Women's best-sellers section, max 3 per gender)
+                    </label>
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="fabric">Fabric</Label>
                     <Select value={formData.fabric} onValueChange={(value) => handleSelectChange("fabric", value)}>
@@ -562,7 +575,7 @@ const ProductUpdate = () => {
                 {formData.colors.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-4">
                     {formData.colors.map((color) => (
-                      <div key={color} className="flex items-center rounded-full px-3 py-1 bg-gray-800">
+                      <div key={color} className="flex items-center rounded-full px-3 py-1 bg-gray-100">
                         <span className="mr-2">{color}</span>
                         <Button
                           type="button"
@@ -581,7 +594,7 @@ const ProductUpdate = () => {
                 )}
               </div>
 
-              <div className="border-t border-gray-800 my-6"></div>
+              <div className="border-t border-gray-200 my-6"></div>
 
               <h3 className="text-lg font-medium mb-4">Size & Inventory</h3>
               <p className="text-sm text-yellow-600 mb-4">

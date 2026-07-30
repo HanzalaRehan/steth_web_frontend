@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../../utils/imageUrl";
+import { API_BASE_URL } from "../../../config/api";
 
 // Register ScrollTrigger with GSAP
 gsap.registerPlugin(ScrollTrigger);
@@ -42,11 +43,11 @@ const Hero = () => {
     // Fetch hero images
     const fetchHeroImages = async () => {
       try {
-        const response = await axios.get('https://steth-backend.onrender.com/api/hero-images/mens');
+        const response = await axios.get(`${API_BASE_URL}/api/hero-images/mens`);
         if (response.data.success) {
           setImages({
-            web: response.data.data.web.imageUrl,
-            mobile: response.data.data.mobile.imageUrl
+            web: response.data.data.web?.imageUrl || "",
+            mobile: response.data.data.mobile?.imageUrl || ""
           });
         }
       } catch (error) {
@@ -135,7 +136,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section ref={heroRef} className="relative w-full h-[84vh] md:h-auto md:aspect-[16/9] font-poppins overflow-hidden">
+    <section ref={heroRef} className="relative w-full h-[100svh] md:h-[85vh] font-poppins overflow-hidden">
       {/* #4 - loading skeleton while the API-fetched image URLs are still
           empty, instead of an empty <img> with nothing visible. */}
       {!images.web && !images.mobile && (
@@ -157,38 +158,31 @@ const Hero = () => {
             alt="Medical professionals in scrubs"
             className="hidden md:block w-full h-full object-cover object-center"
           />
-          {/* Enhanced gradient overlay for better text visibility - extremely reduced intensity for mobile */}
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/15 md:from-black/70 to-transparent"></div>
-          {/* Additional shadow overlay - extremely reduced intensity for mobile */}
-          <div className="absolute inset-0 shadow-inner bg-gradient-to-b from-transparent via-transparent to-black/5 md:to-black/30"></div>
+          {/* Single, lighter bottom-anchored scrim - matches the Homepage
+              Hero's treatment, replacing the previous two stacked overlays. */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
         </div>
       </div>
-      
+
       {/* Hero Content Overlay */}
-      <div className="relative h-full flex mt-20 md:mt-0 flex-col items-center justify-center text-center px-4">
-        <div 
-          ref={contentRef} 
-          className="py-6 sm:py-8 md:py-12 px-4 sm:px-6 md:px-8 rounded-2xl max-w-3xl mx-auto transform hover:scale-105 transition-transform duration-300"
+      <div className="relative h-full flex flex-col items-center justify-end text-center px-4 pb-16 sm:pb-20 md:pb-24">
+        <div
+          ref={contentRef}
+          className="max-w-3xl mx-auto"
         >
-          <h1 
-            ref={headingRef} 
-            className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg"
+          <h1
+            ref={headingRef}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white drop-shadow-lg text-balance"
           >
-            STETH MEN'S
+            STETH MEN'S COLLECTION
           </h1>
-          <h1 
-            ref={headingRef} 
-            className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 md:mb-8 text-white drop-shadow-lg"
+          <p
+            ref={descRef}
+            className="text-base sm:text-lg md:text-xl max-w-xl mx-auto mt-4 mb-8 sm:mb-10 text-white leading-relaxed px-2 sm:px-4 drop-shadow-md"
           >
-            COLLECTION
-          </h1>
-          <p 
-            ref={descRef} 
-            className="text-base sm:text-lg md:text-lg lg:text-xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-white leading-relaxed px-2 sm:px-4 drop-shadow-md"
-          >
-           Built for the grind, styled for the frontline
+            Built for the grind, styled for the frontline.
           </p>
-          <div 
+          <div
             ref={buttonsRef} 
             className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center px-2 sm:px-4"
           >
@@ -224,12 +218,6 @@ const Hero = () => {
               <div className="button-shine absolute inset-0 bg-gradient-to-r from-transparent via-black/10 to-transparent -translate-x-full"></div>
             </button>
           </div>
-          <p 
-            ref={descRef} 
-            className="text-base sm:text-lg md:text-lg lg:text-xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-white leading-relaxed px-2 sm:px-4 drop-shadow-md mt-5"
-          >
-            For doctors, by doctors
-          </p>
         </div>
       </div>
     </section>

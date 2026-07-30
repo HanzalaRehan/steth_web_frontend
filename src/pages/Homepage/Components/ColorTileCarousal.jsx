@@ -5,6 +5,7 @@ import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useNavigate } from "react-router-dom"
 import { getImageUrl } from "../../../utils/imageUrl"
+import { API_BASE_URL } from "../../../config/api"
 
 // Register GSAP plugins
 if (typeof window !== "undefined") {
@@ -25,13 +26,15 @@ const ColorTileCarousel = () => {
   const touchEndX = useRef(0)
   const directionRef = useRef("next")
 
-  // Fetch color tiles from API
+  // Fetch homepage-featured colors from the Color entity (integrated with
+  // the admin Colors screen's "Show on homepage carousel" flag - this used
+  // to be a separate ColorTile collection/admin screen, now retired).
   useEffect(() => {
     const fetchColorTiles = async () => {
       try {
-        const response = await fetch('https://steth-backend.onrender.com/api/color-tiles/')
+        const response = await fetch(`${API_BASE_URL}/api/colors?featured=true`)
         const data = await response.json()
-        
+
         if (data.success) {
           setColorTiles(data.data)
           setPrevIndex(data.data.length - 1)
@@ -47,8 +50,8 @@ const ColorTileCarousel = () => {
   }, [])
 
   // Function to handle color tile click
-  const handleColorTileClick = (colorName) => {
-    navigate(`/color-products/${encodeURIComponent(colorName.toLowerCase())}`)
+  const handleColorTileClick = (colorId) => {
+    navigate(`/color-products/${colorId}`)
   }
 
   // Function to move to the next slide
@@ -260,11 +263,11 @@ const ColorTileCarousel = () => {
               className={`color-tile absolute inset-0 mx-4 sm:mx-8 md:mx-12 flex justify-center items-center cursor-pointer group
                           ${index !== activeIndex && index !== prevIndex ? "opacity-0" : "opacity-100"}`}
               style={{ zIndex: index === activeIndex ? 5 : index === prevIndex ? 10 : 0 }}
-              onClick={() => handleColorTileClick(tile.colorName)}
+              onClick={() => handleColorTileClick(tile._id)}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") handleColorTileClick(tile.colorName)
+                if (e.key === "Enter" || e.key === " ") handleColorTileClick(tile._id)
               }}
             >
               <div className="w-full h-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-5xl relative overflow-hidden">
@@ -272,7 +275,7 @@ const ColorTileCarousel = () => {
                   <div
                     className="absolute inset-0 w-full h-full transition-transform duration-300 ease-out group-hover:scale-[1.03]"
                     style={{
-                      backgroundImage: `url(${getImageUrl(tile.imageUrl, { width: 1200 })})`,
+                      backgroundImage: `url(${getImageUrl(tile.titleImageUrl, { width: 1200 })})`,
                       backgroundSize: 'contain',
                       backgroundPosition: 'center',
                       backgroundRepeat: 'no-repeat',

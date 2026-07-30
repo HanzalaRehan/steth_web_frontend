@@ -171,7 +171,7 @@ const CustomersAlsoBoughtEdit = () => {
                     {isRelated(relatedProduct._id) ? (
                       <Check className="h-4 w-4 text-green-500" />
                     ) : (
-                      <X className="h-4 w-4 text-gray-400" />
+                      <X className="h-4 w-4 text-gray-500" />
                     )}
                   </Button>
                 </TableCell>

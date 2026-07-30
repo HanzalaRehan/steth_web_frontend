@@ -9,7 +9,6 @@ import {
   Package,
   Settings,
   Image as ImageIcon,
-  Palette,
   Mail,
   Menu,
   X,
@@ -33,7 +32,6 @@ const NAV_ITEMS = [
   { to: "/admin/student-approval", label: "Student Approval", icon: Globe },
   { to: "/admin/orders", label: "Orders", icon: Package },
   { to: "/admin/hero-images", label: "Hero Images", icon: ImageIcon },
-  { to: "/admin/color-tiles", label: "Color Tiles", icon: Palette },
   { to: "/admin/fabrics", label: "Fabric", icon: Layers },
   { to: "/admin/categories", label: "Category", icon: Tags },
   { to: "/admin/colors", label: "Colors", icon: Droplet },
@@ -54,7 +52,6 @@ const PAGE_TITLES = {
   "/admin/student-approval": "Student Approval",
   "/admin/orders": "Orders",
   "/admin/hero-images": "Hero Image Management",
-  "/admin/color-tiles": "Color Tiles",
   "/admin/fabrics": "Fabric Management",
   "/admin/categories": "Category Management",
   "/admin/colors": "Colors Management",
@@ -143,10 +140,10 @@ const AdminLayout = () => {
   const pageTitle = PAGE_TITLES[location.pathname] || ""
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="lg:grid lg:grid-cols-[280px_1fr]">
         {/* Mobile Header */}
-        <div className="lg:hidden flex items-center justify-between p-4 border-b bg-background/50 backdrop-blur">
+        <div className="lg:hidden flex items-center justify-between p-4 border-b bg-background">
           <div className="flex items-center gap-2">
             <img src={logo} alt="STETH" className="h-6 w-6" />
             <span className="font-bold">STETH</span>
@@ -173,7 +170,7 @@ const AdminLayout = () => {
             top-0 left-0
             w-[280px] lg:w-auto
             h-full lg:h-screen
-            border-r bg-background/50 backdrop-blur
+            border-r bg-background
             flex flex-col
             z-50 lg:z-auto
             transition-transform duration-300 ease-in-out
@@ -212,7 +209,7 @@ const AdminLayout = () => {
             <div className="px-2 pb-4 mt-auto">
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-2 text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                className="w-full justify-start gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
                 onClick={handleLogout}
               >
                 <LogOut className="h-4 w-4" />
@@ -229,7 +226,7 @@ const AdminLayout = () => {
             </div>
             <div className="relative">
               {isLoading ? (
-                <div className="h-8 w-8 lg:h-10 lg:w-10 rounded-full bg-gray-700 animate-pulse" />
+                <div className="h-8 w-8 lg:h-10 lg:w-10 rounded-full bg-gray-200 animate-pulse" />
               ) : userData?.profilePicUrl ? (
                 <img
                   src={userData.profilePicUrl}
@@ -237,8 +234,8 @@ const AdminLayout = () => {
                   className="h-8 w-8 lg:h-10 lg:w-10 rounded-full object-cover"
                 />
               ) : (
-                <div className="h-8 w-8 lg:h-10 lg:w-10 rounded-full bg-gray-700 flex items-center justify-center">
-                  <User className="h-4 w-4 lg:h-5 lg:w-5 text-gray-300" />
+                <div className="h-8 w-8 lg:h-10 lg:w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                  <User className="h-4 w-4 lg:h-5 lg:w-5 text-gray-500" />
                 </div>
               )}
             </div>

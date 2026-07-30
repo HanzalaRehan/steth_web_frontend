@@ -527,17 +527,17 @@ const ProductImages = () => {
 
       {(uploadingDefault || uploadingColor || uploadingVariant) && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl flex flex-col items-center gap-6 min-w-[300px]">
+          <div className="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center gap-6 min-w-[300px]">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
             <div className="text-center">
-              <p className="text-xl font-semibold mb-2">
+              <p className="text-xl font-semibold mb-2 text-black">
                 {uploadingDefault
                   ? "Uploading Default Images"
                   : uploadingVariant
                   ? "Uploading Variant Images"
                   : `Uploading ${productData?.colors.find((c) => c._id === uploadingColor)?.name} Images`}
               </p>
-              <p className="text-gray-500 dark:text-gray-400">Please wait while we process your images...</p>
+              <p className="text-gray-500">Please wait while we process your images...</p>
             </div>
           </div>
         </div>

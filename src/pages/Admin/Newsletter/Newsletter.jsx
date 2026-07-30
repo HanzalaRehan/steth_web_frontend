@@ -140,7 +140,7 @@ const Newsletter = () => {
               ))}
               <label className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer hover:border-gray-400 transition-colors">
                 <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploading} />
-                {uploading ? <Loader2 className="h-6 w-6 animate-spin text-gray-400" /> : <Upload className="h-6 w-6 text-gray-400" />}
+                {uploading ? <Loader2 className="h-6 w-6 animate-spin text-gray-500" /> : <Upload className="h-6 w-6 text-gray-500" />}
               </label>
             </div>
             {uploadError && <div className="text-red-500 text-sm">{uploadError}</div>}

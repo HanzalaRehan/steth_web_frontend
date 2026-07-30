@@ -3,22 +3,26 @@ import { X, Tag, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../Login&Signup/AuthContext';
 
-const RegistrationPopup = () => {
+const RegistrationPopup = ({ canStart = true }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const { isLoggedIn, isLoading } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Only show popup if user is not logged in and not loading
-    if (!isLoggedIn && !isLoading) {
+    // Only show popup if user is not logged in, not loading, and the
+    // homepage's gender quick-select prompt (if it's showing) has already
+    // been dismissed - otherwise a first-time logged-out visitor would see
+    // both modals stacked. canStart defaults to true so nothing changes for
+    // returning visitors who never see the gender prompt at all.
+    if (!isLoggedIn && !isLoading && canStart) {
       const timer = setTimeout(() => {
         setIsOpen(true);
       }, 1500);
 
       return () => clearTimeout(timer);
     }
-  }, [isLoggedIn, isLoading]);
+  }, [isLoggedIn, isLoading, canStart]);
 
   const closePopup = () => {
     setIsClosing(true);

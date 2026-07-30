@@ -68,6 +68,7 @@ const ProductAdd = () => {
     selectedSizes: [],
     colorSizeInventory: [],
     attributes: [],
+    isBestSeller: false,
   })
 
   const [selectedColor, setSelectedColor] = useState("")
@@ -272,6 +273,7 @@ const ProductAdd = () => {
       categoryRef: categoryObj?._id,
       fabric: formData.fabric || undefined,
       gender: formData.gender,
+      isBestSeller: formData.isBestSeller,
       material: formData.material === "custom" ? formData.customMaterial.trim() : formData.material,
       attributes: formData.attributes.filter((a) => a.name.trim()),
       colors: formData.colors.map((colorValue) => ({
@@ -362,11 +364,11 @@ const ProductAdd = () => {
     <div className="space-y-6">
       {isLoading && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl flex flex-col items-center gap-6 min-w-[300px]">
+          <div className="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center gap-6 min-w-[300px]">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
             <div className="text-center">
-              <p className="text-xl font-semibold mb-2">Creating Product</p>
-              <p className="text-gray-500 dark:text-gray-400">Please wait while we process your request...</p>
+              <p className="text-xl font-semibold mb-2 text-black">Creating Product</p>
+              <p className="text-gray-500">Please wait while we process your request...</p>
             </div>
           </div>
         </div>
@@ -459,6 +461,16 @@ const ProductAdd = () => {
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div className="space-y-2 flex items-end">
+                    <label className="flex items-center gap-2 text-sm font-medium">
+                      <input
+                        type="checkbox"
+                        checked={formData.isBestSeller}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, isBestSeller: e.target.checked }))}
+                      />
+                      Best Seller (shown in the Men's/Women's best-sellers section, max 3 per gender)
+                    </label>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="fabric">Fabric</Label>
@@ -602,7 +614,7 @@ const ProductAdd = () => {
                     {formData.colors.map((color) => {
                       const colorObj = availableColors.find((c) => c.value === color) || { name: color, value: color, id: 0, code: "" }
                       return (
-                        <div key={color} className="flex items-center rounded-full px-3 py-1 bg-gray-800">
+                        <div key={color} className="flex items-center rounded-full px-3 py-1 bg-gray-100">
                           <span className="mr-2">{colorObj.name}</span>
                           <Button type="button" variant="ghost" size="sm" className="h-5 w-5 p-0 rounded-full" onClick={() => removeColor(color)}>
                             <X className="h-3 w-3" />
@@ -614,7 +626,7 @@ const ProductAdd = () => {
                 )}
               </div>
 
-              <div className="border-t border-gray-800 my-6"></div>
+              <div className="border-t border-gray-200 my-6"></div>
 
               <h3 className="text-lg font-medium mb-4">Size & Inventory</h3>
               <div className="space-y-4">

@@ -7,46 +7,53 @@ import { Link, useSearchParams } from "react-router-dom"
 import { API_BASE_URL } from "../../../config/api"
 import { getImageUrl } from "../../../utils/imageUrl"
 
-// Initialize the font
+const GRID_PAGE_SIZE = 24
+const OPTIONS_FETCH_LIMIT = 100
 
-import product1Img1 from "../../../assets/Mens/products/men_product_01_img_01.png"
-import product2Img1 from "../../../assets/Mens/products/men_product_02_img_01.png"
-import product3Img1 from "../../../assets/Mens/products/men_product_03_img_01.png"
-import product4Img1 from "../../../assets/Mens/products/men_product_04_img_01.png"
-import product5Img1 from "../../../assets/Mens/products/men_product_05_img_01.png"
+const SORT_OPTIONS = [
+  { label: "Newest", value: "-createdAt" },
+  { label: "Price: Low to High", value: "price" },
+  { label: "Price: High to Low", value: "-price" },
+]
 
 export default function ProductPage() {
-  // State for products
+  // Grid (paginated, server-filtered) state
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [searchParams] = useSearchParams()
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
 
   // Filter states
   const [colorFilter, setColorFilter] = useState("All")
   const [sizeFilter, setSizeFilter] = useState("All")
-  const [styleFilter, setStyleFilter] = useState("All")
   const [categoryFilter, setCategoryFilter] = useState("All")
+  const [sortOption, setSortOption] = useState(SORT_OPTIONS[0].value)
 
   // Dropdown states
   const [colorOpen, setColorOpen] = useState(false)
   const [sizeOpen, setSizeOpen] = useState(false)
-  const [styleOpen, setStyleOpen] = useState(false)
   const [categoryOpen, setCategoryOpen] = useState(false)
+  const [sortOpen, setSortOpen] = useState(false)
 
-  // Filtered products
+  // Client-local filtered view (Color/Category still refine whatever page
+  // the server returned - unchanged mechanic from before, just now applied
+  // on top of a paginated grid fetch instead of an unpaginated full set)
   const [filteredProducts, setFilteredProducts] = useState([])
 
-  // All colors from products for filter
+  // Filter option sets - sourced from a dedicated, larger, unpaginated
+  // fetch (see fetchFilterOptions below) rather than derived from the grid
+  // fetch, since a paginated grid fetch only ever contains one page's worth
+  // of products and would make these dropdowns flicker/shrink as the
+  // visitor pages or filters.
   const [availableColors, setAvailableColors] = useState(["All"])
+  const [availableSizes, setAvailableSizes] = useState(["All"])
 
   // Refs for GSAP animations
   const productsRef = useRef(null)
   const productRefs = useRef([])
-
-  // Size options
-  const sizeOptions = ["All", "Small", "Medium", "Large", "Extra Large"]
-  const styleOptions = ["All", "Classic"]
 
   // Color name to hex code mapping for color dots
   const colorHexMap = {
@@ -129,7 +136,6 @@ export default function ProductPage() {
     'Zinc': '#7A7A7A'
   }
 
-  // Add category options and colorHexMap (if you want colored dots in the future)
   const categoryOptions = [
     'All',
     'Scrubs',
@@ -139,49 +145,82 @@ export default function ProductPage() {
     'Bottles',
   ]
 
-  // Fetch products data
+  // categoryRef/colorRefs/fabric come from the navbar megamenu's "Shop By"
+  // links (issue #23) - additive on top of the CATEGORY/COLOR/SIZE filter
+  // bar below, which still works as a secondary refinement.
+  const categoryRef = searchParams.get("categoryRef")
+  const colorRefs = searchParams.get("colorRefs")
+  const fabric = searchParams.get("fabric")
+
+  // Options fetch - fires only when the URL-driven refs change, not on
+  // every filter/sort/page change, so Color/Size dropdown contents stay
+  // stable and complete regardless of which page the grid is showing.
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        const params = new URLSearchParams({ gender: "Men", limit: String(OPTIONS_FETCH_LIMIT) })
+        if (categoryRef) params.set("categoryRef", categoryRef)
+        if (colorRefs) params.set("colorRefs", colorRefs)
+        if (fabric) params.set("fabric", fabric)
+
+        const response = await fetch(`${API_BASE_URL}/api/products?${params.toString()}`)
+        const responseData = await response.json()
+        if (!responseData.success) return
+
+        const colors = new Set(["All"])
+        const sizes = new Set(["All"])
+        responseData.data.forEach((product) => {
+          product.inventory.forEach((item) => {
+            if (item.color) colors.add(item.color)
+            if (item.size) sizes.add(item.size)
+          })
+        })
+        setAvailableColors(Array.from(colors))
+        setAvailableSizes(Array.from(sizes))
+      } catch (err) {
+        console.error("Error fetching filter options:", err)
+      }
+    }
+
+    fetchFilterOptions()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoryRef, colorRefs, fabric])
+
+  // Grid fetch - real server-side size/sort/pagination.
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true)
-        // categoryRef/colorRefs/fabric come from the navbar megamenu's
-        // "Shop By" links (issue #23) - additive on top of the existing
-        // client-side CATEGORY/COLOR/SIZE/STYLE filter bar below, which
-        // still works as a secondary refinement on whatever this narrows
-        // down first.
-        const params = new URLSearchParams({ gender: "Men" })
-        const categoryRef = searchParams.get("categoryRef")
-        const colorRefs = searchParams.get("colorRefs")
-        const fabric = searchParams.get("fabric")
+        const params = new URLSearchParams({
+          gender: "Men",
+          sort: sortOption,
+          page: String(currentPage),
+          limit: String(GRID_PAGE_SIZE),
+        })
         if (categoryRef) params.set("categoryRef", categoryRef)
         if (colorRefs) params.set("colorRefs", colorRefs)
         if (fabric) params.set("fabric", fabric)
+        if (sizeFilter !== "All") params.set("size", sizeFilter)
 
         const response = await fetch(`${API_BASE_URL}/api/products?${params.toString()}`)
 
         if (!response.ok) {
           throw new Error('Failed to fetch products')
         }
-        
+
         const responseData = await response.json()
-        
+
         if (!responseData.success) {
           throw new Error('API returned unsuccessful response')
         }
 
         // Transform products to separate by color
         const transformedProducts = []
-        const allColors = new Set(["All"])
 
         responseData.data.forEach(product => {
-          // Get unique colors from inventory
           const uniqueColors = [...new Set(product.inventory.map(item => item.color))]
-          
+
           uniqueColors.forEach(color => {
-            // Add color to available colors for filter
-            allColors.add(color)
-            
-            // Create product entry for this color
             transformedProducts.push({
               id: `${product._id}-${color.replace(/\s+/g, '-').toLowerCase()}`,
               _id: product._id,
@@ -189,9 +228,7 @@ export default function ProductPage() {
               price: product.price,
               color: color,
               colorCount: uniqueColors.length,
-              // Use the first default image as primary image
               primaryImage: product.defaultImages[0]?.url || '',
-              // Keep all default images
               images: product.defaultImages,
               category: product.category,
             })
@@ -199,8 +236,8 @@ export default function ProductPage() {
         })
 
         setProducts(transformedProducts)
-        setFilteredProducts(transformedProducts)
-        setAvailableColors(Array.from(allColors))
+        setTotalPages(responseData.pagination?.pages || 1)
+        setTotalCount(responseData.total || 0)
         setLoading(false)
       } catch (err) {
         console.error("Error fetching products:", err)
@@ -210,9 +247,13 @@ export default function ProductPage() {
     }
 
     fetchProducts()
-  }, [searchParams])
+  }, [categoryRef, colorRefs, fabric, sizeFilter, sortOption, currentPage])
 
-  // Apply filters
+  // Color/Category stay client-local filters on top of whichever page the
+  // grid fetch returned (unchanged mechanic from before). Known limitation
+  // carried forward: combining this with true server pagination means
+  // picking a color can shrink the visible count on a page without
+  // signaling more matches exist on other pages.
   useEffect(() => {
     let result = [...products]
 
@@ -223,11 +264,8 @@ export default function ProductPage() {
       result = result.filter((product) => product.category === categoryFilter)
     }
 
-    // In a real app, you would filter by size and style as well
-    // This is just a placeholder for demonstration
-
     setFilteredProducts(result)
-  }, [colorFilter, sizeFilter, styleFilter, categoryFilter, products])
+  }, [colorFilter, categoryFilter, products])
 
   // GSAP animations
   useEffect(() => {
@@ -251,23 +289,36 @@ export default function ProductPage() {
 
   // Format price to display properly
   const formatPrice = (price) => {
-    // Remove any existing currency formatting and ensure it's a number
     const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
     return `Rs.${numericPrice}`;
   }
 
+  const changeSize = (size) => {
+    setSizeFilter(size)
+    setSizeOpen(false)
+    setCurrentPage(1)
+  }
+
+  const changeSort = (value) => {
+    setSortOption(value)
+    setSortOpen(false)
+    setCurrentPage(1)
+  }
+
   if (loading) {
-    return <div className="flex justify-center items-center h-64">Loading products...</div>
+    return <div id="products" className="flex justify-center items-center h-64">Loading products...</div>
   }
 
   if (error) {
-    return <div className="flex justify-center items-center h-64 text-red-500">Error: {error}</div>
+    return <div id="products" className="flex justify-center items-center h-64 text-red-500">Error: {error}</div>
   }
+
+  const sortLabel = SORT_OPTIONS.find((option) => option.value === sortOption)?.label ?? "Sort"
 
   return (
     <div id="products" className="mx-auto px-4 lg:px-20 py-8 w-full">
       {/* Heading */}
-      <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 text-black px-4">Accessories</h1>
+      <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 text-black px-4">Men's Collection</h1>
 
       {/* Filter section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-4">
@@ -280,7 +331,7 @@ export default function ProductPage() {
                 setCategoryOpen(!categoryOpen)
                 setColorOpen(false)
                 setSizeOpen(false)
-                setStyleOpen(false)
+                setSortOpen(false)
               }}
               type="button"
             >
@@ -311,7 +362,7 @@ export default function ProductPage() {
               onClick={() => {
                 setColorOpen(!colorOpen)
                 setSizeOpen(false)
-                setStyleOpen(false)
+                setSortOpen(false)
                 setCategoryOpen(false)
               }}
             >
@@ -340,14 +391,14 @@ export default function ProductPage() {
             )}
           </div>
 
-          {/* Size filter */}
+          {/* Size filter - real, server-side */}
           <div className="relative">
             <button
               className="flex items-center gap-2 font-medium bg-white text-black text-sm md:text-base lg:text-lg border border-gray-300 rounded-md px-4 py-2 shadow-sm"
               onClick={() => {
                 setSizeOpen(!sizeOpen)
                 setColorOpen(false)
-                setStyleOpen(false)
+                setSortOpen(false)
                 setCategoryOpen(false)
               }}
             >
@@ -355,14 +406,11 @@ export default function ProductPage() {
             </button>
             {sizeOpen && (
               <div className="absolute z-10 mt-2 w-48 bg-white shadow-lg rounded-md py-1 border">
-                {sizeOptions.map((size) => (
+                {availableSizes.map((size) => (
                   <button
                     key={size}
                     className={`block px-4 py-2 text-xs md:text-sm w-full bg-white text-black rounded-none text-left hover:bg-gray-100 ${sizeFilter === size ? "font-bold" : ""}`}
-                    onClick={() => {
-                      setSizeFilter(size)
-                      setSizeOpen(false)
-                    }}
+                    onClick={() => changeSize(size)}
                   >
                     {size}
                   </button>
@@ -371,31 +419,28 @@ export default function ProductPage() {
             )}
           </div>
 
-          {/* Style filter */}
+          {/* Sort */}
           <div className="relative">
             <button
               className="flex items-center gap-2 font-medium bg-white text-black text-sm md:text-base lg:text-lg border border-gray-300 rounded-md px-4 py-2 shadow-sm"
               onClick={() => {
-                setStyleOpen(!styleOpen)
+                setSortOpen(!sortOpen)
                 setColorOpen(false)
                 setSizeOpen(false)
                 setCategoryOpen(false)
               }}
             >
-              STYLE <ChevronDown className={`h-4 w-4 transition-transform ${styleOpen ? "rotate-180" : ""}`} />
+              SORT: {sortLabel} <ChevronDown className={`h-4 w-4 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
             </button>
-            {styleOpen && (
-              <div className="absolute z-10 mt-2 w-48 bg-white shadow-lg rounded-md py-1 border">
-                {styleOptions.map((style) => (
+            {sortOpen && (
+              <div className="absolute z-10 mt-2 w-56 bg-white shadow-xl rounded-lg py-2 border">
+                {SORT_OPTIONS.map((option) => (
                   <button
-                    key={style}
-                    className={`block px-4 py-2 text-xs md:text-sm w-full bg-white text-black rounded-none text-left hover:bg-gray-100 ${styleFilter === style ? "font-bold" : ""}`}
-                    onClick={() => {
-                      setStyleFilter(style)
-                      setStyleOpen(false)
-                    }}
+                    key={option.value}
+                    className={`block px-4 py-2 text-sm w-full bg-white text-black rounded-none text-left hover:bg-gray-100 ${sortOption === option.value ? "font-bold" : ""}`}
+                    onClick={() => changeSort(option.value)}
                   >
-                    {style}
+                    {option.label}
                   </button>
                 ))}
               </div>
@@ -405,55 +450,82 @@ export default function ProductPage() {
 
         {/* Total count */}
         <div className="text-black px-4 font-medium text-sm md:text-base lg:text-lg">
-          {filteredProducts.length} Total
+          {totalCount} Total
         </div>
       </div>
 
       {/* Products grid or No Products message */}
       {filteredProducts.length > 0 ? (
-        <div ref={productsRef} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {filteredProducts.map((product, index) => (
-            <Link 
-              to={`/product/${product._id}?color=${product.color}`}
-              key={product.id}
-              state={{ selectedColor: product.color }}
-            >
-             <div
-                ref={(el) => (productRefs.current[index] = el)}
-                className="flex flex-col transition-all duration-300 hover:shadow-md cursor-pointer"
+        <>
+          <div ref={productsRef} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {filteredProducts.map((product, index) => (
+              <Link
+                to={`/product/${product._id}?color=${product.color}`}
+                key={product.id}
+                state={{ selectedColor: product.color }}
               >
-                {/* Product image */}
-                <div className="bg-gray-100 overflow-hidden mb-3 aspect-[3/4.5]">
-                  <img
-                    src={getImageUrl(product.primaryImage, { width: 500 }) || "/placeholder.svg"}
-                    alt={`${product.name} - ${product.color}`}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                </div>
-
-                {/* Product details */}
-                <div className="flex flex-col p-2">
-                  {/* Product name */}
-                  <h3 className="text-gray-900 font-medium text-base md:text-lg lg:text-xl mb-1">
-                    {product.name}
-                  </h3>
-
-                  {/* Color and color count */}
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-gray-700 text-xs md:text-sm lg:text-base">{product.color}</span>
-                    <span className="text-gray-500 text-xs md:text-sm lg:text-base">{product.colorCount} Colors</span>
+               <div
+                  ref={(el) => (productRefs.current[index] = el)}
+                  className="flex flex-col transition-all duration-300 hover:shadow-md cursor-pointer"
+                >
+                  {/* Product image */}
+                  <div className="bg-gray-100 overflow-hidden mb-3 aspect-[3/4.5]">
+                    <img
+                      src={getImageUrl(product.primaryImage, { width: 500 }) || "/placeholder.svg"}
+                      alt={`${product.name} - ${product.color}`}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
                   </div>
 
-                  {/* Price */}
-                  <div className="text-gray-900 font-medium text-sm md:text-base lg:text-lg">
-                    {formatPrice(product.price)}
+                  {/* Product details */}
+                  <div className="flex flex-col p-2">
+                    {/* Product name */}
+                    <h3 className="text-gray-900 font-medium text-base md:text-lg lg:text-xl mb-1">
+                      {product.name}
+                    </h3>
+
+                    {/* Color and color count */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-gray-700 text-xs md:text-sm lg:text-base">{product.color}</span>
+                      <span className="text-gray-500 text-xs md:text-sm lg:text-base">{product.colorCount} Colors</span>
+                    </div>
+
+                    {/* Price */}
+                    <div className="text-gray-900 font-medium text-sm md:text-base lg:text-lg">
+                      {formatPrice(product.price)}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-4 mt-10">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="border border-gray-300 rounded-md px-4 py-2 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+              >
+                Previous
+              </button>
+              <span className="text-sm text-gray-700 font-medium">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="bg-black text-white rounded-md px-4 py-2 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-800 transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         <div className="flex flex-col items-center justify-center py-16 px-4">
           <div className="text-gray-500 text-xl md:text-2xl mb-4">No products found</div>
@@ -464,8 +536,8 @@ export default function ProductPage() {
             onClick={() => {
               setColorFilter("All");
               setSizeFilter("All");
-              setStyleFilter("All");
               setCategoryFilter("All");
+              setCurrentPage(1);
             }}
             className="bg-black text-white rounded-md px-6 py-3 font-medium hover:bg-gray-800 transition-colors"
           >

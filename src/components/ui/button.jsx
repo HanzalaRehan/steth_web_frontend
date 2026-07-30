@@ -9,14 +9,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-[#f5f5f5] text-black hover:bg-[#eaeaea]", // Light grey background with black text
+        default: "bg-black text-white hover:bg-gray-800", // DESIGN.md: storefront primary CTA is bg-black/text-white
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-input bg-background hover:bg-[#f5f5f5] hover:text-black", // Light grey hover for outline
+          "border border-input bg-background hover:bg-gray-100 hover:text-black",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-[#f5f5f5] hover:text-black", // Light grey hover for ghost
+        ghost: "hover:bg-gray-100 hover:text-black",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

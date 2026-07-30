@@ -1,14 +1,19 @@
 import { useContext, useEffect, useState } from "react"
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
+import RewardsCTA from "../../components/DiscountOffers"
 import { AuthContext } from "../Login&Signup/AuthContext"
 import { API_BASE_URL } from "../../config/api"
 
-// Issue #22 - shell only. Program rules (earn rate, redemption options,
-// tiers) are explicitly TBD per the master plan and the session brief -
-// nothing here invents numbers. The "How It Works" copy below is a
-// deliberately generic placeholder pending real copy from the business
-// side; do not fill in a rate or redemption value without being told one.
+// Issue #22, revisited for the storefront design-alignment session: the
+// original shell avoided stating any earn-rate/redemption numbers here
+// since the plan flagged them as TBD. They're not actually TBD anymore -
+// DiscountOffers.jsx (rendered on Homepage/WomenPage/MensPage) already
+// ships real, approved numbers for exactly this ("1 point = 1 PKR
+// discount", 10% first order, 5% student). Reusing that component here
+// (RewardsCTA) surfaces already-live, already-approved info on the one
+// page a customer would most expect to find it, rather than inventing
+// anything new.
 const Rewards = () => {
   const { isLoggedIn, openAuthPanel } = useContext(AuthContext)
   const [profile, setProfile] = useState(null)
@@ -48,8 +53,8 @@ const Rewards = () => {
   return (
     <div className="min-h-screen flex flex-col w-full bg-white">
       <Header />
-      <main className="flex-grow py-16 px-4">
-        <div className="max-w-2xl mx-auto">
+      <main className="flex-grow">
+        <div className="max-w-2xl mx-auto py-16 px-4">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
             Loyalty & Rewards
           </h1>
@@ -75,18 +80,18 @@ const Rewards = () => {
               {error}
             </div>
           ) : (
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100 space-y-6">
-              <div className="text-center">
-                <p className="text-sm text-gray-500 mb-1">Your Points Balance</p>
-                <p className="text-5xl font-bold text-black">{profile?.rewardPoints ?? 0}</p>
-              </div>
+            // DESIGN.md's one documented dark-surface pattern (same #0B132B
+            // tone as DiscountOffers.jsx's cards below) - the account's own
+            // point balance gets the same "premium membership" treatment as
+            // the program tiers, instead of a plain gray placeholder box.
+            <div className="bg-[#0B132B] rounded-2xl p-8 text-center text-white">
+              <p className="text-sm text-gray-300 mb-1">Your Points Balance</p>
+              <p className="text-5xl font-bold text-white">{profile?.rewardPoints ?? 0}</p>
 
               {profile?.firstOrderPlaced && (
-                <div className="text-center">
-                  <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    First order complete
-                  </span>
-                </div>
+                <span className="inline-block mt-4 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  First order complete
+                </span>
               )}
 
               {/*
@@ -99,19 +104,12 @@ const Rewards = () => {
               */}
             </div>
           )}
-
-          <div className="mt-10">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">How It Works</h2>
-            {/* Placeholder copy - deliberately generic, no earn rate or
-                redemption value stated. Replace once real program rules
-                are provided; anything specific written here would look
-                official to a customer. */}
-            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-gray-600 space-y-2">
-              <p>Every account earns reward points on purchases automatically.</p>
-              <p>Redemption options are being finalized and will appear here soon.</p>
-            </div>
-          </div>
         </div>
+
+        {/* Full-width, not nested in the max-w-2xl column above - matches
+            how this component actually renders on Homepage/WomenPage/
+            MensPage (its own py-16 + container mx-auto px-4). */}
+        <RewardsCTA />
       </main>
       <Footer />
     </div>

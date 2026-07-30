@@ -80,7 +80,7 @@ const ProductManagementHub = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-2 mt-8">
         <Link
           to="/admin/product-management/add"
-          className="flex items-center justify-center h-12 px-6 text-lg rounded-md bg-white text-black shadow-sm transition-colors hover:bg-gray-100 hover:text-black"
+          className="flex items-center justify-center h-12 px-6 text-lg rounded-md bg-white text-black border border-input transition-colors hover:bg-gray-100 hover:text-black"
         >
           <PlusCircle className="h-5 w-5 mr-2" />
           Add Product
@@ -104,7 +104,7 @@ const ProductManagementHub = () => {
 
         <Link
           to="/admin/product-management/customers-also-bought"
-          className="flex items-center justify-center h-12 px-6 text-lg rounded-md bg-green-600 text-white shadow-sm transition-colors hover:bg-green-700"
+          className="flex items-center justify-center h-12 px-6 text-lg rounded-md bg-white text-black border border-input transition-colors hover:bg-gray-100 hover:text-black"
         >
           <ShoppingCart className="h-5 w-5 mr-2" />
           Customers Also Bought

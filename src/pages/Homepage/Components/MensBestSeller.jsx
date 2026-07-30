@@ -3,8 +3,9 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode, Mousewheel } from 'swiper/modules';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { getImageUrl } from '../../../utils/imageUrl';
+import { API_BASE_URL } from '../../../config/api';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -20,7 +21,6 @@ const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const card = cardRef.current;
@@ -94,17 +94,11 @@ const ProductCard = ({ product }) => {
     img2.src = product.defaultImages[1].url;
   }, [product.defaultImages]);
 
-  const handleClick = () => {
-    console.log('Product clicked:', product);
-    console.log('Navigating to product ID:', product._id);
-    navigate(`/product/${product._id}`);
-  };
-
   return (
-    <div 
-      ref={cardRef} 
+    <Link
+      to={`/product/${product._id}`}
+      ref={cardRef}
       className="group cursor-pointer w-full h-full flex flex-col"
-      onClick={handleClick}
     >
       {/* Image Container */}
       <div 
@@ -163,7 +157,7 @@ const ProductCard = ({ product }) => {
             Rs.{(product.price)}
           </p>
         </div>
-    </div>
+    </Link>
   );
 };
 
@@ -182,7 +176,7 @@ const MenBestSellers = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('https://steth-backend.onrender.com/api/products?gender=Men');
+        const response = await fetch(`${API_BASE_URL}/api/products?gender=Men`);
         const data = await response.json();
         
         if (data.success) {

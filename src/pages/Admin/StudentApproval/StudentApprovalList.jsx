@@ -72,7 +72,7 @@ const StudentApprovalList = () => {
                 verifications.map((verification) => (
                   <tr
                     key={verification._id}
-                    className="border-t hover:bg-gray-800 cursor-pointer transition-colors"
+                    className="border-t hover:bg-gray-100 cursor-pointer transition-colors"
                     onClick={() => handleRowClick(verification)}
                   >
                     <td className="p-3">{verification.name}</td>

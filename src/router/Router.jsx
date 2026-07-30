@@ -51,7 +51,6 @@ const StudentApprovalDetail = lazy(() => import('../pages/Admin/StudentApproval/
 const OrdersList = lazy(() => import('../pages/Admin/Orders/OrdersList'));
 const OrderUpdateStatus = lazy(() => import('../pages/Admin/Orders/OrderUpdateStatus'));
 const HeroImages = lazy(() => import('../pages/Admin/HeroImages/HeroImages'));
-const ColorTiles = lazy(() => import('../pages/Admin/ColorTiles/ColorTiles'));
 const Newsletter = lazy(() => import('../pages/Admin/Newsletter/Newsletter'));
 const Settings = lazy(() => import('../pages/Admin/Settings/Settings'));
 const FabricPage = lazy(() => import('../pages/Admin/Fabric/Fabric'));
@@ -99,7 +98,7 @@ const AppRouter = () => {
 
       {/* Checkout page route */}
       <Route path="/checkout" element={<CheckoutPage />} />
-      <Route path="/color-products/:colorName" element={<ColorProductsPage />} />
+      <Route path="/color-products/:colorId" element={<ColorProductsPage />} />
 
       {/* Product detail routes */}
       <Route path="/product/:productId" element={<ProductDetail/>} />
@@ -154,7 +153,6 @@ const AppRouter = () => {
           <Route path="orders" element={<OrdersList />} />
           <Route path="orders/:id/update-status" element={<OrderUpdateStatus />} />
           <Route path="hero-images" element={<HeroImages />} />
-          <Route path="color-tiles" element={<ColorTiles />} />
           <Route path="fabrics" element={<FabricPage />} />
           <Route path="categories" element={<CategoryPage />} />
           <Route path="colors" element={<ColorsPage />} />

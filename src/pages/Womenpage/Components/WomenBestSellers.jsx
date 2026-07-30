@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
 import { getImageUrl } from '../../../utils/imageUrl';
+import { API_BASE_URL } from '../../../config/api';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -151,7 +152,7 @@ const WomenBestSellers = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('https://steth-backend.onrender.com/api/products?gender=Women');
+        const response = await fetch(`${API_BASE_URL}/api/products?gender=Women&bestSeller=true`);
         const data = await response.json();
         
         if (data.success) {
@@ -186,12 +187,17 @@ const WomenBestSellers = () => {
     );
   }
 
+  // No best sellers curated yet (Product.isBestSeller, set via the admin
+  // ProductAdd/ProductUpdate checkbox) - stay silent rather than showing an
+  // empty "Best Sellers" heading with nothing underneath.
+  if (products.length === 0) return null;
+
   return (
     <section className="py-16 bg-white">
       <div className="max-w-[90%] mx-auto px-4 md:px-8">
         {/* Title */}
         <h2 className="text-2xl md:text-3xl font-bold text-black mb-8">
-          Women's 
+          Best Sellers
         </h2>
 
         {/* Swiper Container */}

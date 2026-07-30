@@ -7,11 +7,15 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Link, useParams } from "react-router-dom"
 import Header from "../../components/Header"
 import AwsomeHumansFooter from "../../components/Footer"
+import { API_BASE_URL } from "../../config/api"
 
 export default function ColorProductsPage() {
-  // Get color parameter from URL
-  const { colorName } = useParams()
-  const decodedColorName = colorName ? decodeURIComponent(colorName) : null
+  // Color id from the URL (a Color entity _id, not a name string - this
+  // page used to string-match Product.inventory.color against a decoded
+  // name; now it filters server-side via ?colorRefs=<id> like the rest of
+  // the site's "shop by color" links do).
+  const { colorId } = useParams()
+  const [colorInfo, setColorInfo] = useState(null)
 
   // State for products
   const [products, setProducts] = useState([])
@@ -64,33 +68,55 @@ export default function ColorProductsPage() {
   const sizeOptions = ["All", "Extra Small", "Small", "Medium", "Large", "Extra Large"]
   const styleOptions = ["All", "Classic"]
 
-  // Fetch products data
+  // Fetch the Color entity itself (for its display name) and the products
+  // tagged with it server-side via colorRefs - replaces the old approach of
+  // fetching every product and string-matching inventory colors client-side.
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchColorAndProducts = async () => {
+      if (!colorId) {
+        setLoading(false)
+        setAnimationsReady(true)
+        return
+      }
+
       try {
         setLoading(true)
         // Reset animation flag when fetching new data
         animationsInitialized.current = false
         setAnimationsReady(false)
-        
-        const response = await fetch("https://steth-backend.onrender.com/api/products")
 
-        if (!response.ok) {
+        const [colorResponse, productsResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/colors/${colorId}`),
+          fetch(`${API_BASE_URL}/api/products?colorRefs=${colorId}&limit=100`),
+        ])
+
+        if (!colorResponse.ok) {
+          throw new Error("Failed to fetch color")
+        }
+        if (!productsResponse.ok) {
           throw new Error("Failed to fetch products")
         }
 
-        const responseData = await response.json()
+        const colorData = await colorResponse.json()
+        const productsData = await productsResponse.json()
 
-        if (!responseData.success) {
-          throw new Error("API returned unsuccessful response")
+        if (!colorData.success) {
+          throw new Error("API returned unsuccessful response for color")
+        }
+        if (!productsData.success) {
+          throw new Error("API returned unsuccessful response for products")
         }
 
-        // Transform and filter products in a single step
-        const transformedProducts = responseData.data.reduce((acc, product) => {
-          // Get unique colors from inventory
+        const matchedColorName = colorData.data.name
+        setColorInfo(colorData.data)
+
+        // Server already filtered to products tagged with this colorRef, but
+        // a product's inventory can span multiple colors - still need to
+        // pick out the specific matching variant per product for the card
+        // image/label, same as before.
+        const transformedProducts = productsData.data.reduce((acc, product) => {
           const uniqueColors = [...new Set(product.inventory.map(item => item.color))];
-          
-          // Process each color as a separate product entry
+
           const colorVariants = uniqueColors.map((color) => ({
             id: `${product._id}-${color.replace(/\s+/g, "-").toLowerCase()}`,
             _id: product._id,
@@ -103,35 +129,30 @@ export default function ColorProductsPage() {
             colorSlug: color.replace(/\s+/g, "-").toLowerCase(),
           }))
 
-          // If we have a color filter, only include matching variants
-          if (decodedColorName && decodedColorName !== "All") {
-            const filteredVariants = colorVariants.filter(
-              variant => variant.color.toLowerCase() === decodedColorName.toLowerCase()
-            )
-            return [...acc, ...filteredVariants]
-          }
-
-          return [...acc, ...colorVariants]
+          const filteredVariants = colorVariants.filter(
+            variant => variant.color.toLowerCase() === matchedColorName.toLowerCase()
+          )
+          return [...acc, ...filteredVariants]
         }, [])
 
         setProducts(transformedProducts)
         setFilteredProducts(transformedProducts)
         setLoading(false)
-        
+
         // Set animations ready after a short delay to ensure DOM is updated
         setTimeout(() => {
           setAnimationsReady(true)
         }, 100)
       } catch (err) {
-        console.error("Error fetching products:", err)
+        console.error("Error fetching color/products:", err)
         setError(err.message)
         setLoading(false)
         setAnimationsReady(true) // Still set ready to show products even on error
       }
     }
 
-    fetchProducts()
-  }, [decodedColorName])
+    fetchColorAndProducts()
+  }, [colorId])
 
   // Enhanced GSAP animations with better fallback
   useEffect(() => {
@@ -358,7 +379,7 @@ export default function ColorProductsPage() {
           <div className="container mx-auto px-4 md:px-6 max-w-6xl overflow-hidden">
             <div className="text-center mb-12">
               <h1 className="text-3xl md:text-5xl font-bold mb-4 break-words max-w-full">
-                {decodedColorName ? `${decodedColorName.toUpperCase()} COLLECTION` : "COLOR COLLECTION"}
+                {colorInfo ? `${colorInfo.name.toUpperCase()} COLLECTION` : "COLOR COLLECTION"}
               </h1>
             </div>
           </div>
@@ -369,10 +390,10 @@ export default function ColorProductsPage() {
           <div className="container mx-auto px-4 md:px-6 max-w-6xl">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold break-words max-w-full">
-                {decodedColorName ? `${decodedColorName} Products` : "Color Products"}
+                {colorInfo ? `${colorInfo.name} Products` : "Color Products"}
               </h2>
               <p className="text-gray-600 mt-2 break-words max-w-full">
-                {filteredProducts.length} products available in {decodedColorName ? decodedColorName : "various colors"}
+                {filteredProducts.length} products available in {colorInfo ? colorInfo.name : "various colors"}
               </p>
             </div>
 
@@ -386,7 +407,7 @@ export default function ColorProductsPage() {
                 {/* Color indicator */}
                 <div className="flex items-center gap-2 font-medium text-black">
                   <span className="text-gray-600">COLOR:</span>
-                  <span className="font-bold">{decodedColorName ? decodedColorName.toUpperCase() : "ALL"}</span>
+                  <span className="font-bold">{colorInfo ? colorInfo.name.toUpperCase() : "ALL"}</span>
                 </div>
 
                 {/* Total count */}

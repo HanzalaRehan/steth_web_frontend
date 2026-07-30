@@ -1,6 +1,7 @@
 // src/App.jsx
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import AppRouter from './router/Router';
 import { AuthProvider } from '../src/pages/Login&Signup/AuthContext';
 import AuthPanel from './components/AuthPanel/AuthPanel';
@@ -12,19 +13,21 @@ import AnalyticsListener from './components/Analytics/AnalyticsListener';
 
 function App() {
   return (
-    <AuthProvider>
-      <CartDrawerProvider>
-        <AccountProvider>
-          <BrowserRouter>
-            <AnalyticsListener />
-            <AppRouter />
-            <AuthPanel />
-            <CartDrawer />
-            <AccountOverlay />
-          </BrowserRouter>
-        </AccountProvider>
-      </CartDrawerProvider>
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <CartDrawerProvider>
+          <AccountProvider>
+            <BrowserRouter>
+              <AnalyticsListener />
+              <AppRouter />
+              <AuthPanel />
+              <CartDrawer />
+              <AccountOverlay />
+            </BrowserRouter>
+          </AccountProvider>
+        </CartDrawerProvider>
+      </AuthProvider>
+    </HelmetProvider>
   );
 }
 

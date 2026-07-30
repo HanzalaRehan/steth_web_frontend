@@ -47,7 +47,7 @@ const AwesomeHumansFooter = () => {
             </div>
           </div>
 
-          <div className="w-full md:w-3/4 grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="w-full md:w-3/4 grid grid-cols-2 md:grid-cols-3 gap-8">
             <div>
               <h4 className="font-semibold mb-4">SHOP</h4>
               <ul className="space-y-2">

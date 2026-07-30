@@ -60,29 +60,32 @@ const FeatureSection = () => {
   ];
 
   return (
-    <section 
-      ref={sectionRef} 
-      className="w-full px-4 py-8 md:py-16 bg-gray-200"
+    <section
+      ref={sectionRef}
+      className="w-full px-4 py-16 bg-[#0B132B]"
     >
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 w-full">
+        <p className="text-center text-sm md:text-base font-medium uppercase tracking-wide text-gray-300 mb-10">
+          For doctors, by doctors
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-8 w-full">
           {features.map((feature, index) => (
-            <div 
+            <div
               key={feature.title}
               ref={el => featuresRef.current[index] = el}
-              className="flex flex-col items-center text-center text-black space-y-3 p-4 md:p-6 w-full"
+              className="flex flex-col items-center text-center text-white space-y-3 p-4 md:p-6 w-full"
             >
               <div className="w-16 h-16 mb-2 flex items-center justify-center">
-                <img 
-                  src={feature.icon} 
-                  alt={feature.title} 
-                  className="max-w-full max-h-full object-contain"
+                <img
+                  src={feature.icon}
+                  alt={feature.title}
+                  className="max-w-full max-h-full object-contain [filter:brightness(0)_invert(1)]"
                 />
               </div>
-              <h3 className="text-base md:text-xl font-semibold">
+              <h3 className="text-lg md:text-2xl font-semibold">
                 {feature.title}
               </h3>
-              <p className="text-xs md:text-sm text-black px-2">
+              <p className="text-sm md:text-base text-gray-300 px-2">
                 {feature.description}
               </p>
             </div>
