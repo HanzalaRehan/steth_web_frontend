@@ -21,6 +21,7 @@ import ColorProductsPage from '../pages/ColorProduct/ColorProductPage';
 import TermsAndConditions from '../pages/TermsAndConditions/TermsAndConditions';
 import AdminRoute from '../pages/Login&Signup/AdminRoute';
 import Rewards from '../pages/Rewards/Rewards';
+import SizeQuiz from '../pages/SizeQuiz/SizeQuiz';
 import GiftCards from '../pages/GiftCards/GiftCards';
 import BlogList from '../pages/Blog/BlogList';
 import BlogDetail from '../pages/Blog/BlogDetail';
@@ -122,6 +123,10 @@ const AppRouter = () => {
 
       {/* Navbar/footer rebuild - issues #23/#24 + B.4 */}
       <Route path="/rewards" element={<Rewards />} />
+
+      {/* Size recommendation - the points-earning entry point. The instant
+          "What's My Size?" version lives on the product page itself. */}
+      <Route path="/size-quiz" element={<SizeQuiz />} />
       <Route path="/gift-cards" element={<GiftCards />} />
       <Route path="/blog" element={<BlogList />} />
       <Route path="/blog/:slug" element={<BlogDetail />} />
