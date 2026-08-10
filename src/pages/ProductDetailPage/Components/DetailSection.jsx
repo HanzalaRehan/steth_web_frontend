@@ -6,6 +6,7 @@ import { X, ChevronLeft, ChevronRight, Check, Plus, Minus, Maximize2, Minimize2 
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { useCartDrawer } from "../../../context/CartDrawerContext"
 import { getImageUrl } from "../../../utils/imageUrl"
+import SizeFinder from "../../../components/SizeFinder/SizeFinder"
 import sizeChartImage0 from "/src/assets/sizes/Size chart -images-0.jpg";
 import sizeChartImage1 from "/src/assets/sizes/Size chart -images-1.jpg";
 import careInstructionsImage from "/src/assets/sizes/Care Instructions.jpg";
@@ -21,6 +22,9 @@ export default function ProductDetail({ product }) {
   const initialColor = colorFromUrl || (product?.colors?.length > 0 ? product.colors[0].name : "")
   const [selectedColor, setSelectedColor] = useState(initialColor)
   const [selectedSize, setSelectedSize] = useState(null)
+  // "What's My Size?" - sits alongside the size chart, since a shopper who
+  // opens the chart and still isn't sure is exactly who this is for.
+  const [isSizeFinderOpen, setIsSizeFinderOpen] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -821,12 +825,20 @@ const onTouchEnd = () => {
             <div className="mb-4 lg:mb-6">
               <div className="flex justify-between items-center mb-2 md:mb-3">
                 <p className="font-medium text-base md:text-lg">SIZE</p>
-                <button
-                  onClick={() => setIsSizeChartOpen(true)}
-                  className="px-3 py-1.5 border border-gray-300 rounded-full text-xs md:text-sm font-medium text-gray-700 bg-white hover:border-black hover:text-black transition-colors"
-                >
-                  Size Chart
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsSizeFinderOpen(true)}
+                    className="px-3 py-1.5 border border-black rounded-full text-xs md:text-sm font-medium text-black bg-white hover:bg-black hover:text-white transition-colors"
+                  >
+                    What's my size?
+                  </button>
+                  <button
+                    onClick={() => setIsSizeChartOpen(true)}
+                    className="px-3 py-1.5 border border-gray-300 rounded-full text-xs md:text-sm font-medium text-gray-700 bg-white hover:border-black hover:text-black transition-colors"
+                  >
+                    Size Chart
+                  </button>
+                </div>
               </div>
               <div className="flex gap-3 md:gap-4 flex-wrap">
                 {product.sizes.map((size) => {
@@ -1048,12 +1060,20 @@ const onTouchEnd = () => {
             <div className="mb-8">
               <div className="flex justify-between items-center mb-3">
                 <p className="font-medium">SIZE</p>
-                <button
-                  onClick={() => setIsSizeChartOpen(true)}
-                  className="px-3 py-1 border border-gray-300 rounded-full text-xs font-medium text-gray-700 bg-white hover:border-black hover:text-black transition-colors"
-                >
-                  Size Chart
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsSizeFinderOpen(true)}
+                    className="px-3 py-1 border border-black rounded-full text-xs font-medium text-black bg-white hover:bg-black hover:text-white transition-colors"
+                  >
+                    What's my size?
+                  </button>
+                  <button
+                    onClick={() => setIsSizeChartOpen(true)}
+                    className="px-3 py-1 border border-gray-300 rounded-full text-xs font-medium text-gray-700 bg-white hover:border-black hover:text-black transition-colors"
+                  >
+                    Size Chart
+                  </button>
+                </div>
               </div>
               <div className="flex gap-4">
                 {product.sizes.map((size) => {
@@ -1193,6 +1213,20 @@ const onTouchEnd = () => {
         </div>
       )}
       <SizeChartModal />
+
+      {/* Preselects the recommended size when this product actually stocks it,
+          so the shopper lands back on the page ready to add to cart rather
+          than having to remember a letter and find it themselves. */}
+      <SizeFinder
+        isOpen={isSizeFinderOpen}
+        onClose={() => setIsSizeFinderOpen(false)}
+        mode="whats-my-size"
+        onSized={(size) => {
+          if (isSizeAvailable(size) && getSizeStock(size) > 0) {
+            setSelectedSize(size)
+          }
+        }}
+      />
     </div>
   )
 }
