@@ -1,33 +1,40 @@
 /**
  * Author(s): 1. Hanzala B. Rehan
  *            2. Zainab Raza
- * Description: The customer-facing rewards page. Shows the points balance,
- *              the full "ways to earn" grid, and recent points history.
+ * Description: The customer-facing rewards page, laid out to the programme
+ *              design: a "How It Works" explainer, the signed-in points header
+ *              and activity table, and the "How To Earn Points" grid.
  *
- *              Reads from the loyalty programme API (/api/rewards). Signed-out
- *              visitors get the public catalogue so the page still works as a
- *              marketing page; signed-in customers get their balance, what
- *              they have already earned, and the ability to claim the
- *              self-declared rewards.
+ *              Signed-out visitors get the explainer and the full earn grid so
+ *              the page still works as a marketing page - clicking any reward
+ *              prompts them to join. Signed-in customers additionally get
+ *              their balance, expiry date, activity history and the ability to
+ *              claim the rewards they self-declare.
  *
- *              Opening the page calls GET /api/rewards/me, which re-derives
- *              purchase and celebration rewards server-side - so a customer
- *              who qualified for a milestone before the programme launched
- *              sees it credited the moment they land here.
+ *              Loading the page calls GET /api/rewards/me, which re-derives
+ *              purchase and celebration rewards and sweeps expired points
+ *              server-side. That is why a customer who qualified for something
+ *              before the programme launched sees it credited the moment they
+ *              land here.
  *
  * Date created: July 2026
  * Edit(s):
  *   (1): Replaced the balance-only shell with the full programme UI - ways to
  *        earn, claiming, birthday capture and points history - now that the
  *        rewards backend exists.
+ *   (2): Rebuilt to the programme design: How It Works band, points header
+ *        with expiry date, activity table, and the icon-led earn grid.
  * Date last modified: August 3rd, 2026
  * Run: Not directly runnable - routed at /rewards by src/router/Router.jsx
  */
 
-import { useCallback, useContext, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useRef, useState } from "react"
+import { X } from "lucide-react"
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
 import RewardsCTA from "../../components/DiscountOffers"
+import HowItWorks from "./HowItWorks"
+import PointsActivity from "./PointsActivity"
 import WaysToEarn from "./WaysToEarn"
 import { AuthContext } from "../Login&Signup/AuthContext"
 import { API_BASE_URL } from "../../config/api"
@@ -38,8 +45,10 @@ const Rewards = () => {
   const [catalogue, setCatalogue] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState("")
+  const [showBirthdayPrompt, setShowBirthdayPrompt] = useState(false)
   const [birthday, setBirthday] = useState("")
   const [birthdayMessage, setBirthdayMessage] = useState("")
+  const activityRef = useRef(null)
 
   // Signed in: the personalised payload (balance + per-rule status + history).
   // Signed out: the public catalogue, so the grid still renders.
@@ -95,126 +104,36 @@ const Rewards = () => {
       if (!res.ok || !data.success) throw new Error(data.message || "Could not save your birthday")
 
       setBirthdayMessage(data.message)
-      load()
+      await load()
+      setShowBirthdayPrompt(false)
+      // Send them to the table, where the points they just earned now appear.
+      if (activityRef.current) {
+        activityRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+      }
     } catch (err) {
       setBirthdayMessage(err.message)
     }
   }
 
-  // Only prompt for a birthday when the backend says it is what's blocking
-  // the reward - never ask for a date we already hold.
-  const needsBirthday = Boolean(
-    rewards && rewards.rules.some((rule) => rule.blockedBy === "dateOfBirth")
-  )
-
   return (
     <div className="min-h-screen flex flex-col w-full bg-white">
       <Header />
       <main className="flex-grow">
-        <div className="max-w-2xl mx-auto py-16 px-4">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
-            Loyalty & Rewards
-          </h1>
+        <HowItWorks />
 
-          {!isLoggedIn ? (
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100 text-center">
-              <p className="text-gray-600 mb-4">
-                Sign in to see your points balance and start earning.
-              </p>
-              <button
-                onClick={() => openAuthPanel("login")}
-                className="bg-black text-white rounded-md px-6 py-3 font-medium hover:bg-gray-800 transition-colors"
-              >
-                Log In
-              </button>
-            </div>
-          ) : isLoading ? (
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100 text-center text-gray-500">
-              Loading your rewards...
-            </div>
-          ) : error ? (
-            <div className="bg-red-50 rounded-2xl p-8 border border-red-200 text-center text-red-700">
-              {error}
-            </div>
-          ) : (
-            <>
-              {/* DESIGN.md's one documented dark-surface pattern (same #0B132B
-                  tone as DiscountOffers.jsx's cards below). */}
-              <div className="bg-[#0B132B] rounded-2xl p-8 text-center text-white">
-                <p className="text-sm text-gray-300 mb-1">Your Points Balance</p>
-                <p className="text-5xl font-bold text-white">{rewards?.balance ?? 0}</p>
-                <p className="text-xs text-gray-400 mt-2">
-                  {rewards?.lifetimeEarned ?? 0} points earned all time
-                </p>
+        {isLoggedIn && (
+          <div ref={activityRef}>
+            {isLoading ? (
+              <p className="text-center text-gray-500 py-12">Loading your rewards...</p>
+            ) : error ? (
+              <div className="max-w-xl mx-auto my-12 bg-red-50 rounded-2xl p-6 border border-red-200 text-center text-red-700">
+                {error}
               </div>
-
-              {/* Points credited by the sync that just ran on page load. */}
-              {rewards?.pointsJustAwarded > 0 && (
-                <div className="mt-4 rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-center text-green-800 text-sm">
-                  You just earned {rewards.pointsJustAwarded} points!
-                </div>
-              )}
-
-              {needsBirthday && (
-                <form
-                  onSubmit={saveBirthday}
-                  className="mt-6 rounded-2xl border border-gray-200 p-6"
-                >
-                  <p className="font-semibold text-gray-900 mb-1">
-                    Tell us your birthday
-                  </p>
-                  <p className="text-sm text-gray-500 mb-4">
-                    We will send you points every year. You can only set this once.
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <input
-                      type="date"
-                      value={birthday}
-                      onChange={(e) => setBirthday(e.target.value)}
-                      required
-                      className="flex-grow border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/10"
-                    />
-                    <button
-                      type="submit"
-                      className="bg-black text-white rounded-md px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors"
-                    >
-                      Save
-                    </button>
-                  </div>
-                  {birthdayMessage && (
-                    <p className="text-sm text-gray-600 mt-3">{birthdayMessage}</p>
-                  )}
-                </form>
-              )}
-
-              {rewards?.history?.length > 0 && (
-                <div className="mt-8">
-                  <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">
-                    Recent activity
-                  </h2>
-                  <ul className="divide-y divide-gray-100 border border-gray-200 rounded-2xl overflow-hidden">
-                    {rewards.history.map((entry, index) => (
-                      <li
-                        key={`${entry.ruleKey}-${index}`}
-                        className="flex items-center justify-between px-5 py-3"
-                      >
-                        <div>
-                          <p className="text-sm text-gray-900">{entry.description}</p>
-                          <p className="text-xs text-gray-400">
-                            {new Date(entry.awardedAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <span className="text-sm font-semibold text-green-700">
-                          +{entry.points}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+            ) : (
+              rewards && <PointsActivity rewards={rewards} />
+            )}
+          </div>
+        )}
 
         {catalogue.length > 0 && (
           <WaysToEarn
@@ -222,15 +141,56 @@ const Rewards = () => {
             isLoggedIn={isLoggedIn}
             onClaimed={load}
             openAuthPanel={openAuthPanel}
+            onBirthdayClick={() => setShowBirthdayPrompt(true)}
           />
         )}
 
-        {/* Full-width, not nested in the max-w-2xl column above - matches
-            how this component actually renders on Homepage/WomenPage/
-            MensPage (its own py-16 + container mx-auto px-4). */}
+        {/* Full-width, not nested in a narrow column - matches how this
+            component renders on Homepage/WomenPage/MensPage. */}
         <RewardsCTA />
       </main>
       <Footer />
+
+      {showBirthdayPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <form
+            onSubmit={saveBirthday}
+            className="bg-white rounded-2xl w-full max-w-sm p-8 relative"
+          >
+            <button
+              type="button"
+              onClick={() => setShowBirthdayPrompt(false)}
+              aria-label="Close"
+              className="absolute top-4 right-4 text-gray-400 hover:text-black"
+            >
+              <X size={20} />
+            </button>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              Celebrate your birthday
+            </h3>
+            <p className="text-sm text-gray-500 mb-5">
+              Tell us the date and we will send you points every year. You can
+              only set this once.
+            </p>
+            <input
+              type="date"
+              value={birthday}
+              onChange={(e) => setBirthday(e.target.value)}
+              required
+              className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-black/10"
+            />
+            <button
+              type="submit"
+              className="w-full bg-black text-white rounded-md px-6 py-3 font-medium hover:bg-gray-800 transition-colors"
+            >
+              Save
+            </button>
+            {birthdayMessage && (
+              <p className="text-sm text-gray-600 mt-4 text-center">{birthdayMessage}</p>
+            )}
+          </form>
+        </div>
+      )}
     </div>
   )
 }
