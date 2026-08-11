@@ -119,11 +119,22 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
    */
   const getAction = (rule) => {
     if (!isLoggedIn) return "join"
-    if (rule.timesEarned > 0 && rule.cadence === "once") return null
+    // `available` is the backend's own "can this be earned right now?" - it
+    // already accounts for cadence, so a one-time reward is spent forever
+    // while an annual one reopens next year. Checking it here rather than
+    // re-deriving from cadence keeps the two in step.
+    if (rule.available === false) return null
     if (rule.key === "BIRTHDAY" && rule.blockedBy === "dateOfBirth") return "birthday"
     if (rule.claimable) return rule.key === "SUBSCRIBE_WHATSAPP" ? "whatsapp" : "claim"
     return null
   }
+
+  /**
+   * "Done" styling: earned, and not earnable again right now. Covers annual
+   * rewards already collected this year as well as one-time ones, while
+   * repeatable rewards (orders, reviews) never dim.
+   */
+  const isEarnedOut = (rule) => rule.timesEarned > 0 && rule.available === false
 
   const handleClick = (rule) => {
     const action = getAction(rule)
@@ -162,8 +173,7 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
             const Icon = RULE_ICONS[rule.key] || Award
             const action = getAction(rule)
             const isInteractive = Boolean(action)
-            // "Done" styling: a one-time reward already collected.
-            const isDone = rule.timesEarned > 0 && rule.cadence === "once"
+            const isDone = isEarnedOut(rule)
 
             return (
               <div
