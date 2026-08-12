@@ -34,6 +34,19 @@ const PointsActivity = ({ rewards }) => (
       <span className="font-extrabold">{rewards.balance}</span> POINTS
     </h2>
 
+    {/* A point count means nothing on its own - show what it is worth to
+        spend. The rate comes from the API so it can never drift from what
+        checkout actually applies. */}
+    {rewards.balanceValuePkr > 0 && (
+      <p className="text-center text-lg text-gray-700 mt-3">
+        Worth{" "}
+        <span className="font-semibold text-gray-900">
+          PKR {rewards.balanceValuePkr.toLocaleString("en-PK")}
+        </span>{" "}
+        off your next order
+      </p>
+    )}
+
     {rewards.nextExpiryDate && (
       <div className="flex justify-center mt-5">
         <span className="rounded-full bg-gray-100 px-5 py-2 text-sm text-gray-600">
@@ -87,8 +100,13 @@ const PointsActivity = ({ rewards }) => (
                     <span className="ml-2 text-xs uppercase tracking-wide">expired</span>
                   )}
                 </td>
-                <td className="px-5 py-4 text-right whitespace-nowrap">
+                <td className="px-5 py-4 text-right whitespace-nowrap tabular-nums">
                   {entry.points > 0 ? `+ ${entry.points}` : entry.points} Points
+                  {rewards.pointValuePkr > 0 && (
+                    <span className="block text-xs text-gray-400">
+                      PKR {Math.abs(entry.points * rewards.pointValuePkr).toLocaleString("en-PK")}
+                    </span>
+                  )}
                 </td>
                 <td className="px-5 py-4 text-right whitespace-nowrap">
                   {formatDate(entry.awardedAt)}
