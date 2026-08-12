@@ -39,6 +39,30 @@ import WaysToEarn from "./WaysToEarn"
 import { AuthContext } from "../Login&Signup/AuthContext"
 import { API_BASE_URL } from "../../config/api"
 
+// fetch() waits indefinitely by default, so a backend that accepts the
+// connection and then stalls leaves the page on "Loading..." forever with no
+// way out. Abort well before a customer would give up and reload.
+const REQUEST_TIMEOUT_MS = 15000
+
+const fetchWithTimeout = async (url, options = {}) => {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+  try {
+    return await fetch(url, { ...options, signal: controller.signal })
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+/**
+ * A timed-out request and a failed one need different wording - "try again"
+ * is useful advice for the first and useless for the second.
+ */
+const timeoutAwareMessage = (error, fallback) =>
+  error.name === "AbortError"
+    ? "Rewards are taking longer than usual to load. Please try again."
+    : fallback
+
 const Rewards = () => {
   const { isLoggedIn, openAuthPanel } = useContext(AuthContext)
   const [rewards, setRewards] = useState(null)
@@ -50,32 +74,56 @@ const Rewards = () => {
   const [birthdayMessage, setBirthdayMessage] = useState("")
   const activityRef = useRef(null)
 
-  // Signed in: the personalised payload (balance + per-rule status + history).
-  // Signed out: the public catalogue, so the grid still renders.
+  // Loads the page in two independent steps.
+  //
+  // The order matters: the "ways to earn" grid is the page's main content and
+  // must not depend on the personalised call succeeding. Fetching both in one
+  // try block meant a rejected /me - an expired token, a cold backend - threw
+  // before the catalogue was ever stored, so a signed-in customer whose token
+  // had gone stale lost the entire grid as well as their balance.
   const load = useCallback(async () => {
     setError("")
+    const token = localStorage.getItem("accessToken")
 
+    // Step 1: the public catalogue. Always runs, for everyone.
     try {
-      const token = localStorage.getItem("accessToken")
+      const res = await fetchWithTimeout(`${API_BASE_URL}/api/rewards/catalogue`)
+      if (!res.ok) throw new Error("Failed to load rewards")
+      const data = await res.json()
+      setCatalogue(data.data.rules)
+    } catch (err) {
+      setError(timeoutAwareMessage(err, "Failed to load rewards"))
+    }
 
-      if (!isLoggedIn || !token) {
-        const res = await fetch(`${API_BASE_URL}/api/rewards/catalogue`)
-        if (!res.ok) throw new Error("Failed to load rewards")
-        const data = await res.json()
-        setCatalogue(data.data.rules)
+    if (!isLoggedIn || !token) {
+      setRewards(null)
+      setIsLoading(false)
+      return
+    }
+
+    // Step 2: the customer's own balance and history. A failure here costs
+    // them the balance, never the grid.
+    try {
+      const res = await fetchWithTimeout(`${API_BASE_URL}/api/rewards/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      // Signed in as far as the app is concerned, but the API rejected the
+      // token. Show the signed-out view - an "authentication failed" error is
+      // something the customer can't act on.
+      if (res.status === 401) {
         setRewards(null)
         return
       }
 
-      const res = await fetch(`${API_BASE_URL}/api/rewards/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (!res.ok) throw new Error("Failed to load your rewards")
+      if (!res.ok) throw new Error("We couldn't load your points just now")
       const data = await res.json()
       setRewards(data.data)
+      // Richer than the public catalogue - carries earned state per rule.
       setCatalogue(data.data.rules)
     } catch (err) {
-      setError(err.message || "Failed to load your rewards")
+      setRewards(null)
+      setError(timeoutAwareMessage(err, "We couldn't load your points just now"))
     } finally {
       setIsLoading(false)
     }
