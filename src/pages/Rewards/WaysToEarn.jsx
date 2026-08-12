@@ -143,7 +143,17 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
     if (action === "join") setShowJoinPrompt(true)
     else if (action === "birthday") onBirthdayClick()
     else if (action === "whatsapp") setWhatsappFor(rule.key)
-    else claim(rule.key)
+    else {
+      // Social rewards carry the profile they're paying the customer to
+      // follow. Open it first, so the click actually performs the action
+      // rather than just collecting points for nothing. Opened before the
+      // claim, and synchronously inside the click handler, or the browser
+      // treats it as an unrequested popup and blocks it.
+      if (rule.actionUrl) {
+        window.open(rule.actionUrl, "_blank", "noopener,noreferrer")
+      }
+      claim(rule.key)
+    }
   }
 
   return (
