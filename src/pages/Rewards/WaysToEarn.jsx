@@ -38,6 +38,7 @@
  */
 
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   ArrowRight,
   Award,
@@ -76,6 +77,7 @@ const RULE_ICONS = {
 }
 
 const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayClick }) => {
+  const navigate = useNavigate()
   const [claiming, setClaiming] = useState(null)
   const [message, setMessage] = useState(null)
   const [showJoinPrompt, setShowJoinPrompt] = useState(false)
@@ -126,6 +128,10 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
     if (rule.available === false) return null
     if (rule.key === "BIRTHDAY" && rule.blockedBy === "dateOfBirth") return "birthday"
     if (rule.claimable) return rule.key === "SUBSCRIBE_WHATSAPP" ? "whatsapp" : "claim"
+    // Rewards earned elsewhere on the site (the sizing quiz) are not claimed
+    // from this page - the card just takes you to where you earn them, and
+    // only while there is still something to earn.
+    if (rule.actionPath) return "navigate"
     return null
   }
 
@@ -142,6 +148,7 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
 
     if (action === "join") setShowJoinPrompt(true)
     else if (action === "birthday") onBirthdayClick()
+    else if (action === "navigate") navigate(rule.actionPath)
     else if (action === "whatsapp") setWhatsappFor(rule.key)
     else {
       // Social rewards carry the profile they're paying the customer to
