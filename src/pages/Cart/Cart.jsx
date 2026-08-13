@@ -11,6 +11,7 @@ import { Dialog } from '@headlessui/react';
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
 import YouMayAlsoLike from "./Components/YouMayAlsoLike"
+import { API_BASE_URL } from '../../config/api';
 
 const Cart = () => {
   const navigate = useNavigate()
@@ -36,7 +37,65 @@ const Cart = () => {
         console.error("Error loading cart items:", error)
       }
     }
-    loadCartItems()
+
+    // The support agent hands a customer a link to this page carrying the
+    // basket it prepared for them, as ?draft=<id>:<colour>:<size>:<qty>,...
+    // Each entry is resolved against the catalogue here rather than trusting
+    // anything in the URL - the link carries a selection, never a price.
+    const loadAgentDraft = async () => {
+      const draft = new URLSearchParams(window.location.search).get('draft')
+      if (!draft) return false
+
+      try {
+        const existing = JSON.parse(localStorage.getItem('cartItems') || '[]')
+
+        for (const entry of draft.split(',')) {
+          const [productId, colorName, size, qty] = entry.split(':')
+          if (!productId || !colorName || !size) continue
+
+          const res = await fetch(`${API_BASE_URL}/api/products/${productId}`)
+          if (!res.ok) continue
+          const product = (await res.json()).data
+          if (!product) continue
+
+          const quantity = Math.max(parseInt(qty, 10) || 1, 1)
+          // Skip anything already in the cart, so re-opening the link does
+          // not silently double the order.
+          if (existing.some((item) => item.id === product._id && item.colorName === colorName && item.size === size)) {
+            continue
+          }
+
+          const colour = (product.colors || []).find((c) => c.name === colorName)
+          existing.push({
+            id: product._id,
+            name: product.name,
+            price: product.price,
+            colorName,
+            colorHex: colour?.code || '#000000',
+            size,
+            quantity,
+            image: product.defaultImages?.[0]?.url || '',
+            timestamp: new Date().toISOString(),
+            totalPrice: product.price * quantity,
+            category: product.category,
+            description: product.description,
+          })
+        }
+
+        localStorage.setItem('cartItems', JSON.stringify(existing))
+        setProducts(existing)
+        // Drop the parameter so a refresh cannot re-apply it.
+        window.history.replaceState({}, '', window.location.pathname)
+        return true
+      } catch (error) {
+        console.error('Could not load the prepared order:', error)
+        return false
+      }
+    }
+
+    loadAgentDraft().then((handled) => {
+      if (!handled) loadCartItems()
+    })
     
     // Load user's available points if logged in
     const loadUserPoints = async () => {
