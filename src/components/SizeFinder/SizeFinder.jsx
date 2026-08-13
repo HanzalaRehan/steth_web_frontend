@@ -27,7 +27,7 @@
  * Run: Not directly runnable - rendered by DetailSection.jsx and SizeQuiz.jsx
  */
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { API_BASE_URL } from "../../config/api"
 
 const EMPTY_FORM = {
@@ -39,17 +39,47 @@ const EMPTY_FORM = {
   fitPreference: "regular",
 }
 
+// Every measurement is in inches, matching the printed size chart. Weight is
+// the one exception and is labelled as kg.
+//
+// The min/max here are only a fallback: the real bounds come from
+// GET /api/size/chart so the form can never accept a value the API will
+// reject. Keep these in step with MEASUREMENT_BOUNDS if you touch them.
 const FIELDS = [
-  { name: "chest", label: "Chest", hint: "around the fullest part" },
-  { name: "waist", label: "Waist", hint: "around your natural waist" },
-  { name: "hip", label: "Hip", hint: "optional" },
+  { name: "chest", label: "Chest", unit: "in", hint: "around the fullest part", min: 20, max: 80 },
+  { name: "waist", label: "Waist", unit: "in", hint: "around your natural waist", min: 18, max: 80 },
+  { name: "hip", label: "Hip", unit: "in", hint: "around the fullest part", min: 20, max: 80 },
+  { name: "heightInches", label: "Height", unit: "in", hint: "5'6\" is 66 in", min: 36, max: 90 },
+  { name: "weightKg", label: "Weight", unit: "kg", hint: "optional", min: 25, max: 250 },
 ]
+
+// A focused number input changes value when the wheel scrolls over it, so
+// scrolling the modal silently rewrites whatever the customer already typed.
+// Dropping focus first makes the page scroll instead.
+const blurOnWheel = (event) => event.currentTarget.blur()
 
 const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized }) => {
   const [form, setForm] = useState(EMPTY_FORM)
   const [result, setResult] = useState(null)
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  // Authoritative min/max per field, served by the API. Falls back to the
+  // constants in FIELDS until it arrives (or if the request fails).
+  const [limits, setLimits] = useState({})
+
+  useEffect(() => {
+    if (!isOpen || Object.keys(limits).length) return
+
+    fetch(`${API_BASE_URL}/api/size/chart`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.data?.measurementBounds) setLimits(data.data.measurementBounds)
+      })
+      .catch(() => {
+        // Non-critical - the fallback bounds still guard the inputs, and the
+        // API validates regardless.
+      })
+  }, [isOpen, limits])
 
   if (!isOpen) return null
 
@@ -63,8 +93,19 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized }) => {
     setError("")
   }
 
+  // Any filled-in field sitting outside its accepted range. Used to block
+  // submission, so the customer fixes it here rather than being bounced by
+  // the API after waiting for a round trip.
+  const invalidFields = FIELDS.filter((field) => {
+    const value = form[field.name]
+    if (value === "") return false
+    const bounds = limits[field.name] || field
+    return Number(value) < bounds.min || Number(value) > bounds.max
+  })
+
   const submit = async (e) => {
     e.preventDefault()
+    if (invalidFields.length) return
     setError("")
     setIsSubmitting(true)
 
@@ -181,67 +222,51 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized }) => {
             </p>
 
             <div className="space-y-4">
-              {FIELDS.map((field) => (
-                <div key={field.name}>
-                  <label
-                    htmlFor={field.name}
-                    className="block text-sm font-medium text-gray-900 mb-1"
-                  >
-                    {field.label}{" "}
-                    <span className="font-normal text-gray-400">
-                      (inches, {field.hint})
-                    </span>
-                  </label>
-                  <input
-                    id={field.name}
-                    type="number"
-                    step="0.5"
-                    inputMode="decimal"
-                    value={form[field.name]}
-                    onChange={(e) => update(field.name, e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/10"
-                  />
-                </div>
-              ))}
+              {FIELDS.map((field) => {
+                const bounds = limits[field.name] || field
+                const value = form[field.name]
+                // Show the problem next to the field rather than waiting for
+                // the server to reject the whole form.
+                const outOfRange =
+                  value !== "" && (Number(value) < bounds.min || Number(value) > bounds.max)
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label
-                    htmlFor="heightInches"
-                    className="block text-sm font-medium text-gray-900 mb-1"
-                  >
-                    Height{" "}
-                    <span className="font-normal text-gray-400">(inches)</span>
-                  </label>
-                  <input
-                    id="heightInches"
-                    type="number"
-                    step="0.5"
-                    inputMode="decimal"
-                    value={form.heightInches}
-                    onChange={(e) => update("heightInches", e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/10"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="weightKg"
-                    className="block text-sm font-medium text-gray-900 mb-1"
-                  >
-                    Weight{" "}
-                    <span className="font-normal text-gray-400">(kg)</span>
-                  </label>
-                  <input
-                    id="weightKg"
-                    type="number"
-                    step="0.5"
-                    inputMode="decimal"
-                    value={form.weightKg}
-                    onChange={(e) => update("weightKg", e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/10"
-                  />
-                </div>
-              </div>
+                return (
+                  <div key={field.name}>
+                    <label
+                      htmlFor={field.name}
+                      className="block text-sm font-medium text-gray-900 mb-1"
+                    >
+                      {field.label}{" "}
+                      <span className="font-normal text-gray-400">
+                        ({field.unit === "kg" ? "kg" : "inches"}, {field.hint})
+                      </span>
+                    </label>
+                    <input
+                      id={field.name}
+                      type="number"
+                      step="0.5"
+                      min={bounds.min}
+                      max={bounds.max}
+                      inputMode="decimal"
+                      value={value}
+                      onChange={(e) => update(field.name, e.target.value)}
+                      onWheel={blurOnWheel}
+                      aria-invalid={outOfRange}
+                      className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+                        outOfRange
+                          ? "border-red-400 focus:ring-red-200"
+                          : "border-gray-300 focus:ring-black/10"
+                      }`}
+                    />
+                    {outOfRange && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {field.label} should be between {bounds.min} and {bounds.max}{" "}
+                        {field.unit === "kg" ? "kg" : "inches"}.
+                      </p>
+                    )}
+                  </div>
+                )
+              })}
 
               <fieldset>
                 <legend className="block text-sm font-medium text-gray-900 mb-2">
@@ -277,7 +302,7 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized }) => {
 
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || invalidFields.length > 0}
               className="mt-6 w-full bg-black text-white rounded-md px-4 py-3 text-sm font-medium hover:bg-gray-800 disabled:opacity-40 transition-colors"
             >
               {isSubmitting ? "Working it out..." : "Find my size"}
