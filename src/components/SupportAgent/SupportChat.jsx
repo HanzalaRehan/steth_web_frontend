@@ -45,6 +45,75 @@ const SUGGESTIONS = [
   "How many reward points do I have?",
 ]
 
+// The agent writes light markdown - **bold**, [links](url) and "- " bullets.
+// Rendered as React elements rather than injected HTML: the text comes from a
+// language model quoting customer input, so building nodes keeps it
+// structurally impossible to inject markup.
+const INLINE_PATTERN = /(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g
+
+const renderInline = (text, keyPrefix) =>
+  text
+    .split(INLINE_PATTERN)
+    .filter(Boolean)
+    .map((chunk, index) => {
+      const key = `${keyPrefix}-${index}`
+
+      if (chunk.startsWith("**") && chunk.endsWith("**")) {
+        return (
+          <strong key={key} className="font-semibold">
+            {chunk.slice(2, -2)}
+          </strong>
+        )
+      }
+
+      const link = chunk.match(/^\[([^\]]+)\]\(([^)]+)\)$/)
+      if (link) {
+        const [, label, href] = link
+        // Only ever follow http(s). A javascript: or data: URL from model
+        // output must never become a clickable link.
+        if (!/^https?:\/\//i.test(href)) return <span key={key}>{label}</span>
+        return (
+          <a
+            key={key}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium underline underline-offset-2 hover:opacity-70"
+          >
+            {label}
+          </a>
+        )
+      }
+
+      return <span key={key}>{chunk}</span>
+    })
+
+const MessageText = ({ text }) => (
+  <>
+    {String(text)
+      .split("\n")
+      .filter((line, index, all) => line.trim() || (index > 0 && index < all.length - 1))
+      .map((line, index) => {
+        const bullet = line.match(/^\s*[-*]\s+(.*)$/)
+        if (bullet) {
+          return (
+            <span key={index} className="flex gap-2">
+              <span aria-hidden="true" className="select-none">
+                •
+              </span>
+              <span className="min-w-0">{renderInline(bullet[1], index)}</span>
+            </span>
+          )
+        }
+        return (
+          <span key={index} className="block">
+            {renderInline(line, index)}
+          </span>
+        )
+      })}
+  </>
+)
+
 const SupportChat = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isReady, setIsReady] = useState(false)
@@ -152,14 +221,17 @@ const SupportChat = () => {
                 key={index}
                 className={`flex ${entry.role === "customer" ? "justify-end" : "justify-start"}`}
               >
+                {/* min-w-0 plus break-words is what actually stops a long URL
+                    pushing the bubble past the panel - max-width alone does
+                    not constrain an unbreakable string. */}
                 <div
-                  className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm ${
+                  className={`flex min-w-0 max-w-[85%] flex-col gap-1 rounded-2xl px-4 py-2.5 text-sm leading-relaxed [overflow-wrap:anywhere] ${
                     entry.role === "customer"
-                      ? "bg-black text-white"
-                      : "bg-gray-100 text-gray-900"
+                      ? "rounded-br-sm bg-black text-white"
+                      : "rounded-bl-sm bg-gray-100 text-gray-900"
                   }`}
                 >
-                  {entry.text}
+                  <MessageText text={entry.text} />
                 </div>
               </div>
             ))}
