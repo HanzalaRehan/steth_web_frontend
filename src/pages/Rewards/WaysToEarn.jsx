@@ -224,6 +224,26 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
                 </p>
                 <p className="text-gray-600 text-sm mb-3">{rule.points} Points</p>
 
+                {/* Purchase rewards are otherwise invisible work - a customer
+                    cannot tell they are already 3 orders into a 5 order
+                    milestone. Hidden once earned, when it stops being a goal. */}
+                {rule.progress && !isDone && (
+                  <div className="mb-3">
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+                      <div
+                        className="h-full rounded-full bg-gray-900 transition-all"
+                        style={{
+                          width: `${Math.min(
+                            100,
+                            Math.round((rule.progress.current / rule.progress.target) * 100)
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                    <p className="mt-1.5 text-xs text-gray-500">{rule.progress.label}</p>
+                  </div>
+                )}
+
                 {/* The action arrow only appears on cards that do something,
                     so the grid never invites a click that goes nowhere. */}
                 {isInteractive && (
