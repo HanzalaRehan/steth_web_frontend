@@ -10,6 +10,7 @@ import CartDrawer from './components/CartDrawer/CartDrawer';
 import { AccountProvider } from './context/AccountContext';
 import AccountOverlay from './components/AccountOverlay/AccountOverlay';
 import AnalyticsListener from './components/Analytics/AnalyticsListener';
+import SupportChat from './components/SupportAgent/SupportChat';
 
 function App() {
   return (
@@ -23,6 +24,9 @@ function App() {
               <AuthPanel />
               <CartDrawer />
               <AccountOverlay />
+              {/* Support agent widget - global, hides itself when the
+                  agent is not configured. */}
+              <SupportChat />
             </BrowserRouter>
           </AccountProvider>
         </CartDrawerProvider>
