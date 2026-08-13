@@ -22,6 +22,7 @@
  */
 
 import { useContext, useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
 import SizeFinder from "../../components/SizeFinder/SizeFinder"
@@ -29,6 +30,7 @@ import { AuthContext } from "../Login&Signup/AuthContext"
 import { API_BASE_URL } from "../../config/api"
 
 const SizeQuiz = () => {
+  const navigate = useNavigate()
   const { isLoggedIn, openAuthPanel } = useContext(AuthContext)
   const [isQuizOpen, setIsQuizOpen] = useState(false)
   const [profile, setProfile] = useState(null)
@@ -54,6 +56,8 @@ const SizeQuiz = () => {
   }, [isLoggedIn, isQuizOpen])
 
   const savedSize = profile?.latest?.recommendation?.recommendedSize
+  // 'quiz' or 'whats-my-size' - the two entry points that share the engine.
+  const savedFromQuiz = profile?.latest?.recommendation?.source === "quiz"
 
   return (
     <div className="min-h-screen flex flex-col w-full bg-white">
@@ -72,10 +76,25 @@ const SizeQuiz = () => {
             <div className="bg-[#0B132B] rounded-2xl p-8 text-white mb-8">
               <p className="text-sm text-gray-300 mb-1">Your size</p>
               <p className="text-6xl font-bold">{savedSize}</p>
-              {profile.quizCompleted && (
-                <p className="text-xs text-gray-400 mt-3">
-                  You've already earned {profile.quizPointsAwarded} points for
-                  this quiz.
+
+              {/* Say where this size came from. Without it, someone who used
+                  "What's My Size?" on a product page arrives here, sees a size
+                  already filled in, and reasonably assumes they have already
+                  done the quiz - and never earns the points. */}
+              <p className="text-sm text-gray-300 mt-3">
+                {savedFromQuiz
+                  ? "From your sizing quiz."
+                  : "From “What’s My Size?” on a product page."}
+              </p>
+
+              {profile.quizCompleted ? (
+                <p className="text-xs text-gray-400 mt-2">
+                  You’ve already earned {profile.quizPointsAwarded} points for this
+                  quiz. You can retake it any time — it just won’t pay again.
+                </p>
+              ) : (
+                <p className="text-xs text-amber-300 mt-2">
+                  You haven’t taken the quiz yet — take it to earn your points.
                 </p>
               )}
             </div>
@@ -86,7 +105,11 @@ const SizeQuiz = () => {
               onClick={() => setIsQuizOpen(true)}
               className="bg-black text-white rounded-md px-8 py-3 font-medium hover:bg-gray-800 transition-colors"
             >
-              {savedSize ? "Retake the quiz" : "Start the quiz"}
+              {/* Keyed to whether the quiz was actually completed, not to
+                  whether a size exists - a size from "What's My Size?" is not
+                  a quiz, and calling it a retake would tell them they had
+                  already earned points they have not. */}
+              {profile?.quizCompleted ? "Retake the quiz" : "Start the quiz"}
             </button>
           ) : (
             <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100">
@@ -109,6 +132,12 @@ const SizeQuiz = () => {
         isOpen={isQuizOpen}
         onClose={() => setIsQuizOpen(false)}
         mode="quiz"
+        // Sends them back to the rewards page, but only when they press the
+        // button - the result stays on screen until they are done with it.
+        onDone={() => {
+          setIsQuizOpen(false)
+          navigate("/rewards")
+        }}
       />
     </div>
   )

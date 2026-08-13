@@ -58,7 +58,7 @@ const FIELDS = [
 // Dropping focus first makes the page scroll instead.
 const blurOnWheel = (event) => event.currentTarget.blur()
 
-const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized }) => {
+const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }) => {
   const [form, setForm] = useState(EMPTY_FORM)
   const [result, setResult] = useState(null)
   const [error, setError] = useState("")
@@ -206,11 +206,15 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized }) => {
               >
                 Start over
               </button>
+              {/* Deliberately not an automatic redirect. The customer came
+                  here for their size - throwing them to another page the
+                  instant it appears takes away the thing they asked for. They
+                  leave when they choose to. */}
               <button
-                onClick={onClose}
+                onClick={onDone || onClose}
                 className="flex-1 bg-black text-white rounded-md px-4 py-2.5 text-sm font-medium hover:bg-gray-800 transition-colors"
               >
-                Done
+                {onDone ? "Back to rewards" : "Done"}
               </button>
             </div>
           </div>
