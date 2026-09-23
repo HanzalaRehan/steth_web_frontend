@@ -10,14 +10,16 @@ import SEO from '../../components/SEO/SEO';
 
 const MensPage = ({ children }) => {
   return (
-    <div className="font-poppins min-h-screen flex flex-col w-full bg-white">
+    <div className="min-h-screen flex flex-col w-full bg-paper">
       <SEO
         title="Men's Scrubs"
         description="Shop STETH's Men's collection - premium medical scrubs, lab coats, and accessories built for the frontline, crafted for Pakistan's doctors, nurses, and students."
         canonicalPath="/men"
       />
-      <Header />
-      <Hero />
+      <div className="relative">
+        <Header transparent />
+        <Hero />
+      </div>
       <MensBestSellers />
       <ProductPage />
       <NewsletterSignup />

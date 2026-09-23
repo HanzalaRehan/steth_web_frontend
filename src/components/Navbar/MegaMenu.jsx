@@ -12,22 +12,22 @@ const MegaMenu = ({ gender, categories, fabrics, colors, loading }) => {
     // margin, the gap was dead space no DOM element covered, so the cursor
     // exited the trigger's wrapping <div onMouseEnter/Leave> (Header.jsx)
     // while crossing it, closing the menu before it ever reached the panel.
-    <div className="absolute top-full left-0 pt-2 w-[560px] max-w-[90vw] z-40">
-      <div className="bg-white border border-gray-200 rounded-lg shadow-xl p-6 grid grid-cols-3 gap-6">
+    <div className="absolute top-full left-0 pt-3 w-[560px] max-w-[90vw] z-40">
+      <div className="bg-shirting border border-hairline shadow-xl p-6 grid grid-cols-3 gap-6 border-t-2 border-t-brass">
         <div>
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Shop By Color</h3>
+          <h3 className="font-archivo text-[11px] font-semibold text-flannel uppercase tracking-[0.22em] mb-3">Shop By Color</h3>
           {loading ? (
-            <p className="text-sm text-gray-400">Loading...</p>
+            <p className="text-sm text-flannel/60">Loading...</p>
           ) : colors.length > 0 ? (
             <ul className="space-y-2">
               {colors.map((color) => (
                 <li key={color._id}>
                   <a
                     href={`${basePath}?colorRefs=${color._id}`}
-                    className="flex items-center gap-2 text-sm text-gray-700 hover:text-black transition-colors"
+                    className="flex items-center gap-2 text-sm text-ink hover:text-claret transition-colors no-underline"
                   >
                     <span
-                      className="w-4 h-4 rounded-sm inline-block border border-gray-200 shrink-0"
+                      className="w-4 h-4 inline-block border border-hairline shrink-0"
                       style={{ backgroundColor: color.hexCode }}
                     />
                     {color.name}
@@ -36,21 +36,21 @@ const MegaMenu = ({ gender, categories, fabrics, colors, loading }) => {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-gray-400">No colors yet</p>
+            <p className="text-sm text-flannel/60">No colors yet</p>
           )}
         </div>
 
         <div>
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Shop By Fabric</h3>
+          <h3 className="font-archivo text-[11px] font-semibold text-flannel uppercase tracking-[0.22em] mb-3">Shop By Fabric</h3>
           {loading ? (
-            <p className="text-sm text-gray-400">Loading...</p>
+            <p className="text-sm text-flannel/60">Loading...</p>
           ) : fabrics.length > 0 ? (
             <ul className="space-y-2">
               {fabrics.map((fabric) => (
                 <li key={fabric._id}>
                   <a
                     href={`${basePath}?fabric=${fabric._id}`}
-                    className="text-sm text-gray-700 hover:text-black transition-colors"
+                    className="text-sm text-ink hover:text-claret transition-colors no-underline"
                   >
                     {fabric.name}
                   </a>
@@ -58,21 +58,21 @@ const MegaMenu = ({ gender, categories, fabrics, colors, loading }) => {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-gray-400">No fabrics yet</p>
+            <p className="text-sm text-flannel/60">No fabrics yet</p>
           )}
         </div>
 
         <div>
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Shop By Category</h3>
+          <h3 className="font-archivo text-[11px] font-semibold text-flannel uppercase tracking-[0.22em] mb-3">Shop By Category</h3>
           {loading ? (
-            <p className="text-sm text-gray-400">Loading...</p>
+            <p className="text-sm text-flannel/60">Loading...</p>
           ) : categories.length > 0 ? (
             <ul className="space-y-2">
               {categories.map((category) => (
                 <li key={category._id}>
                   <a
                     href={`${basePath}?categoryRef=${category._id}`}
-                    className="text-sm text-gray-700 hover:text-black transition-colors"
+                    className="text-sm text-ink hover:text-claret transition-colors no-underline"
                   >
                     {category.name}
                   </a>
@@ -80,7 +80,7 @@ const MegaMenu = ({ gender, categories, fabrics, colors, loading }) => {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-gray-400">No categories yet</p>
+            <p className="text-sm text-flannel/60">No categories yet</p>
           )}
         </div>
       </div>

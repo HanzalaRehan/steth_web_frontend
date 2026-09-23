@@ -11,7 +11,13 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        poppins: ['Poppins', 'sans-serif'],
+        // Savile Row design system. `poppins` kept only so any
+        // not-yet-restyled screen doesn't fall back to the browser
+        // default serif while it's migrated.
+        poppins: ['Spectral', 'Georgia', 'serif'],
+        caslon: ['"Libre Caslon Display"', 'Georgia', 'serif'],
+        spectral: ['Spectral', 'Georgia', 'serif'],
+        archivo: ['"Archivo Narrow"', 'sans-serif'],
       },
       colors: {
         'navy-blue': {
@@ -19,6 +25,16 @@ export default {
           dark: '#121858',
           light: '#534bae',
         },
+        // Savile Row palette (design system doc: "Savile Row.dc.html")
+        navy: { DEFAULT: '#1B2440', dark: '#14161F' },
+        claret: { DEFAULT: '#6B2233', dark: '#521A27' },
+        brass: '#A9884C',
+        paper: '#EFECE4',
+        shirting: '#F7F5EF',
+        chalk: '#D8D3C6',
+        flannel: '#3A3D45',
+        ink: '#14161F',
+        hairline: '#CBC5B6',
         // shadcn/ui theme (ported from Steth_admin_Panel), scoped in
         // practice to the /admin/* section - nothing in the storefront
         // references these class names today.

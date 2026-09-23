@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useContext } from "react"
 import gsap from "gsap"
-import logo from "../assets/logo.png"
 import { AuthContext } from "../pages/Login&Signup/AuthContext"
 import { API_BASE_URL } from "../config/api"
 import { useCatalogTaxonomy } from "../hooks/useCatalogTaxonomy"
@@ -12,7 +11,12 @@ import MegaMenu from "./Navbar/MegaMenu"
 import AboutDropdown from "./Navbar/AboutDropdown"
 import { trackSearch } from "../lib/analytics"
 
-const Header = ({ className = "" }) => {
+// `transparent`: used on pages whose first section is a full-bleed hero
+// (Homepage, MensPage, WomenPage) so the nav row can float over the photo -
+// see the Savile Row design system's navbar spec (sleek, minimal, no logo
+// mark, transparent-until-scrolled-or-hovered). Every other page renders a
+// normal solid, in-flow sticky nav, same as before this rebuild.
+const Header = ({ className = "", transparent = false }) => {
   const { isLoggedIn, openAuthPanel } = useContext(AuthContext)
   const { openCartDrawer } = useCartDrawer()
   const { openAccountOverlay } = useAccountOverlay()
@@ -21,8 +25,10 @@ const Header = ({ className = "" }) => {
   const [activeDropdown, setActiveDropdown] = useState(null) // 'Women' | 'Men' | 'About' | null
   const [mobileExpandedSection, setMobileExpandedSection] = useState(null) // 'Women' | 'Men' | 'About' | null
   const [cartCount, setCartCount] = useState(0)
+  const [scrolled, setScrolled] = useState(false)
+  const [navHovered, setNavHovered] = useState(false)
   const headerRef = useRef(null)
-  const logoRef = useRef(null)
+  const wordmarkRef = useRef(null)
   const navItemsRef = useRef([])
   const searchRef = useRef(null)
   const iconsRef = useRef(null)
@@ -57,24 +63,47 @@ const Header = ({ className = "" }) => {
     }
   }, [])
 
+  // Only relevant in transparent mode: once the visitor scrolls past the
+  // hero, the nav switches from an absolutely-positioned overlay to a fixed,
+  // solid bar - otherwise it would scroll away with the hero instead of
+  // staying reachable.
+  useEffect(() => {
+    if (!transparent) return
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [transparent])
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
     setMobileExpandedSection(null)
-    // Prevent body scroll when menu is open
-    document.body.style.overflow = isMenuOpen ? "auto" : "hidden"
   }
 
   const toggleMobileSection = (section) => {
     setMobileExpandedSection((prev) => (prev === section ? null : section))
   }
 
-  // Clean up effect
+  // Prevent body scroll while the mobile menu is open, restoring whatever
+  // was there before rather than hardcoding "auto" - matches the
+  // save/restore pattern AccountOverlay/AuthPanel/CartDrawer already use.
+  // (The previous version set `document.body.style.overflow` directly
+  // inside toggleMenu, plus a separate unconditional-on-unmount cleanup
+  // effect that ran regardless of whether the menu was ever opened - under
+  // React StrictMode's dev double-invoke, that cleanup fired once on every
+  // mount, leaving body with a stray inline `overflow: auto` permanently.
+  // That inline style is exactly what breaks `position: sticky` sitewide,
+  // since it makes body a CSS scroll container even though it never
+  // actually scrolls independently of the window.)
   useEffect(() => {
+    if (!isMenuOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
     return () => {
-      document.body.style.overflow = "auto"
+      document.body.style.overflow = previousOverflow
     }
-  }, [])
-  
+  }, [isMenuOpen])
+
   useEffect(() => {
     // Text Slider Animation
     const slider = sliderRef.current
@@ -129,7 +158,7 @@ const Header = ({ className = "" }) => {
     // GSAP animations on mount for header elements
     gsap.fromTo(
       headerRef.current,
-      { y: -100, opacity: 0 },
+      { y: -20, opacity: 0 },
       {
         y: 0,
         opacity: 1,
@@ -139,14 +168,13 @@ const Header = ({ className = "" }) => {
     )
 
     gsap.fromTo(
-      logoRef.current,
-      { scale: 0.8, opacity: 0 },
+      wordmarkRef.current,
+      { opacity: 0 },
       {
-        scale: 1,
         opacity: 1,
         duration: 0.6,
         delay: 0.3,
-        ease: "back.out(1.7)",
+        ease: "power2.out",
       },
     )
 
@@ -273,33 +301,67 @@ const Header = ({ className = "" }) => {
     setTimeout(() => setShowResults(false), 200)
   }
 
+  // Whether the nav should currently render as a solid bar. Always true off
+  // the hero pages; on a hero page it's true once scrolled past the hero or
+  // while the visitor's cursor is over the bar.
+  const solid = !transparent || scrolled || navHovered
+  const overlay = transparent && !scrolled
+
+  const navLinkClass = `font-archivo text-xs font-medium uppercase tracking-[0.18em] transition-colors whitespace-nowrap no-underline ${
+    solid ? "text-ink hover:text-claret" : "text-paper hover:text-chalk"
+  }`
+
+  const iconClass = `transition-colors ${solid ? "text-ink hover:text-claret" : "text-paper hover:text-chalk"}`
+
   return (
     <>
-      <header ref={headerRef} className={`w-full z-50 sticky top-0 ${className}`}>
-        {/* Desktop Header */}
-        <div className="hidden md:grid grid-cols-[auto_1fr_auto] items-center py-3 lg:py-4 border-b bg-white shadow-md px-[clamp(1rem,2vw,2.5rem)]">
-          <div className="flex items-center space-x-4 lg:space-x-8">
-            <a href="/" className="flex items-center ml-0 lg:ml-10" ref={logoRef}>
-              <img src={logo || "/placeholder.svg"} alt="STETH Logo" className="h-14 lg:h-20 w-auto" />
-              <h1 className="text-xl lg:text-3xl text-black">STETH</h1>
-            </a>
+      {/* Flair - the site-wide promise band, always above the navbar. */}
+      <div className="w-full bg-claret text-shirting overflow-hidden h-9 relative z-50">
+        <div ref={sliderRef} className="h-9 flex items-center">
+          <div className="slider-content flex whitespace-nowrap">
+            <div className="slider-item flex-shrink-0 ml-10 mr-10 font-archivo text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] py-2">
+              No compromise on your experience! No questions asked return within 7 days.
+            </div>
+            <div className="slider-item flex-shrink-0 ml-10 mr-10 font-archivo text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] py-2">
+              No compromise on your experience! No questions asked return within 7 days.
+            </div>
+            <div className="slider-item flex-shrink-0 ml-10 mr-10 font-archivo text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] py-2">
+              No compromise on your experience! No questions asked return within 7 days.
+            </div>
+            <div className="slider-item flex-shrink-0 ml-10 mr-10 font-archivo text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] py-2">
+              No compromise on your experience! No questions asked return within 7 days.
+            </div>
           </div>
+        </div>
+      </div>
 
-          {/* Center Navigation - lives in its own grid column, so it can
-              never overlap the logo or icons regardless of viewport width
-              (the old absolute-centered nav could, since it ignored its
-              siblings' actual widths entirely). */}
-          <nav className="hidden lg:flex justify-center items-center gap-x-[clamp(0.75rem,2vw,2.5rem)] min-w-0 px-2 overflow-visible">
+      <header
+        ref={headerRef}
+        onMouseEnter={() => setNavHovered(true)}
+        onMouseLeave={() => setNavHovered(false)}
+        className={`w-full z-40 transition-colors duration-300 ${
+          overlay
+            ? "absolute top-9 left-0 right-0"
+            : transparent
+            // Once scrolled past the hero, `sticky` would be bounded by the
+            // small Header+Hero wrapper it sits in (see Homepage.jsx) and
+            // run out of containing block long before the rest of the page
+            // does - `fixed` is bounded by the viewport instead, so it
+            // stays put for the remainder of the page.
+            ? "fixed top-0 left-0 right-0"
+            : "sticky top-0"
+        } ${solid ? "bg-shirting border-b border-hairline" : "bg-transparent border-b border-transparent"} ${className}`}
+      >
+        {/* Desktop nav - single sleek row: links left, wordmark centered, icons right */}
+        <div className="hidden md:grid grid-cols-[1fr_auto_1fr] items-center py-4 px-[clamp(1.5rem,3vw,3rem)]">
+          <nav className="flex items-center gap-x-[clamp(1rem,2vw,2.25rem)] justify-self-start">
             <div
               className="relative"
               onMouseEnter={() => setActiveDropdown("Women")}
               onMouseLeave={() => setActiveDropdown((prev) => (prev === "Women" ? null : prev))}
               ref={(el) => (navItemsRef.current[0] = el)}
             >
-              <a
-                href="/women"
-                className="text-gray-700 hover:text-gray-900 transition-colors text-xs md:text-sm lg:text-base font-medium whitespace-nowrap"
-              >
+              <a href="/women" className={navLinkClass}>
                 Women
               </a>
               {activeDropdown === "Women" && (
@@ -313,10 +375,7 @@ const Header = ({ className = "" }) => {
               onMouseLeave={() => setActiveDropdown((prev) => (prev === "Men" ? null : prev))}
               ref={(el) => (navItemsRef.current[1] = el)}
             >
-              <a
-                href="/men"
-                className="text-gray-700 hover:text-gray-900 transition-colors text-xs md:text-sm lg:text-base font-medium whitespace-nowrap"
-              >
+              <a href="/men" className={navLinkClass}>
                 Men
               </a>
               {activeDropdown === "Men" && (
@@ -324,11 +383,7 @@ const Header = ({ className = "" }) => {
               )}
             </div>
 
-            <a
-              href="/rewards"
-              className="text-gray-700 hover:text-gray-900 transition-colors text-xs md:text-sm lg:text-base font-medium whitespace-nowrap"
-              ref={(el) => (navItemsRef.current[2] = el)}
-            >
+            <a href="/rewards" className={navLinkClass} ref={(el) => (navItemsRef.current[2] = el)}>
               Rewards
             </a>
 
@@ -338,30 +393,34 @@ const Header = ({ className = "" }) => {
               onMouseLeave={() => setActiveDropdown((prev) => (prev === "About" ? null : prev))}
               ref={(el) => (navItemsRef.current[3] = el)}
             >
-              <a
-                href="/aboutus"
-                className="text-gray-700 hover:text-gray-900 transition-colors text-xs md:text-sm lg:text-base font-medium whitespace-nowrap"
-              >
+              <a href="/aboutus" className={navLinkClass}>
                 About STETH
               </a>
               {activeDropdown === "About" && <AboutDropdown />}
             </div>
-          </nav>
 
-          <div className="flex items-center justify-end space-x-2 lg:space-x-4 mr-0 lg:mr-10">
-            {/* Hamburger Menu for 770px-880px */}
-            <button 
-              onClick={toggleMenu} 
-              className="lg:hidden text-black bg-white p-2 hover:text-gray-600 transition-colors"
+            {/* Hamburger for the narrow mid-range where the full row can't fit */}
+            <button
+              onClick={toggleMenu}
+              className={`lg:hidden p-1 transition-colors ${solid ? "text-ink" : "text-paper"}`}
+              aria-label="Open menu"
             >
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
+          </nav>
 
+          <a href="/" ref={wordmarkRef} className="justify-self-center no-underline">
+            <span className="font-caslon text-2xl lg:text-3xl tracking-[0.1em] leading-none" style={{ color: solid ? "#1B2440" : "#EFECE4" }}>
+              STETH
+            </span>
+          </a>
+
+          <div className="flex items-center justify-end gap-3 lg:gap-5 justify-self-end">
             {/* Desktop Search - Responsive sizing */}
             {!isSearchOverlayActive ? (
-              <div className="relative w-[clamp(140px,16vw,256px)] shrink-0" ref={searchRef}>
+              <div className="relative w-[clamp(120px,14vw,220px)] shrink-0 hidden lg:block" ref={searchRef}>
                 <input
                   type="text"
                   placeholder="Search"
@@ -371,10 +430,14 @@ const Header = ({ className = "" }) => {
                     setIsSearchOverlayActive(true)
                     handleSearchFocus()
                   }}
-                  className="w-full px-3 lg:px-4 py-1.5 lg:py-2 pl-10 lg:pl-12 text-sm lg:text-base rounded-3xl bg-gray-200 border-gray-200 focus:border-navy-blue focus:outline-none transition-colors text-gray-700"
+                  className={`w-full px-3 py-1.5 pl-9 text-sm font-spectral focus:outline-none transition-colors border-b ${
+                    solid
+                      ? "bg-transparent border-hairline text-ink placeholder:text-flannel/60 focus:border-claret"
+                      : "bg-transparent border-paper/50 text-paper placeholder:text-paper/70 focus:border-paper"
+                  }`}
                 />
                 <svg
-                  className="absolute left-3 lg:left-4 top-2 lg:top-2.5 h-4 lg:h-5 w-4 lg:w-5 text-gray-400"
+                  className={`absolute left-2.5 top-2 h-4 w-4 ${solid ? "text-flannel/60" : "text-paper/70"}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -389,9 +452,21 @@ const Header = ({ className = "" }) => {
               </div>
             ) : null}
 
+            {/* Search icon trigger for narrower desktop widths */}
+            <button
+              type="button"
+              onClick={() => setIsSearchOverlayActive(true)}
+              className={`lg:hidden ${iconClass}`}
+              aria-label="Search"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+
             {/* Full Screen Search Overlay */}
             {isSearchOverlayActive && (
-              <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-[9999]">
+              <div className="fixed inset-0 bg-ink/40 backdrop-blur-sm z-[9999]">
                 <div className="max-w-2xl mx-auto px-4 lg:px-6 py-4 lg:py-6">
                   <div className="flex items-center space-x-3 lg:space-x-4">
                     <div className="flex-1 relative">
@@ -408,11 +483,11 @@ const Header = ({ className = "" }) => {
                             }, 200)
                           }
                         }}
-                        className="w-full px-4 lg:px-6 py-2.5 lg:py-3 pl-12 lg:pl-14 pr-4 lg:pr-6 text-sm lg:text-base rounded-2xl bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        className="w-full px-4 lg:px-6 py-2.5 lg:py-3 pl-12 lg:pl-14 pr-4 lg:pr-6 text-sm lg:text-base font-spectral bg-shirting text-ink focus:outline-none border border-hairline"
                         autoFocus
                       />
                       <svg
-                        className="absolute left-4 lg:left-5 top-3 lg:top-4 h-4 lg:h-5 w-4 lg:w-5 text-gray-400"
+                        className="absolute left-4 lg:left-5 top-3 lg:top-4 h-4 lg:h-5 w-4 lg:w-5 text-flannel/60"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -433,10 +508,10 @@ const Header = ({ className = "" }) => {
                         setSearchResults([])
                         setShowResults(false)
                       }}
-                      className="p-2 rounded-full transition-colors bg-gray-100 hover:bg-gray-200"
+                      className="p-2 transition-colors bg-shirting hover:bg-paper border border-hairline"
                       title="Close search"
                     >
-                      <svg className="h-4 lg:h-5 w-4 lg:w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-4 lg:h-5 w-4 lg:w-5 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
@@ -444,15 +519,15 @@ const Header = ({ className = "" }) => {
 
                   {/* Search Results in Overlay */}
                   {showResults && (
-                    <div className="search-overlay-content mt-3 lg:mt-4 bg-white rounded-xl border border-gray-200 shadow-lg max-h-72 lg:max-h-80 overflow-y-auto">
+                    <div className="search-overlay-content mt-3 lg:mt-4 bg-shirting border border-hairline shadow-lg max-h-72 lg:max-h-80 overflow-y-auto">
                       {isSearching ? (
-                        <div className="p-4 lg:p-6 text-center text-gray-500">
-                          <div className="animate-spin rounded-full h-5 lg:h-6 w-5 lg:w-6 border-b-2 border-gray-900 mx-auto"></div>
-                          <span className="mt-2 lg:mt-3 block text-xs lg:text-sm">Searching...</span>
+                        <div className="p-4 lg:p-6 text-center text-flannel/70">
+                          <div className="animate-spin rounded-full h-5 lg:h-6 w-5 lg:w-6 border-b-2 border-navy mx-auto"></div>
+                          <span className="mt-2 lg:mt-3 block text-xs lg:text-sm font-spectral">Searching...</span>
                         </div>
                       ) : searchResults.length > 0 ? (
                         <div className="p-2 lg:p-3">
-                          <h3 className="text-xs lg:text-sm font-semibold text-gray-900 mb-2 lg:mb-3 px-1">Search Results</h3>
+                          <h3 className="font-archivo text-[11px] font-semibold uppercase tracking-[0.18em] text-ink mb-2 lg:mb-3 px-1">Search Results</h3>
                           <div className="space-y-1 lg:space-y-2">
                             {searchResults.map((product) => (
                               <div
@@ -461,21 +536,21 @@ const Header = ({ className = "" }) => {
                                   handleResultClick(product._id)
                                   setIsSearchOverlayActive(false)
                                 }}
-                                className="flex items-center p-2 lg:p-3 hover:bg-gray-50 cursor-pointer rounded-lg border border-gray-100 transition-colors"
+                                className="flex items-center p-2 lg:p-3 hover:bg-paper cursor-pointer border border-hairline transition-colors"
                               >
                                 <img
                                   src={product.defaultImages[0]?.url || "/placeholder.svg?height=40&width=40"}
                                   alt={product.name}
-                                  className="w-8 lg:w-10 h-8 lg:h-10 object-cover rounded-md mr-2 lg:mr-3 flex-shrink-0"
+                                  className="w-8 lg:w-10 h-8 lg:h-10 object-cover mr-2 lg:mr-3 flex-shrink-0"
                                 />
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-xs lg:text-sm font-medium text-gray-900 truncate">{product.name}</p>
-                                  <p className="text-xs text-gray-500 mt-0.5">
+                                  <p className="text-xs lg:text-sm font-spectral font-medium text-ink truncate">{product.name}</p>
+                                  <p className="font-archivo text-[10px] lg:text-[11px] tracking-wide text-flannel/70 mt-0.5">
                                     {product.category} • {product.gender} • PKR {product.price.toLocaleString()}
                                   </p>
                                 </div>
                                 <svg
-                                  className="h-3 lg:h-4 w-3 lg:w-4 text-gray-400"
+                                  className="h-3 lg:h-4 w-3 lg:w-4 text-flannel/60"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"
@@ -492,9 +567,9 @@ const Header = ({ className = "" }) => {
                           </div>
                         </div>
                       ) : searchQuery.trim() ? (
-                        <div className="p-4 lg:p-6 text-center text-gray-500">
+                        <div className="p-4 lg:p-6 text-center text-flannel/70">
                           <svg
-                            className="h-6 lg:h-8 w-6 lg:w-8 text-gray-300 mx-auto mb-2 lg:mb-3"
+                            className="h-6 lg:h-8 w-6 lg:w-8 text-chalk mx-auto mb-2 lg:mb-3"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -506,8 +581,8 @@ const Header = ({ className = "" }) => {
                               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                             />
                           </svg>
-                          <p className="text-xs lg:text-sm">No products found for "{searchQuery}"</p>
-                          <p className="text-xs mt-1">Try searching with different keywords</p>
+                          <p className="text-xs lg:text-sm font-spectral">No products found for "{searchQuery}"</p>
+                          <p className="text-xs mt-1 font-spectral">Try searching with different keywords</p>
                         </div>
                       ) : null}
                     </div>
@@ -516,7 +591,7 @@ const Header = ({ className = "" }) => {
               </div>
             )}
 
-            <div className="flex items-center space-x-2 lg:space-x-4" ref={iconsRef}>
+            <div className="flex items-center gap-3 lg:gap-5" ref={iconsRef}>
               {isLoggedIn ? (
                 <a
                   href="/profile"
@@ -524,10 +599,10 @@ const Header = ({ className = "" }) => {
                     e.preventDefault()
                     openAccountOverlay("profile")
                   }}
-                  className="hover:text-gray-900 transition-colors"
+                  className={iconClass}
                   title="Profile"
                 >
-                  <svg className="h-5 lg:h-6 w-5 lg:w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -540,8 +615,9 @@ const Header = ({ className = "" }) => {
                 <button
                   type="button"
                   onClick={() => openAuthPanel("login")}
-                  className="px-3 lg:px-4 py-1.5 lg:py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors text-xs lg:text-sm font-medium"
-                  title="Login"
+                  className={`font-archivo text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors ${
+                    solid ? "text-ink hover:text-claret" : "text-paper hover:text-chalk"
+                  }`}
                 >
                   Login
                 </button>
@@ -552,10 +628,10 @@ const Header = ({ className = "" }) => {
                   e.preventDefault()
                   openCartDrawer()
                 }}
-                className="hover:text-gray-900 transition-colors relative"
+                className={`relative ${iconClass}`}
                 title="Cart"
               >
-                <svg className="h-5 lg:h-6 w-5 lg:w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -564,7 +640,7 @@ const Header = ({ className = "" }) => {
                   />
                 </svg>
                 {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-4 lg:h-5 w-4 lg:w-5 flex items-center justify-center text-xs">
+                  <span className="absolute -top-2 -right-2 bg-claret text-shirting text-[10px] h-4 w-4 flex items-center justify-center">
                     {cartCount}
                   </span>
                 )}
@@ -574,28 +650,34 @@ const Header = ({ className = "" }) => {
         </div>
 
         {/* Mobile Header */}
-        <div className="md:hidden flex items-center justify-between px-4 py-3 border-b bg-white">
-          <button onClick={toggleMenu} className="text-black bg-white p-2 hover:text-gray-600 transition-colors z-50">
+        <div className="md:hidden flex items-center justify-between px-4 py-3">
+          <button onClick={toggleMenu} className={`p-2 transition-colors z-50 ${solid ? "text-ink" : "text-paper"}`}>
             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
 
-          <a href="/" className="flex items-center">
-            <img src={logo || "/placeholder.svg"} alt="STETH Logo" className="h-10 sm:h-12" />
-            <h1 className="text-lg sm:text-xl text-black ml-1">STETH</h1>
+          <a href="/" className="flex items-center no-underline">
+            <span className="font-caslon text-xl tracking-[0.1em]" style={{ color: solid ? "#1B2440" : "#EFECE4" }}>
+              STETH
+            </span>
           </a>
 
-          <div className="flex items-center px-3">
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={() => setIsSearchOverlayActive(true)} className={iconClass} aria-label="Search">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
             <a
               href="/cart"
               onClick={(e) => {
                 e.preventDefault()
                 openCartDrawer()
               }}
-              className="relative"
+              className={`relative ${iconClass}`}
             >
-              <svg className="h-6 w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -604,7 +686,7 @@ const Header = ({ className = "" }) => {
                 />
               </svg>
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-claret text-shirting text-[10px] h-5 w-5 flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
@@ -614,50 +696,48 @@ const Header = ({ className = "" }) => {
 
         {/* Mobile Menu Overlay - Simplified */}
         {isMenuOpen && (
-          <div className="fixed inset-0 bg-white z-[9999]">
+          <div className="fixed inset-0 bg-shirting z-[9999]">
             {/* Top Navigation */}
-            <div className="border-b">
+            <div className="border-b border-hairline">
               <div className="px-4 py-3 flex items-center justify-between">
-                <button onClick={toggleMenu} className="p-2 bg-white">
-                  <svg className="h-6 w-6 bg-white text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button onClick={toggleMenu} className="p-2 bg-shirting">
+                  <svg className="h-6 w-6 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
-                {/* Keep the logo in the mobile menu header */}
-                <a href="/" className="flex items-center">
-                  <img src={logo || "/placeholder.svg"} alt="STETH Logo" className="h-10" />
-                  <h1 className="text-lg text-black ml-1">STETH</h1>
+                <a href="/" className="flex items-center no-underline">
+                  <span className="font-caslon text-xl tracking-[0.1em] text-navy">STETH</span>
                 </a>
                 <div className="w-6"></div> {/* Spacer for alignment */}
               </div>
             </div>
 
             {/* Simplified Mobile Menu */}
-            <div className="h-[calc(100vh-120px)] overflow-y-auto px-4 py-4 bg-white">
+            <div className="h-[calc(100vh-120px)] overflow-y-auto px-4 py-4 bg-shirting">
               <nav className="space-y-2 sm:space-y-3">
                 {["Women", "Men"].map((gender) => (
-                  <div key={gender} className="border-b border-gray-100">
+                  <div key={gender} className="border-b border-hairline">
                     <button
                       type="button"
                       onClick={() => toggleMobileSection(gender)}
-                      className="w-full flex items-center justify-between text-base sm:text-lg font-medium py-3 text-black rounded px-2"
+                      className="w-full flex items-center justify-between font-archivo text-base font-semibold uppercase tracking-[0.14em] py-3 text-navy px-2"
                     >
-                      {gender.toUpperCase()}
+                      {gender}
                       <span className="text-sm">{mobileExpandedSection === gender ? "−" : "+"}</span>
                     </button>
                     {mobileExpandedSection === gender && (
                       <div className="pb-4 px-2 space-y-4">
                         <div>
-                          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Shop By Color</h4>
+                          <h4 className="font-archivo text-[11px] font-semibold text-flannel/70 uppercase tracking-[0.2em] mb-2">Shop By Color</h4>
                           <div className="flex flex-wrap gap-2">
                             {colors.map((color) => (
                               <a
                                 key={color._id}
                                 href={`/${gender.toLowerCase()}?colorRefs=${color._id}`}
-                                className="flex items-center gap-1.5 text-sm text-gray-700 py-1"
+                                className="flex items-center gap-1.5 text-sm font-spectral text-ink py-1 no-underline"
                               >
                                 <span
-                                  className="w-3.5 h-3.5 rounded-sm inline-block border border-gray-200 shrink-0"
+                                  className="w-3.5 h-3.5 inline-block border border-hairline shrink-0"
                                   style={{ backgroundColor: color.hexCode }}
                                 />
                                 {color.name}
@@ -666,26 +746,26 @@ const Header = ({ className = "" }) => {
                           </div>
                         </div>
                         <div>
-                          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Shop By Fabric</h4>
+                          <h4 className="font-archivo text-[11px] font-semibold text-flannel/70 uppercase tracking-[0.2em] mb-2">Shop By Fabric</h4>
                           <div className="flex flex-col gap-1">
                             {fabrics.map((fabric) => (
-                              <a key={fabric._id} href={`/${gender.toLowerCase()}?fabric=${fabric._id}`} className="text-sm text-gray-700 py-1">
+                              <a key={fabric._id} href={`/${gender.toLowerCase()}?fabric=${fabric._id}`} className="text-sm font-spectral text-ink py-1 no-underline">
                                 {fabric.name}
                               </a>
                             ))}
                           </div>
                         </div>
                         <div>
-                          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Shop By Category</h4>
+                          <h4 className="font-archivo text-[11px] font-semibold text-flannel/70 uppercase tracking-[0.2em] mb-2">Shop By Category</h4>
                           <div className="flex flex-col gap-1">
                             {categories.map((category) => (
-                              <a key={category._id} href={`/${gender.toLowerCase()}?categoryRef=${category._id}`} className="text-sm text-gray-700 py-1">
+                              <a key={category._id} href={`/${gender.toLowerCase()}?categoryRef=${category._id}`} className="text-sm font-spectral text-ink py-1 no-underline">
                                 {category.name}
                               </a>
                             ))}
                           </div>
                         </div>
-                        <a href={`/${gender.toLowerCase()}`} className="block text-sm font-medium text-black underline py-1">
+                        <a href={`/${gender.toLowerCase()}`} className="block text-sm font-archivo font-semibold uppercase tracking-[0.12em] text-claret py-1">
                           Shop all {gender}
                         </a>
                       </div>
@@ -693,28 +773,28 @@ const Header = ({ className = "" }) => {
                   </div>
                 ))}
 
-                <a href="/rewards" className="block text-base sm:text-lg font-medium py-3 text-black hover:bg-gray-100 transition-colors rounded px-2 border-b border-gray-100">
-                  REWARDS
+                <a href="/rewards" className="block font-archivo text-base font-semibold uppercase tracking-[0.14em] py-3 text-navy px-2 border-b border-hairline no-underline">
+                  Rewards
                 </a>
 
-                <div className="border-b border-gray-100">
+                <div className="border-b border-hairline">
                   <button
                     type="button"
                     onClick={() => toggleMobileSection("About")}
-                    className="w-full flex items-center justify-between text-base sm:text-lg font-medium py-3 text-black rounded px-2"
+                    className="w-full flex items-center justify-between font-archivo text-base font-semibold uppercase tracking-[0.14em] py-3 text-navy px-2"
                   >
-                    ABOUT STETH
+                    About STETH
                     <span className="text-sm">{mobileExpandedSection === "About" ? "−" : "+"}</span>
                   </button>
                   {mobileExpandedSection === "About" && (
                     <div className="pb-4 px-2 flex flex-col gap-2">
-                      <a href="/aboutus#our-story" className="text-sm text-gray-700 py-1">Our Story</a>
-                      <a href="/blog" className="text-sm text-gray-700 py-1">Blog</a>
+                      <a href="/aboutus#our-story" className="text-sm font-spectral text-ink py-1 no-underline">Our Story</a>
+                      <a href="/blog" className="text-sm font-spectral text-ink py-1 no-underline">Blog</a>
                     </div>
                   )}
                 </div>
 
-                <div className="pt-4 border-t border-gray-200">
+                <div className="pt-4">
                   {!isLoggedIn ? (
                     <button
                       type="button"
@@ -722,9 +802,9 @@ const Header = ({ className = "" }) => {
                         setIsMenuOpen(false)
                         openAuthPanel("login")
                       }}
-                      className="block w-full text-left text-base sm:text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2"
+                      className="block w-full text-left font-archivo text-base font-semibold uppercase tracking-[0.14em] py-2 text-navy px-2"
                     >
-                      LOGIN
+                      Login
                     </button>
                   ) : (
                     <button
@@ -733,9 +813,9 @@ const Header = ({ className = "" }) => {
                         setIsMenuOpen(false)
                         openAccountOverlay("profile")
                       }}
-                      className="w-full flex items-center text-base sm:text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2"
+                      className="w-full flex items-center font-archivo text-base font-semibold uppercase tracking-[0.14em] py-2 text-navy px-2"
                     >
-                      <svg className="h-5 w-5 sm:h-6 sm:w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -743,14 +823,14 @@ const Header = ({ className = "" }) => {
                           d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                         />
                       </svg>
-                      PROFILE
+                      Profile
                     </button>
                   )}
                   <a
                     href="/cart"
-                    className="block text-base sm:text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2"
+                    className="block font-archivo text-base font-semibold uppercase tracking-[0.14em] py-2 text-navy px-2 no-underline"
                   >
-                    CART
+                    Cart
                   </a>
                 </div>
               </nav>
@@ -758,118 +838,82 @@ const Header = ({ className = "" }) => {
           </div>
         )}
 
-        {/* Mobile Search */}
-        <div className="md:hidden px-4 py-2 border-b bg-white">
-          <div className="relative">
-            <input 
-              type="text" 
-              placeholder="Search" 
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-              onFocus={handleSearchFocus}
-              onBlur={handleSearchBlur}
-              className="w-full px-4 py-2 pl-12 text-sm sm:text-base rounded-3xl bg-gray-200 text-black border-gray-200 focus:border-gray-400 focus:outline-none transition-colors"
-            />
-            <svg 
-              className="absolute left-4 top-3 h-5 w-5 text-gray-400" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+        {/* Mobile Search Results Panel */}
+        {isSearchOverlayActive && (
+          <div className="md:hidden fixed inset-0 bg-ink/40 backdrop-blur-sm z-[9999]" onClick={() => setIsSearchOverlayActive(false)}>
+            <div className="bg-shirting px-4 py-4" onClick={(e) => e.stopPropagation()}>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search"
+                  value={searchQuery}
+                  onChange={handleSearchInputChange}
+                  onFocus={handleSearchFocus}
+                  onBlur={handleSearchBlur}
+                  className="w-full px-4 py-2 pl-12 text-sm font-spectral bg-transparent text-ink border border-hairline focus:outline-none focus:border-claret transition-colors"
+                  autoFocus
+                />
+                <svg
+                  className="absolute left-4 top-3 h-5 w-5 text-flannel/60"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
 
-
-            {/* Mobile Search Results */}
-            {showResults && (
-              <div className="absolute left-0 right-0 mt-2 bg-white rounded-xl border border-gray-200 shadow-lg max-h-96 overflow-y-auto z-50">
-                {isSearching ? (
-                  <div className="p-4 text-center text-gray-500">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
-                    <span className="mt-2 block text-sm">Searching...</span>
-                  </div>
-                ) : searchResults.length > 0 ? (
-                  <div className="p-2">
-                    <div className="space-y-2">
-                      {searchResults.map((product) => (
-                        <div
-                          key={product._id}
-                          onClick={() => {
-                            handleResultClick(product._id)
-                          }}
-                          className="flex items-center p-2 hover:bg-gray-50 cursor-pointer rounded-lg border border-gray-100 transition-colors"
-                        >
-                          <img
-                            src={product.defaultImages[0]?.url || "/placeholder.svg?height=60&width=60"}
-                            alt={product.name}
-                            className="w-12 h-12 object-cover rounded-lg mr-3 flex-shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
-                            <p className="text-xs text-gray-500 mt-0.5">
-                              {product.category} • {product.gender} • PKR {product.price.toLocaleString()}
-                            </p>
-                          </div>
-                          <svg
-                            className="h-4 w-4 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
+                {showResults && (
+                  <div className="absolute left-0 right-0 mt-2 bg-shirting border border-hairline shadow-lg max-h-96 overflow-y-auto z-50">
+                    {isSearching ? (
+                      <div className="p-4 text-center text-flannel/70">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-navy mx-auto"></div>
+                        <span className="mt-2 block text-sm font-spectral">Searching...</span>
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      <div className="p-2">
+                        <div className="space-y-2">
+                          {searchResults.map((product) => (
+                            <div
+                              key={product._id}
+                              onClick={() => {
+                                handleResultClick(product._id)
+                              }}
+                              className="flex items-center p-2 hover:bg-paper cursor-pointer border border-hairline transition-colors"
+                            >
+                              <img
+                                src={product.defaultImages[0]?.url || "/placeholder.svg?height=60&width=60"}
+                                alt={product.name}
+                                className="w-12 h-12 object-cover mr-3 flex-shrink-0"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-spectral font-medium text-ink truncate">{product.name}</p>
+                                <p className="font-archivo text-[10px] tracking-wide text-flannel/70 mt-0.5">
+                                  {product.category} • {product.gender} • PKR {product.price.toLocaleString()}
+                                </p>
+                              </div>
+                              <svg className="h-4 w-4 text-flannel/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ) : searchQuery.trim() ? (
+                      <div className="p-4 text-center text-flannel/70">
+                        <svg className="h-8 w-8 text-chalk mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <p className="text-sm font-spectral">No products found for "{searchQuery}"</p>
+                        <p className="text-xs mt-1 font-spectral">Try searching with different keywords</p>
+                      </div>
+                    ) : null}
                   </div>
-                ) : searchQuery.trim() ? (
-                  <div className="p-4 text-center text-gray-500">
-                    <svg
-                      className="h-8 w-8 text-gray-300 mx-auto mb-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
-                    <p className="text-sm">No products found for "{searchQuery}"</p>
-                    <p className="text-xs mt-1">Try searching with different keywords</p>
-                  </div>
-                ) : null}
+                )}
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </header>
-
-      {/* Text Slider - Positioned at the top */}
-      <div ref={sliderRef} className="w-full bg-white text-white overflow-hidden h-8">
-        <div className="slider-content flex whitespace-nowrap">
-          <div className="slider-item text-black flex-shrink-0 ml-10 mr-10  text-xs sm:text-sm font-medium py-2">
-            Free delivery on orders over PKR 5000
-          </div>
-          <div className="slider-item text-white flex-shrink-0 ml-10 mr-10  text-xs sm:text-sm font-medium py-2">
-            Free delivery on orders over PKR 5000
-          </div>
-
-          <div className="slider-item text-black flex-shrink-0 mr-10 ml-10 text-xs sm:text-sm font-medium py-2">
-            Free delivery on orders over PKR 5000
-          </div>
-          <div className="slider-item text-white flex-shrink-0 ml-10 mr-10  text-xs sm:text-sm font-medium py-2">
-            Free delivery on orders over PKR 5000
-          </div>
-        </div>
-      </div>
     </>
   )
 }

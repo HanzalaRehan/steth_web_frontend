@@ -624,20 +624,20 @@ const onTouchEnd = () => {
     if (!isSizeChartOpen) return null;
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy bg-opacity-50">
         <div 
           ref={sizeChartRef}
-          className={`bg-white transition-all duration-300 ${
+          className={`bg-shirting transition-all duration-300 ${
             isSizeChartMinimized ? 'w-64 h-48' : 'w-[90%] max-w-3xl h-[80vh]'
           }`}
         >
           {/* Header */}
-          <div className="flex justify-between items-center p-4 bg-white">
+          <div className="flex justify-between items-center p-4 bg-shirting">
             <h3 className="text-lg font-semibold">Size Chart</h3>
             <div className="flex gap-2">
               <button
                 onClick={() => setIsSizeChartOpen(false)}
-                className="p-1 bg-white hover:bg-gray-50"
+                className="p-1 bg-shirting hover:bg-paper"
               >
                 <X size={20} />
               </button>
@@ -645,18 +645,18 @@ const onTouchEnd = () => {
           </div>
 
           {/* Content */}
-          <div className="p-4 h-[calc(100%-4rem)] overflow-auto bg-white relative">
+          <div className="p-4 h-[calc(100%-4rem)] overflow-auto bg-shirting relative">
             {/* Navigation Arrows */}
             <button
               onClick={() => handleSizeChartNavigation('prev')}
-              className="absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md z-10"
+              className="absolute left-6 top-1/2 transform -translate-y-1/2 bg-shirting/80 hover:bg-shirting p-2 rounded-full shadow-md z-10"
             >
               <ChevronLeft size={24} />
             </button>
             
             <button
               onClick={() => handleSizeChartNavigation('next')}
-              className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md z-10"
+              className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-shirting/80 hover:bg-shirting p-2 rounded-full shadow-md z-10"
             >
               <ChevronRight size={24} />
             </button>
@@ -677,8 +677,8 @@ const onTouchEnd = () => {
                   onClick={() => setCurrentSizeChartIndex(index)}
                   className={`w-3 h-3 rounded-full border-0 p-0 flex-shrink-0 transition-all duration-300 ${
                     index === currentSizeChartIndex 
-                      ? "bg-black" 
-                      : "bg-black/40 hover:bg-black/60"
+                      ? "bg-navy" 
+                      : "bg-navy/40 hover:bg-navy/60"
                   }`}
                   style={{ 
                     minWidth: '12px', 
@@ -710,7 +710,7 @@ const onTouchEnd = () => {
   const productBadge = product.category || ""
 
   return (
-    <div className="bg-white min-h-screen w-full text-black" ref={productRef}>
+    <div className="bg-shirting min-h-screen w-full text-ink" ref={productRef}>
       {/* Mobile/Tablet View (below 1400px) */}
       {isMobile ? (
         <div className="px-4 pt-4 pb-8 max-w-6xl mx-auto">
@@ -738,8 +738,8 @@ const onTouchEnd = () => {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="flex items-center justify-center w-full h-full bg-gray-100 absolute top-0 left-0">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+                    <div className="flex items-center justify-center w-full h-full bg-paper absolute top-0 left-0">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-navy"></div>
                     </div>
                   )}
                   </div>
@@ -750,7 +750,7 @@ const onTouchEnd = () => {
                       <div
                         key={index}
                         className={`w-16 h-16 lg:w-20 lg:h-20 border-2 ${
-                          index === currentImageIndex ? "border-black" : "border-gray-200"
+                          index === currentImageIndex ? "border-navy" : "border-hairline"
                         } cursor-pointer flex-shrink-0`}
                         onClick={() => setCurrentImageIndex(index)}
                       >
@@ -771,46 +771,46 @@ const onTouchEnd = () => {
                         key={index}
                         className={`w-3 h-3 rounded-full transition-all duration-300 ${
                           index === currentImageIndex 
-                            ? "bg-black scale-110" 
-                            : "bg-black/40"
+                            ? "bg-navy scale-110" 
+                            : "bg-navy/40"
                         }`}
                       />
                     ))}
                   </div>
                 </>
             ) : (
-              <div className="w-full h-[400px] flex items-center justify-center bg-gray-100">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+              <div className="w-full h-[400px] flex items-center justify-center bg-paper">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-navy"></div>
               </div>
             )}
           </div>
   
           {/* Product Info Section */}
           <div className="max-w-2xl mx-auto">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-1">{product.name}</h1>
+            <h1 className="font-caslon text-2xl md:text-3xl lg:text-4xl text-navy mb-1 leading-tight">{product.name}</h1>
             {product.material && (
-              <div className="mb-2 text-sm md:text-base">{product.material}</div>
+              <div className="mb-2 text-sm md:text-base font-spectral italic text-flannel">{product.material}</div>
             )}
-  
-            <p className="text-2xl md:text-3xl font-bold mb-4 lg:mb-6">Rs.{formattedPrice}</p>
-  
+
+            <p className="font-archivo text-xl md:text-2xl tracking-[0.04em] text-ink mb-4 lg:mb-6">Rs.{formattedPrice}</p>
+
             {productBadge && (
-              <div className="inline-block px-3 py-1 md:px-4 md:py-2 bg-white text-sm md:text-base font-medium mb-4 lg:mb-6 border border-gray-200 rounded-md">
+              <div className="inline-block px-3 py-1 md:px-4 md:py-1.5 bg-transparent font-archivo text-xs md:text-sm font-semibold uppercase tracking-[0.16em] text-ink mb-4 lg:mb-6 border border-brass">
                 {productBadge}
               </div>
             )}
-  
+
             {/* Color Selection */}
             <div className="mb-4 lg:mb-6">
-              <p className="font-medium mb-2 md:mb-3 text-base md:text-lg">
-                COLOR {isColorSelected && <span className="ml-2 font-normal">{selectedColor}</span>}
+              <p className="font-archivo text-xs md:text-sm font-semibold uppercase tracking-[0.2em] text-navy mb-2 md:mb-3">
+                Colour {isColorSelected && <span className="ml-2 font-normal normal-case tracking-normal text-flannel">{selectedColor}</span>}
               </p>
-              <div className="flex gap-1.5 md:gap-2">
+              <div className="flex gap-2 md:gap-2.5">
                 {product.colors.map((color) => (
                   <button
                     key={color._id}
-                    className={`w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-full p-0 flex items-center justify-center transition-all ${
-                      selectedColor === color.name ? "ring-2 ring-black" : ""
+                    className={`w-6 h-6 md:w-8 md:h-8 lg:w-9 lg:h-9 p-0 flex items-center justify-center border border-ink/20 transition-all ${
+                      selectedColor === color.name ? "outline outline-2 outline-offset-2 outline-brass" : ""
                     }`}
                     style={{ backgroundColor: color.code }}
                     onClick={() => handleColorSelect(color.name)}
@@ -820,27 +820,27 @@ const onTouchEnd = () => {
                 ))}
               </div>
             </div>
-  
+
             {/* Size Selection */}
             <div className="mb-4 lg:mb-6">
               <div className="flex justify-between items-center mb-2 md:mb-3">
-                <p className="font-medium text-base md:text-lg">SIZE</p>
+                <p className="font-archivo text-xs md:text-sm font-semibold uppercase tracking-[0.2em] text-navy">Size</p>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setIsSizeFinderOpen(true)}
-                    className="px-3 py-1.5 border border-black rounded-full text-xs md:text-sm font-medium text-black bg-white hover:bg-black hover:text-white transition-colors"
+                    className="px-3 py-1.5 border border-navy font-archivo text-xs md:text-sm font-medium uppercase tracking-wide text-navy bg-transparent hover:bg-navy hover:text-paper transition-colors"
                   >
                     What's my size?
                   </button>
                   <button
                     onClick={() => setIsSizeChartOpen(true)}
-                    className="px-3 py-1.5 border border-gray-300 rounded-full text-xs md:text-sm font-medium text-gray-700 bg-white hover:border-black hover:text-black transition-colors"
+                    className="px-3 py-1.5 border border-brass font-archivo text-xs md:text-sm font-medium uppercase tracking-wide text-ink bg-transparent hover:bg-paper transition-colors"
                   >
                     Size Chart
                   </button>
                 </div>
               </div>
-              <div className="flex gap-3 md:gap-4 flex-wrap">
+              <div className="flex gap-3 md:gap-4 flex-wrap pb-5">
                 {product.sizes.map((size) => {
                   const sizeAvailable = isSizeAvailable(size.name);
                   const sizeStock = getSizeStock(size.name);
@@ -851,27 +851,28 @@ const onTouchEnd = () => {
                   // && sizeStock === 0 check was unreachable in practice,
                   // since sizeAvailable is itself derived from stock > 0).
                   const isUnavailable = !sizeAvailable || sizeStock === 0;
+                  const isSelected = selectedSize === size.name;
 
                   return (
                     <button
                       key={size._id}
-                      className={`w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 flex items-center justify-center border text-sm md:text-base ${
-                        selectedSize === size.name
-                          ? "border-black bg-white text-black"
+                      className={`w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 flex items-center justify-center border font-archivo text-sm md:text-base tracking-wide ${
+                        isSelected
+                          ? "border-navy bg-navy text-paper"
                           : isUnavailable
-                          ? "border-gray-200 bg-gray-100 text-gray-400 line-through"
-                          : "border-gray-300 bg-white text-black"
+                          ? "border-chalk bg-paper text-chalk line-through"
+                          : "border-hairline bg-transparent text-ink"
                       } ${
                         isUnavailable
-                          ? "opacity-60 cursor-not-allowed"
-                          : "hover:border-black"
-                      } text-center relative rounded-md transition-all`}
+                          ? "cursor-not-allowed"
+                          : "hover:border-navy"
+                      } text-center relative transition-all`}
                       onClick={() => !isUnavailable && setSelectedSize(size.name)}
                       disabled={isUnavailable}
                     >
                       {size.name}
                       {isUnavailable && (
-                        <span className="absolute -bottom-6 left-0 right-0 text-xs text-red-500">
+                        <span className="absolute -bottom-5 left-0 right-0 font-archivo text-[10px] uppercase tracking-wide text-flannel/70 no-underline">
                           Out of stock
                         </span>
                       )}
@@ -884,53 +885,53 @@ const onTouchEnd = () => {
 
             {/* Quantity Selector */}
             <div className="mb-4 lg:mb-6">
-              <p className="font-medium mb-2 md:mb-3 text-base md:text-lg">QUANTITY</p>
-              <div className="flex items-center border border-gray-300 inline-flex rounded-md">
-                <button 
-                  onClick={decrementQuantity} 
-                  className="px-3 py-2 md:px-4 md:py-3 bg-white hover:bg-gray-50 transition-colors"
+              <p className="font-archivo text-xs md:text-sm font-semibold uppercase tracking-[0.2em] text-navy mb-2 md:mb-3">Quantity</p>
+              <div className="flex items-center border border-hairline inline-flex">
+                <button
+                  onClick={decrementQuantity}
+                  className="px-3 py-2 md:px-4 md:py-3 bg-transparent hover:bg-paper transition-colors"
                 >
                   <Minus size={16} />
                 </button>
-                <span className="px-4 py-2 md:px-6 md:py-3 min-w-[40px] text-center font-medium">
+                <span className="px-4 py-2 md:px-6 md:py-3 min-w-[40px] text-center font-archivo">
                   {quantity}
                 </span>
-                <button 
-                  onClick={incrementQuantity} 
-                  className="px-3 py-2 md:px-4 md:py-3 bg-white hover:bg-gray-50 transition-colors"
+                <button
+                  onClick={incrementQuantity}
+                  className="px-3 py-2 md:px-4 md:py-3 bg-transparent hover:bg-paper transition-colors"
                 >
                   <Plus size={16} />
                 </button>
               </div>
             </div>
-  
+
             {/* Validation Error */}
             {validationError && (
-              <div className="mb-4 lg:mb-6 text-red-500 text-sm md:text-base p-3 bg-red-50 border border-red-200 rounded-md">
+              <div className="mb-4 lg:mb-6 text-claret font-spectral text-sm md:text-base p-3 bg-shirting border border-claret">
                 {validationError}
               </div>
             )}
-            
+
             {/* Add to Bag Button */}
             <button
-              className={`w-full py-4 md:py-5 font-medium mb-4 lg:mb-6 rounded-none transition-colors text-base md:text-lg flex items-center justify-center gap-2 ${
-                justAdded ? "bg-green-600 text-white" : "bg-black text-white hover:bg-gray-800"
+              className={`w-full py-4 md:py-5 font-archivo font-semibold uppercase tracking-[0.2em] mb-4 lg:mb-6 transition-colors text-sm md:text-base flex items-center justify-center gap-2 ${
+                justAdded ? "bg-flannel text-paper" : "bg-navy text-paper hover:bg-ink"
               }`}
               onClick={validateAndAddToBag}
             >
               {justAdded ? (
                 <>
-                  <Check size={18} /> ADDED
+                  <Check size={18} /> Added
                 </>
               ) : (
-                "ADD TO BAG"
+                "Add to Bag"
               )}
             </button>
 
             {/* #15 - Shop Now: add current selection to cart, go straight
                 to checkout */}
             <button
-              className="w-full py-4 md:py-5 border border-black text-black bg-white font-medium mb-4 lg:mb-6 rounded-none hover:bg-gray-50 transition-colors text-base md:text-lg"
+              className="w-full py-4 md:py-5 border border-brass text-ink bg-transparent font-archivo font-semibold uppercase tracking-[0.2em] mb-4 lg:mb-6 hover:bg-paper transition-colors text-sm md:text-base"
               onClick={handleShopNow}
             >
               SHOP NOW
@@ -946,11 +947,11 @@ const onTouchEnd = () => {
             </p>
   
             {/* Product Description */}
-            <div className="mt-8 lg:mt-12 border-t border-gray-200 pt-8 lg:pt-12">
+            <div className="mt-8 lg:mt-12 border-t border-hairline pt-8 lg:pt-12">
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-6 lg:mb-8">
                 Product Description
               </h2>
-              <div className="text-gray-700 whitespace-pre-line leading-relaxed text-base md:text-lg">
+              <div className="text-flannel whitespace-pre-line leading-relaxed text-base md:text-lg">
                 {product.description || "No description available."}
               </div>
             </div>
@@ -962,14 +963,14 @@ const onTouchEnd = () => {
           {/* Thumbnail Gallery */}
           <div className="w-45 mr-6">
             {isLoadingImages ? (
-              <div className="w-40 h-40 mb-4 flex items-center justify-center bg-gray-100">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+              <div className="w-40 h-40 mb-4 flex items-center justify-center bg-paper">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-navy"></div>
               </div>
             ) : (
               displayImages.slice(0, 7).map((image, index) => (
                 <div
                   key={index}
-                  className={`w-40 h-40 mb-4 border ${currentImageIndex === index ? "border-gray-300" : "border-gray-200"} cursor-pointer`}
+                  className={`w-40 h-40 mb-4 border ${currentImageIndex === index ? "border-hairline" : "border-hairline"} cursor-pointer`}
                   onClick={() => setCurrentImageIndex(index)}
                 >
                   <img
@@ -1012,42 +1013,42 @@ const onTouchEnd = () => {
                     loading="lazy"
                   />
                 ) : (
-                  <div className="flex items-center justify-center w-full h-full bg-gray-100 absolute top-0 left-0">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-black"></div>
+                  <div className="flex items-center justify-center w-full h-full bg-paper absolute top-0 left-0">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-navy"></div>
                 </div>
                 )}
               </div>
             ) : (
-              <div className="w-[95%] h-[80%] flex items-center justify-center bg-gray-100">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-black"></div>
+              <div className="w-[95%] h-[80%] flex items-center justify-center bg-paper">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-navy"></div>
               </div>
             )}
           </div>
   
           {/* Product Details - Desktop */}
           <div className="w-1/3 pl-12">
-            <h1 className="text-3xl font-bold mb-1">{product.name}</h1>
+            <h1 className="font-caslon text-3xl text-navy mb-1 leading-tight">{product.name}</h1>
             {product.material && (
-              <div className="mb-2 text-sm">{product.material}</div>
+              <div className="mb-2 text-sm font-spectral italic text-flannel">{product.material}</div>
             )}
-  
-            <p className="text-2xl font-bold mb-8">Rs.{formattedPrice}</p>
-  
+
+            <p className="font-archivo text-2xl tracking-[0.04em] text-ink mb-8">Rs.{formattedPrice}</p>
+
             {productBadge && (
-              <div className="inline-block px-4 py-1 bg-white text-sm font-medium mb-8 border border-gray-200 rounded-md">
+              <div className="inline-block px-4 py-1 bg-transparent font-archivo text-xs font-semibold uppercase tracking-[0.16em] text-ink mb-8 border border-brass">
                 {productBadge}
               </div>
             )}
-  
+
             <div className="mb-8">
-              <p className="font-medium mb-2">
-                COLOR {isColorSelected && <span className="ml-2 font-normal">{selectedColor}</span>}
+              <p className="font-archivo text-sm font-semibold uppercase tracking-[0.2em] text-navy mb-2">
+                Colour {isColorSelected && <span className="ml-2 font-normal normal-case tracking-normal text-flannel">{selectedColor}</span>}
               </p>
-              <div className="flex gap-1.5">
+              <div className="flex gap-2">
                 {product.colors.map((color) => (
                   <button
                     key={color._id}
-                    className={`w-6 h-6 rounded-full p-0 flex items-center justify-center ${selectedColor === color.name ? "ring-1 ring-black" : ""}`}
+                    className={`w-7 h-7 p-0 flex items-center justify-center border border-ink/20 transition-all ${selectedColor === color.name ? "outline outline-2 outline-offset-2 outline-brass" : ""}`}
                     style={{ backgroundColor: color.code }}
                     onClick={() => handleColorSelect(color.name)}
                     disabled={!color.isAvailable}
@@ -1056,48 +1057,53 @@ const onTouchEnd = () => {
                 ))}
               </div>
             </div>
-  
+
             <div className="mb-8">
               <div className="flex justify-between items-center mb-3">
-                <p className="font-medium">SIZE</p>
+                <p className="font-archivo text-sm font-semibold uppercase tracking-[0.2em] text-navy">Size</p>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setIsSizeFinderOpen(true)}
-                    className="px-3 py-1 border border-black rounded-full text-xs font-medium text-black bg-white hover:bg-black hover:text-white transition-colors"
+                    className="px-3 py-1 border border-navy font-archivo text-xs font-medium uppercase tracking-wide text-navy bg-transparent hover:bg-navy hover:text-paper transition-colors"
                   >
                     What's my size?
                   </button>
                   <button
                     onClick={() => setIsSizeChartOpen(true)}
-                    className="px-3 py-1 border border-gray-300 rounded-full text-xs font-medium text-gray-700 bg-white hover:border-black hover:text-black transition-colors"
+                    className="px-3 py-1 border border-brass font-archivo text-xs font-medium uppercase tracking-wide text-ink bg-transparent hover:bg-paper transition-colors"
                   >
                     Size Chart
                   </button>
                 </div>
               </div>
-              <div className="flex gap-4">
+              <div className="flex gap-4 pb-5">
                 {product.sizes.map((size) => {
                   const sizeAvailable = isSizeAvailable(size.name);
                   const sizeStock = getSizeStock(size.name);
                   const isUnavailable = !sizeAvailable || sizeStock === 0;
+                  const isSelected = selectedSize === size.name;
 
                   return (
                     <button
                       key={size._id}
-                      className={`w-10 h-10 flex items-center justify-center border ${
-                        selectedSize === size.name
-                          ? "border-black bg-white text-black"
+                      className={`w-10 h-10 flex items-center justify-center border font-archivo text-sm tracking-wide ${
+                        isSelected
+                          ? "border-navy bg-navy text-paper"
                           : isUnavailable
-                          ? "border-gray-200 bg-gray-100 text-gray-400 line-through"
-                          : "border-gray-300 bg-white text-black"
+                          ? "border-chalk bg-paper text-chalk line-through"
+                          : "border-hairline bg-transparent text-ink"
                       } ${
-                        isUnavailable ? "opacity-60 cursor-not-allowed" : ""
-                      } text-center relative rounded-md`}
+                        isUnavailable ? "cursor-not-allowed" : "hover:border-navy"
+                      } text-center relative transition-all`}
                       onClick={() => !isUnavailable && setSelectedSize(size.name)}
                       disabled={isUnavailable}
                     >
                       {size.name}
-                      {isUnavailable && <span className="block text-xs text-red-500">Out of stock</span>}
+                      {isUnavailable && (
+                        <span className="absolute -bottom-5 left-0 right-0 font-archivo text-[10px] uppercase tracking-wide text-flannel/70 no-underline">
+                          Out of stock
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -1106,51 +1112,51 @@ const onTouchEnd = () => {
 
             {/* Quantity Selector */}
             <div className="mb-8">
-              <p className="font-medium mb-3">QUANTITY</p>
-              <div className="flex items-center border border-gray-300 inline-flex rounded-md">
-                <button 
-                  onClick={decrementQuantity} 
-                  className="px-3 py-2 bg-white"
+              <p className="font-archivo text-sm font-semibold uppercase tracking-[0.2em] text-navy mb-3">Quantity</p>
+              <div className="flex items-center border border-hairline inline-flex">
+                <button
+                  onClick={decrementQuantity}
+                  className="px-3 py-2 bg-transparent hover:bg-paper transition-colors"
                 >
                   <Minus size={16} />
                 </button>
-                <span className="px-4 py-2 min-w-[40px] text-center">{quantity}</span>
-                <button 
-                  onClick={incrementQuantity} 
-                  className="px-3 py-2 bg-white"
+                <span className="px-4 py-2 min-w-[40px] text-center font-archivo">{quantity}</span>
+                <button
+                  onClick={incrementQuantity}
+                  className="px-3 py-2 bg-transparent hover:bg-paper transition-colors"
                 >
                   <Plus size={16} />
                 </button>
               </div>
             </div>
-  
+
             {/* Validation Error */}
             {validationError && (
-              <div className="mb-6 text-red-500 text-sm">{validationError}</div>
+              <div className="mb-6 text-claret font-spectral text-sm p-3 bg-shirting border border-claret">{validationError}</div>
             )}
-            
+
             <button
-              className={`w-full py-4 rounded-none font-medium text-sm mb-4 transition-colors flex items-center justify-center gap-2 ${
-                justAdded ? "bg-green-600 text-white" : "bg-black text-white hover:bg-gray-800"
+              className={`w-full py-4 font-archivo font-semibold uppercase tracking-[0.2em] text-sm mb-4 transition-colors flex items-center justify-center gap-2 ${
+                justAdded ? "bg-flannel text-paper" : "bg-navy text-paper hover:bg-ink"
               }`}
               onClick={validateAndAddToBag}
             >
               {justAdded ? (
                 <>
-                  <Check size={16} /> ADDED
+                  <Check size={16} /> Added
                 </>
               ) : (
-                "ADD TO BAG"
+                "Add to Bag"
               )}
             </button>
 
             {/* #15 - Shop Now: add current selection to cart, go straight
                 to checkout */}
             <button
-              className="w-full py-4 rounded-none font-medium text-sm mb-4 border border-black text-black bg-white hover:bg-gray-50 transition-colors"
+              className="w-full py-4 font-archivo font-semibold uppercase tracking-[0.2em] text-sm mb-4 border border-brass text-ink bg-transparent hover:bg-paper transition-colors"
               onClick={handleShopNow}
             >
-              SHOP NOW
+              Shop Now
             </button>
 
             <p className="text-center text-gray-600 text-sm mb-6">{product.material || ""}</p>
@@ -1158,9 +1164,9 @@ const onTouchEnd = () => {
             <p className="text-center text-sm font-medium">FREE SHIPPING FOR Rs.5000+ ORDERS AND FREE RETURNS</p>
   
             {/* Product Description */}
-            <div className="mt-8 border-t border-gray-200 pt-8">
+            <div className="mt-8 border-t border-hairline pt-8">
               <h2 className="text-xl font-bold mb-6">Product Description</h2>
-              <div className="text-gray-700 whitespace-pre-line leading-relaxed">
+              <div className="text-flannel whitespace-pre-line leading-relaxed">
                 {product.description || "No description available."}
               </div>
             </div>
@@ -1170,13 +1176,13 @@ const onTouchEnd = () => {
   
       {/* Lightbox - remains the same */}
       {lightboxOpen && (
-        <div className="fixed inset-0 z-50 flex bg-white items-center justify-center" ref={lightboxRef}>
-          <button className="absolute top-4 right-4 p-2 bg-white text-black rounded-full" onClick={closeLightbox}>
+        <div className="fixed inset-0 z-50 flex bg-shirting items-center justify-center" ref={lightboxRef}>
+          <button className="absolute top-4 right-4 p-2 bg-shirting text-ink rounded-full" onClick={closeLightbox}>
             <X size={50} />
           </button>
   
           <button
-            className="absolute bg-white text-black left-4 rounded-full top-1/2 transform -translate-y-1/2 p-2"
+            className="absolute bg-shirting text-ink left-4 rounded-full top-1/2 transform -translate-y-1/2 p-2"
             onClick={() => handleSlide('prev')}
           >
             <ChevronLeft size={50} />
@@ -1192,7 +1198,7 @@ const onTouchEnd = () => {
           )}
   
           <button
-            className="absolute right-4 bg-white text-black rounded-full top-1/2 transform -translate-y-1/2 p-2"
+            className="absolute right-4 bg-shirting text-ink rounded-full top-1/2 transform -translate-y-1/2 p-2"
             onClick={() => handleSlide('next')}
           >
             <ChevronRight size={50} />
@@ -1204,8 +1210,8 @@ const onTouchEnd = () => {
                 key={index}
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${
                   index === currentImageIndex 
-                    ? "bg-black scale-110" 
-                    : "bg-black/40"
+                    ? "bg-navy scale-110" 
+                    : "bg-navy/40"
                 }`}
               />
             ))}

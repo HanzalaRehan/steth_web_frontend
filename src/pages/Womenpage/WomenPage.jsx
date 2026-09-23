@@ -10,14 +10,16 @@ import SEO from '../../components/SEO/SEO';
 
 const WomenPage = ({ children }) => {
   return (
-    <div className="font-poppins min-h-screen flex flex-col w-full bg-white">
+    <div className="min-h-screen flex flex-col w-full bg-paper">
       <SEO
         title="Women's Scrubs"
         description="Shop STETH's Women's collection - premium medical scrubs, lab coats, and accessories designed for Pakistan's doctors, nurses, and students."
         canonicalPath="/women"
       />
-      <Header />
-      <Hero />
+      <div className="relative">
+        <Header transparent />
+        <Hero />
+      </div>
       <WomenBestSellers />
       <ProductPage />
       <NewsletterSignup />

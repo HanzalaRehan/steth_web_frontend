@@ -140,7 +140,7 @@ const Hero = () => {
       {/* #4 - loading skeleton while the API-fetched image URLs are still
           empty, instead of an empty <img> with nothing visible. */}
       {!images.web && !images.mobile && (
-        <div className="absolute inset-0 w-full h-full bg-gray-200 animate-pulse" />
+        <div className="absolute inset-0 w-full h-full bg-navy/20 animate-pulse" />
       )}
 
       {/* Hero Background with responsive images */}
@@ -161,6 +161,10 @@ const Hero = () => {
           {/* Single, lighter bottom-anchored scrim - matches the Homepage
               Hero's treatment, replacing the previous two stacked overlays. */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+          {/* Top scrim - keeps the transparent overlay navbar (Header.jsx
+              `transparent` prop) readable at the very top even when the
+              bottom-anchored scrim above has already faded to nothing there. */}
+          <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/45 to-transparent"></div>
         </div>
       </div>
 

@@ -20,7 +20,7 @@ const Homepage = ({ children }) => {
   const [genderPromptResolved, setGenderPromptResolved] = useState(false);
 
   return (
-    <div className="font-poppins min-h-screen flex flex-col w-full bg-white">
+    <div className="min-h-screen flex flex-col w-full bg-paper">
       <SEO
         title="Premium Medical Scrubs in Pakistan"
         description="STETH — premium medical scrubs and uniforms designed for doctors, nurses, and students across Pakistan. Shop Women's and Men's scrubs, lab coats, and accessories."
@@ -28,10 +28,14 @@ const Homepage = ({ children }) => {
         jsonLd={[organizationSchema]}
       />
       <GenderQuickSelect onDismiss={() => setGenderPromptResolved(true)} />
-      <Header />
-      <Hero />
+      {/* relative wrapper lets the transparent Header float over Hero
+          instead of pushing it down - see Header.jsx's `transparent` prop */}
+      <div className="relative">
+        <Header transparent />
+        <Hero />
+      </div>
       <ColorTileCarousel />
-      <h1 className='text-center text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-bold text-black px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8'> More Than Just A Uniform</h1>
+      <h1 className='text-center font-caslon text-2xl sm:text-3xl md:text-4xl lg:text-4xl text-navy px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8'>More Than Just A Uniform</h1>
       <BestSellers />
       <MensBestSellers />
       <RewardsCTA />

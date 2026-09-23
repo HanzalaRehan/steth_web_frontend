@@ -1,12 +1,31 @@
-/* Poppins font import */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   html {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Spectral', Georgia, serif;
+  }
+
+  body {
+    background: #EFECE4;
+  }
+
+  h1, h2, h3 {
+    font-family: "Libre Caslon Display", Georgia, serif;
+  }
+
+  ::selection {
+    background: #D8D3C6;
+  }
+
+  a {
+    color: #6B2233;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    color: #1B2440;
   }
 
   /* Previously re-injected by Homepage.jsx/MensPage.jsx/WomenPage.jsx on
@@ -15,21 +34,34 @@
      in this repo; Poppins is actually loaded by the @import above).
      Deliberately NOT porting the original block's `height: 100%` - combined
      with `overflow-x: hidden` it makes the browser auto-compute
-     `overflow-y: auto` on #root (a CSS overflow-computed-value rule: a
+     `overflow-y: auto` on the element (a CSS overflow-computed-value rule: a
      non-visible overflow-x forces the other axis off `visible` too), which
-     turns #root into its own internal scroll container instead of the
-     window. That breaks every GSAP ScrollTrigger animation sitewide (they
-     track window scroll, which then never fires) - confirmed live via
-     Homepage's scrollHeight collapsing to exactly the viewport height.
+     turns that element into its own scroll container instead of the window.
      `min-h-screen` on each page's own wrapper div already provides full
-     height coverage without this footgun. */
+     height coverage without this footgun.
+
+     `overflow-x: hidden` now lives on `html` only, not `body`/`#root` too -
+     a second, previously-undiagnosed symptom of the same auto-computed
+     `overflow-y: auto`, found while rebuilding the navbar: `position:
+     sticky` treats the *nearest* ancestor with non-`visible` overflow as its
+     scrolling reference, even when that ancestor never actually scrolls
+     (as was true for a height:auto #root/body here). With `#root` or `body`
+     carrying the rule, every `sticky` element sitewide (Header.jsx's navbar,
+     on every page) silently failed to stick - it just scrolled away like a
+     static element. `html`'s own overflow is UA-propagated to the real
+     viewport instead of making `html` itself a scroll container (a
+     documented root-element special case), so it still blocks horizontal
+     overflow sitewide without the side effect. */
+  html {
+    overflow-x: hidden;
+  }
+
   html,
   body,
   #root {
     margin: 0;
     padding: 0;
     width: 100%;
-    overflow-x: hidden;
   }
 }
 
