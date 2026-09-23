@@ -473,3 +473,19 @@ Ran two full production builds (before and after) to get the bundle-size compari
 
 ### What's next
 Once a reachable environment exists: run the actual Lighthouse/WebPageTest pass this session couldn't (home, catalog, product detail, checkout - matching your original ask exactly), confirm the two-tier Suspense loading states look right in a real browser (not just traced from code), confirm the ImageKit `?tr=` params actually produce smaller/faster-loading images in the Network tab (not just that the URL is correctly formed), and confirm code-splitting didn't introduce any admin-navigation regression (e.g. a lazy chunk failing to load on a flaky connection - React.lazy's default behavior on a failed dynamic import throws, uncaught, which would show a blank page; consider an error boundary around the Suspense trees if that becomes a real issue in practice, not built speculatively here since it wasn't asked for).
+
+## Session: Fixed "Error fetching product details: 404" (2026-07-29)
+
+You hit this clicking into the seeded dummy product from the Best Sellers carousel or full grid.
+
+### Root cause
+`ProductDetailPage/ProductDetail.jsx` hardcoded the **production** backend URL (`https://steth-backend.onrender.com`) directly, not `API_BASE_URL` - part of the already-documented "28 hardcoded backend URL" debt (`CLAUDE.md`), this file just hadn't been touched yet. The dummy product only exists in the local dev database, so production correctly 404'd on that ID.
+
+### Fix
+Swapped the hardcoded literal for `API_BASE_URL` (`src/config/api.js`), matching the fix already applied to ~6 other files earlier today. While in this file: also removed the same dead, scroll-breaking font-injection `useEffect` I'd already found and fixed in `Homepage.jsx`/`MensPage.jsx`/`WomenPage.jsx` this session - identical `@font-face` block pointing at nonexistent `/fonts/` files, plus the same `overflow-x:hidden` + `height:100%` combo on `html,body,#root` that silently turns `#root` into its own scroll container instead of the window (this file wasn't in today's earlier 3-page redesign scope, so it still had the original bug). Poppins is already loaded globally via `index.html`'s Google Fonts link and `src/index.css`'s safe layout rule - no functional loss.
+
+### Verification
+`npm run lint`: 49 problems (down 1 from the prior baseline, zero new). `npm run build`: succeeded clean. Live: navigated directly to `/product/<seeded-id>`, confirmed the real product name/price/image render with no error text, confirmed `window.scrollTo` works correctly on this page (`document.documentElement.scrollHeight` reports the real ~3143px content height, not clamped to viewport - the same regression check used earlier for the scroll footgun).
+
+### What's next
+This file remains part of the broader 27-hardcoded-URL list for everything else it does (any other endpoints it might call) - only this one `fetch` call was touched, matching the narrow scope of the actual bug report. Not a full audit of the file.

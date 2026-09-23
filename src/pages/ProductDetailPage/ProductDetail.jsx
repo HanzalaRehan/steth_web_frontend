@@ -6,6 +6,7 @@ import MenBestSellers from '../Menspage/Components/MensBestSeller';
 import ProductReviews from './Components/ReviewsSection';
 import AwsomeHumansFooter from '../../components/Footer';
 import ProductFeatures from './Components/Features';
+import { API_BASE_URL } from '../../config/api';
 
 const ProductDetailPage = ({ children }) => {
   // Make sure we're getting the correct parameter name
@@ -28,7 +29,7 @@ const ProductDetailPage = ({ children }) => {
           return;
         }
         
-        const apiUrl = `https://steth-backend.onrender.com/api/products/${productId}`;
+        const apiUrl = `${API_BASE_URL}/api/products/${productId}`;
         console.log('Making API request to:', apiUrl);
         
         const response = await fetch(apiUrl);
@@ -56,69 +57,6 @@ const ProductDetailPage = ({ children }) => {
     
     fetchProductData();
   }, [productId]); // Make sure productId is in the dependency array
-
-  // Add font styles
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      @font-face {
-        font-family: 'Poppins';
-        font-style: normal;
-        font-weight: 300;
-        font-display: swap;
-        src: url('/fonts/poppins-v20-latin-300.woff2') format('woff2');
-      }
-      
-      @font-face {
-        font-family: 'Poppins';
-        font-style: normal;
-        font-weight: 400;
-        font-display: swap;
-        src: url('/fonts/poppins-v20-latin-regular.woff2') format('woff2');
-      }
-      
-      @font-face {
-        font-family: 'Poppins';
-        font-style: normal;
-        font-weight: 500;
-        font-display: swap;
-        src: url('/fonts/poppins-v20-latin-500.woff2') format('woff2');
-      }
-      
-      @font-face {
-        font-family: 'Poppins';
-        font-style: normal;
-        font-weight: 600;
-        font-display: swap;
-        src: url('/fonts/poppins-v20-latin-600.woff2') format('woff2');
-      }
-      
-      @font-face {
-        font-family: 'Poppins';
-        font-style: normal;
-        font-weight: 700;
-        font-display: swap;
-        src: url('/fonts/poppins-v20-latin-700.woff2') format('woff2');
-      }
-      
-      html, body, #root {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        overflow-x: hidden;
-      }
-      
-      .font-poppins {
-        font-family: 'Poppins', sans-serif;
-      }
-    `;
-    document.head.appendChild(style);
-    
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
 
   if (loading) {
     return (
