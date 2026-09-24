@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 const AboutUs = () => {
   return (
-    <div className="bg-white w-screen ">
+    <div className="bg-shirting w-screen ">
         <Header/>
       <Hero />
       <OurStory />
@@ -62,13 +62,13 @@ const Hero = () => {
   }, [])
 
   return (
-    <section ref={heroRef} className="relative bg-gray-50 py-20 px-4 sm:px-6 lg:px-8">
+    <section ref={heroRef} className="relative bg-paper py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-gray-900">
-            About <span className="text-black">STETH</span>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-ink">
+            About <span className="text-ink">STETH</span>
           </h1>
-          <p className="mt-6 max-w-2xl mx-auto text-lg md:text-xl lg:text-2xl text-gray-500">
+          <p className="mt-6 max-w-2xl mx-auto text-lg md:text-xl lg:text-2xl text-flannel/70">
             Redefining medical wear with comfort, functionality, and style for healthcare professionals who deserve the
             best.
           </p>
@@ -130,30 +130,30 @@ const OurStory = () => {
   return (
     <section ref={storyRef} id="our-story" className="py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-      <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900">Our Story</h2>
+      <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-ink">Our Story</h2>
         <div className="lg:grid lg:grid-cols-2 lg:gap-8 items-center">
           
           <div>
            
-            <p className="mt-4 text-base md:text-lg lg:text-xl text-gray-500">
+            <p className="mt-4 text-base md:text-lg lg:text-xl text-flannel/70">
             Steth was born in the hallways of hospitals, the quiet corners of on-call rooms, and the never-ending rhythm of 24-hour shifts. As doctors, we lived it all - the back-to-back patients, the emotional highs and lows, and the long hours spent in scrubs that never felt quite right.
             We knew what was missing.
             </p>
-              <p className="mt-4 text-base md:text-lg lg:text-xl text-gray-500">
+              <p className="mt-4 text-base md:text-lg lg:text-xl text-flannel/70">
               Most medical apparel felt like an afterthought - uncomfortable fabrics, awkward fits, and zero personality. So we decided to do something about it.
               Steth is a brand crafted by doctors, for doctors - created with one clear mission: to craft high-quality medical apparel that actually works for the people who wear it every day.
               We obsess over details: the fit, the feel, and the function of the fabric that can live up to the prestige of the profession, every stitch designed to move with you, breathe with you, and support you through the longest shifts.
               But Steth is more than just clothing. 
             </p>
-            <p className="mt-4 text-base md:text-lg lg:text-xl text-gray-500">
+            <p className="mt-4 text-base md:text-lg lg:text-xl text-flannel/70">
             It's a community. A shared belief that what you wear at work should empower you, not slow you down. We believe comfort and style aren't luxuries - they're essentials for those who give their all, every single day.
               We're proud to stand behind the professionals who show up, suit up, and never give up.
               Welcome to Steth. You deserve to feel your best while you give your best.
             </p>
           </div>
-          <div className="mt-10 lg:mt-0 h-full flex items-center bg-black rounded-lg">
+          <div className="mt-10 lg:mt-0 h-full flex items-center bg-navy ">
             <img
-              className="w-full h-[50%] object-cover shadow-xl rounded-lg"
+              className="w-full h-[50%] object-cover shadow-xl "
               src={Logo}
               alt="STETH medical wear"
             />
@@ -249,12 +249,12 @@ const CoreValues = () => {
   ]
 
   return (
-    <section ref={valuesRef} className="py-16 md:py-20 bg-white">
+    <section ref={valuesRef} className="py-16 md:py-20 bg-shirting">
       <div className="container mx-auto px-4 md:px-6">
-        <h2 className="values-title text-3xl md:text-4xl text-black lg:text-5xl font-bold text-center mb-3 md:mb-4">
+        <h2 className="values-title font-caslon text-3xl md:text-4xl text-navy lg:text-5xl text-center mb-3 md:mb-4">
           Our Core Values
         </h2>
-        <p className="values-subtitle text-base md:text-lg lg:text-xl text-gray-600 text-center max-w-3xl mx-auto mb-12 md:mb-16 px-4">
+        <p className="values-subtitle text-base md:text-lg lg:text-xl text-flannel/80 text-center max-w-3xl mx-auto mb-12 md:mb-16 px-4">
           Our values shape the culture of our organization and define the character of our company.
         </p>
 
@@ -262,15 +262,15 @@ const CoreValues = () => {
           {values.map((value, index) => (
             <div 
               key={index} 
-              className={`value-item bg-gray-50 p-6 md:p-8 rounded-lg shadow-sm ${
+              className={`value-item bg-paper p-6 md:p-8  shadow-sm ${
                 index === values.length - 1 ? 'sm:col-span-2 sm:max-w-2xl sm:mx-auto' : ''
               }`}
             >
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-gray-200 flex items-center justify-center mb-4 md:mb-6 text-xl md:text-2xl">
-                <span className="text-black text-2xl md:text-3xl">{value.icon}</span>
+                <span className="text-ink text-2xl md:text-3xl">{value.icon}</span>
               </div>
-              <h3 className="text-xl md:text-2xl lg:text-3xl text-black font-bold mb-2 md:mb-3">{value.title}</h3>
-              <p className="text-gray-600 text-sm md:text-base lg:text-lg">{value.description}</p>
+              <h3 className="font-caslon text-xl md:text-2xl lg:text-3xl text-navy mb-2 md:mb-3">{value.title}</h3>
+              <p className="text-flannel/80 text-sm md:text-base lg:text-lg">{value.description}</p>
             </div>
           ))}
         </div>
@@ -319,18 +319,18 @@ const TeamSection = () => {
   ]
 
   return (
-    <section ref={teamRef} className="py-16 md:py-20 bg-gray-50">
+    <section ref={teamRef} className="py-16 md:py-20 bg-paper">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col md:flex-row gap-6 md:gap-8 mb-12 md:mb-16">
           <div className="md:w-1/2">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl text-black font-bold leading-tight">
+            <h2 className="font-caslon text-3xl md:text-4xl lg:text-5xl text-navy leading-tight">
               Experience and integrity
               <br />
               by our team
             </h2>
           </div>
           <div className="md:w-1/2">
-            <p className="text-base md:text-lg lg:text-xl text-gray-600">
+            <p className="text-base md:text-lg lg:text-xl text-flannel/80">
               The right tools wielded by the right people to make anything possible. From year to year we strive to
               invent the most innovative technology produced by our creative people.
             </p>
@@ -350,7 +350,7 @@ const TeamSection = () => {
             {teamMembers.map((member, index) => (
               <div
                 key={index}
-                className={`relative overflow-hidden rounded-lg transition-all duration-300 h-[200px] sm:h-[400px] md:h-[400px] lg:h-[500px] ${
+                className={`relative overflow-hidden  transition-all duration-300 h-[200px] sm:h-[400px] md:h-[400px] lg:h-[500px] ${
                   activeIndex === index ? "sm:flex-[1.8]" : activeIndex !== null ? "sm:flex-[0.7]" : "flex-1"
                 }`}
                 style={{ minWidth: "100px" }}
@@ -364,9 +364,9 @@ const TeamSection = () => {
                   className="w-full h-full object-cover"
                   crossOrigin="anonymous"
                 />
-                <div className="absolute bottom-6 left-6 z-20 text-white">
-                  <h3 className="text-lg md:text-xl lg:text-2xl font-bold">{member.name}</h3>
-                  <p className="text-sm md:text-base lg:text-lg text-white/80">{member.position}</p>
+                <div className="absolute bottom-6 left-6 z-20 text-paper">
+                  <h3 className="font-caslon text-lg md:text-xl lg:text-2xl text-navy">{member.name}</h3>
+                  <p className="text-sm md:text-base lg:text-lg text-paper/80">{member.position}</p>
                 </div>
               </div>
             ))}
@@ -499,47 +499,47 @@ const Contact = () => {
   }
 
   return (
-    <section ref={contactRef} id="contact" className="py-16 bg-gray-50 px-4 sm:px-6 lg:px-8">
+    <section ref={contactRef} id="contact" className="py-16 bg-paper px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="lg:grid lg:grid-cols-2 lg:gap-8">
           <div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900">Get in Touch</h2>
-            <p className="mt-4 text-base md:text-lg lg:text-xl text-gray-500">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-ink">Get in Touch</h2>
+            <p className="mt-4 text-base md:text-lg lg:text-xl text-flannel/70">
               Have questions about STETH medical wear? Contact our team for information on products, bulk orders, or
               custom designs.
             </p>
 
             <div className="mt-8 space-y-6">
               <div className="contact-info flex items-center">
-                <Mail className="h-6 w-6 text-black" />
-                <span className="ml-3 text-sm md:text-base lg:text-lg text-gray-500">info@steth.com</span>
+                <Mail className="h-6 w-6 text-ink" />
+                <span className="ml-3 text-sm md:text-base lg:text-lg text-flannel/70">info@steth.com</span>
               </div>
               <div className="contact-info flex items-center">
-                <Phone className="h-6 w-6 text-black" />
-                <span className="ml-3 text-sm md:text-base lg:text-lg text-gray-500">+92 3390001306</span>
+                <Phone className="h-6 w-6 text-ink" />
+                <span className="ml-3 text-sm md:text-base lg:text-lg text-flannel/70">+92 3390001306</span>
               </div>
             </div>
           </div>
 
           <div className="mt-10 lg:mt-0">
-            <div className="bg-white shadow-md p-6">
-              <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-4">Send us a message</h3>
+            <div className="bg-shirting shadow-md p-6">
+              <h3 className="font-caslon text-xl md:text-2xl lg:text-3xl text-navy mb-4">Send us a message</h3>
               
               {formStatus.success && (
-                <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded">
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700">
                   {formStatus.success}
                 </div>
               )}
               
               {formStatus.error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
+                <div className="mb-4 p-3 bg-shirting border border-claret text-red-700">
                   {formStatus.error}
                 </div>
               )}
               
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <div>
-                  <label htmlFor="name" className="block text-sm md:text-base lg:text-lg font-medium text-gray-700">
+                  <label htmlFor="name" className="block text-sm md:text-base lg:text-lg font-medium text-flannel">
                     Name
                   </label>
                   <input
@@ -547,12 +547,12 @@ const Contact = () => {
                     id="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 shadow-sm bg-white text-black focus:ring-black focus:border-black text-sm md:text-base p-2 border"
+                    className="mt-1 block w-full border-hairline shadow-sm bg-shirting text-ink focus:ring-black focus:border-navy text-sm md:text-base p-2 border"
                     required
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm md:text-base lg:text-lg font-medium text-gray-700">
+                  <label htmlFor="email" className="block text-sm md:text-base lg:text-lg font-medium text-flannel">
                     Email
                   </label>
                   <input
@@ -560,12 +560,12 @@ const Contact = () => {
                     id="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 shadow-sm bg-white text-black focus:ring-black focus:border-black text-sm md:text-base p-2 border"
+                    className="mt-1 block w-full border-hairline shadow-sm bg-shirting text-ink focus:ring-black focus:border-navy text-sm md:text-base p-2 border"
                     required
                   />
                 </div>
                 <div>
-                  <label htmlFor="message" className="block text-sm md:text-base lg:text-lg font-medium text-gray-700">
+                  <label htmlFor="message" className="block text-sm md:text-base lg:text-lg font-medium text-flannel">
                     Message
                   </label>
                   <textarea
@@ -573,14 +573,14 @@ const Contact = () => {
                     rows="4"
                     value={formData.message}
                     onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 bg-white text-black shadow-sm focus:ring-black focus:border-black text-sm md:text-base p-2 border"
+                    className="mt-1 block w-full border-hairline bg-shirting text-ink shadow-sm focus:ring-black focus:border-navy text-sm md:text-base p-2 border"
                     required
                   ></textarea>
                 </div>
                 <button
                   type="submit"
                   disabled={formStatus.submitting}
-                  className={`inline-flex items-center px-4 py-2 border border-transparent text-sm md:text-base font-medium shadow-sm text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black ${
+                  className={`inline-flex items-center px-4 py-2 border border-transparent text-sm md:text-base font-medium shadow-sm text-paper bg-navy hover:bg-ink focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black ${
                     formStatus.submitting ? 'opacity-75 cursor-not-allowed' : ''
                   }`}
                 >
@@ -648,11 +648,11 @@ const CTA = () => {
   return (
     <section ref={ctaRef} className="py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-black shadow-xl overflow-hidden">
+        <div className="bg-navy shadow-xl overflow-hidden">
           <div className="px-6 py-12 sm:px-12 lg:py-16 lg:px-16">
             <div className="lg:grid lg:grid-cols-2 lg:gap-8 items-center">
               <div>
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white">Experience STETH Quality</h2>
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-paper">Experience STETH Quality</h2>
                 <p className="mt-4 text-base md:text-lg lg:text-xl text-gray-200">
                   Join thousands of healthcare professionals who trust STETH for comfortable, durable, and professional
                   medical wear.
@@ -662,7 +662,7 @@ const CTA = () => {
                 <div className="inline-flex shadow">
                   <a
                     href="/"
-                    className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-sm md:text-base lg:text-lg font-medium text-black bg-white hover:bg-gray-100"
+                    className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-sm md:text-base lg:text-lg font-medium text-ink bg-shirting hover:bg-paper"
                   >
                     Shop Collection
                   </a>
@@ -670,7 +670,7 @@ const CTA = () => {
                 <div className="lg:ml-3 md:ml-3 mt-2 sm:ml-0 inline-flex shadow">
                   <a
                     href="#"
-                    className="inline-flex items-center justify-center  px-5 py-3 border border-transparent text-sm md:text-base lg:text-lg font-medium text-white bg-gray-900 hover:bg-black"
+                    className="inline-flex items-center justify-center  px-5 py-3 border border-transparent text-sm md:text-base lg:text-lg font-medium text-paper bg-gray-900 hover:bg-navy"
                   >
                     Request Catalog
                   </a>

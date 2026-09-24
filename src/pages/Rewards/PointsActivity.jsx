@@ -29,7 +29,7 @@ const formatDate = (value) =>
 
 const PointsActivity = ({ rewards }) => (
   <section className="max-w-4xl mx-auto px-4 py-16">
-    <h2 className="text-2xl md:text-4xl font-bold text-gray-900 text-center tracking-tight">
+    <h2 className="font-caslon text-2xl md:text-4xl text-navy text-center">
       HI {(rewards.username || "there").toUpperCase()}, YOU HAVE{" "}
       <span className="font-extrabold">{rewards.balance}</span> POINTS
     </h2>
@@ -38,9 +38,9 @@ const PointsActivity = ({ rewards }) => (
         spend. The rate comes from the API so it can never drift from what
         checkout actually applies. */}
     {rewards.balanceValuePkr > 0 && (
-      <p className="text-center text-lg text-gray-700 mt-3">
+      <p className="text-center text-lg text-flannel mt-3">
         Worth{" "}
-        <span className="font-semibold text-gray-900">
+        <span className="font-semibold text-ink">
           PKR {rewards.balanceValuePkr.toLocaleString("en-PK")}
         </span>{" "}
         off your next order
@@ -49,7 +49,7 @@ const PointsActivity = ({ rewards }) => (
 
     {rewards.nextExpiryDate && (
       <div className="flex justify-center mt-5">
-        <span className="rounded-full bg-gray-100 px-5 py-2 text-sm text-gray-600">
+        <span className="rounded-full bg-paper px-5 py-2 text-sm text-flannel/80">
           Expiration Date: {formatDate(rewards.nextExpiryDate)}
         </span>
       </div>
@@ -67,12 +67,12 @@ const PointsActivity = ({ rewards }) => (
       </p>
     )}
 
-    <p className="text-center text-gray-500 mt-6 mb-8">
+    <p className="text-center text-flannel/70 mt-6 mb-8">
       Here&apos;s an overview of your current points balance and recent activity
     </p>
 
     {rewards.history.length === 0 ? (
-      <p className="text-center text-gray-400 text-sm">
+      <p className="text-center text-flannel/50 text-sm">
         No activity yet — start earning below.
       </p>
     ) : (
@@ -81,7 +81,7 @@ const PointsActivity = ({ rewards }) => (
       <div className="overflow-x-auto">
         <table className="w-full min-w-[560px] text-sm">
           <thead>
-            <tr className="bg-black text-white text-left">
+            <tr className="bg-navy text-paper text-left">
               <th className="px-5 py-3 font-semibold">ACTIVITY</th>
               <th className="px-5 py-3 font-semibold text-right">POINTS</th>
               <th className="px-5 py-3 font-semibold text-right">DATE</th>
@@ -92,7 +92,7 @@ const PointsActivity = ({ rewards }) => (
             {rewards.history.map((entry, index) => (
               <tr
                 key={`${entry.ruleKey}-${entry.awardedAt}-${index}`}
-                className={`border-b border-gray-100 ${entry.expired ? "text-gray-400" : "text-gray-900"}`}
+                className={`border-b border-hairline ${entry.expired ? "text-flannel/50" : "text-ink"}`}
               >
                 <td className="px-5 py-4">
                   {entry.description}
@@ -103,7 +103,7 @@ const PointsActivity = ({ rewards }) => (
                 <td className="px-5 py-4 text-right whitespace-nowrap tabular-nums">
                   {entry.points > 0 ? `+ ${entry.points}` : entry.points} Points
                   {rewards.pointValuePkr > 0 && (
-                    <span className="block text-xs text-gray-400">
+                    <span className="block text-xs text-flannel/50">
                       PKR {Math.abs(entry.points * rewards.pointValuePkr).toLocaleString("en-PK")}
                     </span>
                   )}

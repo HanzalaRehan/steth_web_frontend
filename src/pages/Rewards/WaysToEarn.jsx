@@ -164,20 +164,20 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
   }
 
   return (
-    <section className="bg-gray-50 py-16">
+    <section className="bg-paper py-16">
       <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3 text-center tracking-tight">
+        <h2 className="font-caslon text-2xl md:text-4xl text-navy mb-3 text-center">
           HOW TO EARN POINTS
         </h2>
-        <p className="text-gray-500 text-center mb-12">
+        <p className="text-flannel/70 text-center mb-12">
           Earn points every time you stock up on Steth essentials.
         </p>
 
         {message && (
           <div
-            className={`max-w-xl mx-auto mb-8 rounded-lg px-4 py-3 text-sm text-center border ${
+            className={`max-w-xl mx-auto mb-8  px-4 py-3 text-sm text-center border ${
               message.tone === "error"
-                ? "bg-red-50 border-red-200 text-red-700"
+                ? "bg-shirting border-claret text-red-700"
                 : "bg-green-50 border-green-200 text-green-800"
             }`}
           >
@@ -215,14 +215,14 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
               >
                 <div className="flex justify-center mb-4">
                   <div className="w-16 h-16 rounded-full border border-gray-900 flex items-center justify-center">
-                    <Icon size={26} strokeWidth={1.5} className="text-gray-900" />
+                    <Icon size={26} strokeWidth={1.5} className="text-ink" />
                   </div>
                 </div>
 
-                <p className="font-semibold text-gray-900 leading-snug mb-1">
+                <p className="font-semibold text-ink leading-snug mb-1">
                   {rule.label}
                 </p>
-                <p className="text-gray-600 text-sm mb-3">{rule.points} Points</p>
+                <p className="text-flannel/80 text-sm mb-3">{rule.points} Points</p>
 
                 {/* Purchase rewards are otherwise invisible work - a customer
                     cannot tell they are already 3 orders into a 5 order
@@ -240,7 +240,7 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
                         }}
                       />
                     </div>
-                    <p className="mt-1.5 text-xs text-gray-500">{rule.progress.label}</p>
+                    <p className="mt-1.5 text-xs text-flannel/70">{rule.progress.label}</p>
                   </div>
                 )}
 
@@ -249,17 +249,17 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
                 {isInteractive && (
                   <div className="flex justify-center">
                     {claiming === rule.key ? (
-                      <span className="text-xs text-gray-500">Claiming...</span>
+                      <span className="text-xs text-flannel/70">Claiming...</span>
                     ) : (
                       <span className="w-7 h-7 rounded-full border border-gray-900 flex items-center justify-center">
-                        <ArrowRight size={14} className="text-gray-900" />
+                        <ArrowRight size={14} className="text-ink" />
                       </span>
                     )}
                   </div>
                 )}
 
                 {isDone && (
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  <p className="text-xs font-medium text-flannel/70 uppercase tracking-wide">
                     Earned
                   </p>
                 )}
@@ -271,19 +271,19 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
 
       {/* Signed-out click target: one prompt for the whole grid. */}
       {showJoinPrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-8 text-center relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/50 p-4">
+          <div className="bg-shirting  w-full max-w-sm p-8 text-center relative">
             <button
               onClick={() => setShowJoinPrompt(false)}
               aria-label="Close"
-              className="absolute top-4 right-4 text-gray-400 hover:text-black"
+              className="absolute top-4 right-4 text-flannel/50 hover:text-claret"
             >
               <X size={20} />
             </button>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+            <h3 className="font-caslon text-xl text-navy mb-2">
               Sign up for rewards
             </h3>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-flannel/70 mb-6">
               Create an account to start collecting points on every order.
             </p>
             <button
@@ -291,7 +291,7 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
                 setShowJoinPrompt(false)
                 openAuthPanel("signup")
               }}
-              className="w-full bg-black text-white rounded-md px-6 py-3 font-medium hover:bg-gray-800 transition-colors mb-3"
+              className="w-full bg-navy text-paper  px-6 py-3 font-medium hover:bg-ink transition-colors mb-3"
             >
               Sign Up
             </button>
@@ -300,7 +300,7 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
                 setShowJoinPrompt(false)
                 openAuthPanel("login")
               }}
-              className="w-full border border-gray-300 rounded-md px-6 py-3 font-medium text-gray-700 hover:border-black transition-colors"
+              className="w-full border border-hairline  px-6 py-3 font-medium text-flannel hover:border-navy transition-colors"
             >
               I already have an account
             </button>
@@ -310,19 +310,19 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
 
       {/* WhatsApp is the one claim that needs an input before it can be paid. */}
       {whatsappFor && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-8 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/50 p-4">
+          <div className="bg-shirting  w-full max-w-sm p-8 relative">
             <button
               onClick={() => setWhatsappFor(null)}
               aria-label="Close"
-              className="absolute top-4 right-4 text-gray-400 hover:text-black"
+              className="absolute top-4 right-4 text-flannel/50 hover:text-claret"
             >
               <X size={20} />
             </button>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+            <h3 className="font-caslon text-xl text-navy mb-2">
               Subscribe on WhatsApp
             </h3>
-            <p className="text-sm text-gray-500 mb-5">
+            <p className="text-sm text-flannel/70 mb-5">
               We will send order updates and early access to your number.
             </p>
             <input
@@ -330,12 +330,12 @@ const WaysToEarn = ({ rules, isLoggedIn, onClaimed, openAuthPanel, onBirthdayCli
               value={whatsappNumber}
               onChange={(e) => setWhatsappNumber(e.target.value)}
               placeholder="+92 300 1234567"
-              className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-black/10"
+              className="w-full border border-hairline  px-3 py-2.5 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-black/10"
             />
             <button
               onClick={() => claim(whatsappFor, { whatsappNumber })}
               disabled={claiming === whatsappFor || !whatsappNumber.trim()}
-              className="w-full bg-black text-white rounded-md px-6 py-3 font-medium hover:bg-gray-800 disabled:opacity-40 transition-colors"
+              className="w-full bg-navy text-paper  px-6 py-3 font-medium hover:bg-ink disabled:opacity-40 transition-colors"
             >
               {claiming === whatsappFor ? "Subscribing..." : "Subscribe"}
             </button>

@@ -29,24 +29,24 @@ const FAQs = () => {
   const [openIndex, setOpenIndex] = useState(null)
 
   return (
-    <div className="min-h-screen flex flex-col w-full bg-white">
+    <div className="min-h-screen flex flex-col w-full bg-shirting">
       <Header />
       <main className="flex-grow py-16 px-4">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">Frequently Asked Questions</h1>
+          <h1 className="font-caslon text-3xl md:text-4xl text-navy mb-8 text-center">Frequently Asked Questions</h1>
           <div className="space-y-3">
             {FAQ_ITEMS.map((item, index) => (
-              <div key={item.question} className="border border-gray-200 rounded-lg overflow-hidden">
+              <div key={item.question} className="border border-hairline  overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                  className="w-full flex items-center justify-between px-5 py-4 text-left font-medium text-gray-900 hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center justify-between px-5 py-4 text-left font-medium text-ink hover:bg-paper transition-colors"
                 >
                   {item.question}
-                  <span className="text-gray-400">{openIndex === index ? "−" : "+"}</span>
+                  <span className="text-flannel/50">{openIndex === index ? "−" : "+"}</span>
                 </button>
                 {openIndex === index && (
-                  <div className="px-5 pb-4 text-gray-600 text-sm">{item.answer}</div>
+                  <div className="px-5 pb-4 text-flannel/80 text-sm">{item.answer}</div>
                 )}
               </div>
             ))}

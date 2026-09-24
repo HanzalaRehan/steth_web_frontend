@@ -12,14 +12,14 @@ const NewsletterSignup = () => {
 
   return (
     <div className='w-full bg-gray-200 py-20'>
-    <div className="max-w-md mx-auto p-6 text-black">
+    <div className="max-w-md mx-auto p-6 text-ink">
       <h2 className="text-center text-3xl font-bold mb-4">TAKE 15% OFF</h2>
       <p className="text-center text-sm mb-4">
         Subscribe to take 15% OFF your first purchase and stay in the know on
         exclusive new colors, styles and promotions.
       </p>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="text-xs text-center text-black mb-2">
+        <div className="text-xs text-center text-ink mb-2">
           By clicking 'Sign up', you agree to receive emails from STETH and accept our 
           <a href="#" className="underline ml-1">Terms of Use</a> and 
           <a href="#" className="underline ml-1">Privacy Policy</a>.
@@ -30,7 +30,7 @@ const NewsletterSignup = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
-          className="w-full px-3 py-2 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+          className="w-full px-3 py-2 border bg-shirting border-hairline  focus:outline-none focus:ring-2 focus:ring-black"
           required
         />
         
@@ -59,7 +59,7 @@ const NewsletterSignup = () => {
         
         <button 
           type="submit"
-          className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition-colors"
+          className="w-full bg-navy text-paper py-2  hover:bg-ink transition-colors"
         >
           SIGN UP
         </button>

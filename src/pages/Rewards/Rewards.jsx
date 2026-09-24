@@ -164,7 +164,7 @@ const Rewards = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col w-full bg-white">
+    <div className="min-h-screen flex flex-col w-full bg-shirting">
       <Header />
       <main className="flex-grow">
         <HowItWorks />
@@ -172,9 +172,9 @@ const Rewards = () => {
         {isLoggedIn && (
           <div ref={activityRef}>
             {isLoading ? (
-              <p className="text-center text-gray-500 py-12">Loading your rewards...</p>
+              <p className="text-center text-flannel/70 py-12">Loading your rewards...</p>
             ) : error ? (
-              <div className="max-w-xl mx-auto my-12 bg-red-50 rounded-2xl p-6 border border-red-200 text-center text-red-700">
+              <div className="max-w-xl mx-auto my-12 bg-shirting  p-6 border border-claret text-center text-red-700">
                 {error}
               </div>
             ) : (
@@ -200,23 +200,23 @@ const Rewards = () => {
       <Footer />
 
       {showBirthdayPrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/50 p-4">
           <form
             onSubmit={saveBirthday}
-            className="bg-white rounded-2xl w-full max-w-sm p-8 relative"
+            className="bg-shirting  w-full max-w-sm p-8 relative"
           >
             <button
               type="button"
               onClick={() => setShowBirthdayPrompt(false)}
               aria-label="Close"
-              className="absolute top-4 right-4 text-gray-400 hover:text-black"
+              className="absolute top-4 right-4 text-flannel/50 hover:text-claret"
             >
               <X size={20} />
             </button>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+            <h3 className="font-caslon text-xl text-navy mb-2">
               Celebrate your birthday
             </h3>
-            <p className="text-sm text-gray-500 mb-5">
+            <p className="text-sm text-flannel/70 mb-5">
               Tell us the date and we will send you points every year. You can
               only set this once.
             </p>
@@ -225,16 +225,16 @@ const Rewards = () => {
               value={birthday}
               onChange={(e) => setBirthday(e.target.value)}
               required
-              className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-black/10"
+              className="w-full border border-hairline  px-3 py-2.5 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-black/10"
             />
             <button
               type="submit"
-              className="w-full bg-black text-white rounded-md px-6 py-3 font-medium hover:bg-gray-800 transition-colors"
+              className="w-full bg-navy text-paper  px-6 py-3 font-medium hover:bg-ink transition-colors"
             >
               Save
             </button>
             {birthdayMessage && (
-              <p className="text-sm text-gray-600 mt-4 text-center">{birthdayMessage}</p>
+              <p className="text-sm text-flannel/80 mt-4 text-center">{birthdayMessage}</p>
             )}
           </form>
         </div>

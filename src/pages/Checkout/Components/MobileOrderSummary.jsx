@@ -309,13 +309,13 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
   }
 
   return (
-    <div className="bg-white p-4 border-b border-gray-300">
+    <div className="bg-shirting p-4 border-b border-hairline">
       {/* Products List */}
       <div className="space-y-4 mb-6">
         {cartItems.map((item) => (
           <div key={`${item.id}-${item.colorName}-${item.size}`} className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 rounded overflow-hidden">
+              <div className="w-16 h-16 bg-paper overflow-hidden">
                 <img
                   src={item.image}
                   alt={item.name}
@@ -323,19 +323,19 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
                 />
               </div>
               <div>
-                <h3 className="font-medium">{item.name}</h3>
-                <p className="text-gray-500 text-sm">
+                <h3 className="font-caslon text-base text-navy">{item.name}</h3>
+                <p className="text-flannel/70 text-sm">
                   Color: {item.colorName} | Size: {item.size}
                 </p>
-                <p className="text-gray-500 text-sm">
+                <p className="text-flannel/70 text-sm">
                   Quantity: {item.quantity}
                 </p>
-                <p className="text-gray-500">Rs. {item.totalPrice.toFixed(2)}</p>
+                <p className="text-flannel/70">Rs. {item.totalPrice.toFixed(2)}</p>
               </div>
             </div>
             <button
               onClick={() => handleRemoveProduct(item.id, item.colorName, item.size)}
-              className="text-black bg-white hover:text-gray-600"
+              className="text-ink bg-shirting hover:text-flannel/80"
             >
               <X size={18} />
             </button>
@@ -344,7 +344,7 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
       </div>
 
       {/* Total and Discounts */}
-      <div className="border-t border-gray-200 pt-4">
+      <div className="border-t border-hairline pt-4">
         <div className="flex justify-between mb-2">
           <span>Subtotal</span>
           <span>Rs. {totalPrice.toFixed(2)}</span>
@@ -354,10 +354,10 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
         {discounts && (discounts.amount > 0 || discounts.reasons.length > 0) && (
           <div className="mt-4 mb-2">
             <div className="flex items-center">
-              <span className="text-[#333333] font-medium">DISCOUNTS</span>
+              <span className="font-archivo text-xs uppercase tracking-wide text-flannel">DISCOUNTS</span>
               <div className="relative group ml-2">
-                <Info size={16} className="text-gray-500" />
-                <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-white p-2 rounded shadow-md text-sm w-48 z-10">
+                <Info size={16} className="text-flannel/70" />
+                <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-shirting p-2 shadow-md text-sm w-48 z-10">
                   <p className="mb-1 font-medium">Available Discounts:</p>
                   <ul className="list-disc list-inside">
                     {discounts.reasons.map((reason, index) => (
@@ -370,19 +370,19 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
             
             {discounts.amount > 0 && (
               <div className="flex justify-between text-sm mt-1">
-                <span className="text-green-600">
+                <span className="text-green-700">
                   {discounts.reasons.length > 0 
                     ? discounts.reasons[0] 
                     : "Discount"}
                 </span>
-                <span className="text-green-600">-Rs. {discounts.amount.toFixed(2)}</span>
+                <span className="text-green-700">-Rs. {discounts.amount.toFixed(2)}</span>
               </div>
             )}
             
             {discounts.reasons.slice(1).map((reason, index) => (
               <div key={index} className="flex justify-between text-sm mt-1">
-                <span className="text-green-600">{reason}</span>
-                <span className="text-green-600"></span>
+                <span className="text-green-700">{reason}</span>
+                <span className="text-green-700"></span>
               </div>
             ))}
           </div>
@@ -392,10 +392,10 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
         {pointsAvailable > 0 && (
           <div className="mt-4 mb-2">
             <div className="flex items-center">
-              <span className="text-[#333333] font-medium">REWARD POINTS</span>
+              <span className="font-archivo text-xs uppercase tracking-wide text-flannel">REWARD POINTS</span>
               <div className="relative group ml-2">
-                <Info size={16} className="text-gray-500" />
-                <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-white p-2 rounded shadow-md text-sm w-48 z-10">
+                <Info size={16} className="text-flannel/70" />
+                <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-shirting p-2 shadow-md text-sm w-48 z-10">
                   <p className="mb-1">You have {pointsAvailable} points available</p>
                   <p className="text-xs">1 point = Rs. 1 discount</p>
                 </div>
@@ -408,15 +408,15 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
                 max={pointsAvailable}
                 value={pointsToUse}
                 onChange={handlePointsChange}
-                className="w-20 p-1 border border-gray-300 rounded text-sm bg-white text-black"
+                className="w-20 p-2 border border-hairline text-sm bg-shirting text-ink font-archivo focus:outline-none focus:border-claret"
                 placeholder="0"
               />
-              <span className="ml-2 text-sm text-gray-600">/ {pointsAvailable} available</span>
+              <span className="ml-2 text-sm text-flannel/80">/ {pointsAvailable} available</span>
             </div>
             {pointsToUse > 0 && (
               <div className="flex justify-between text-sm mt-1">
-                <span className="text-green-600">Points Discount</span>
-                <span className="text-green-600">-Rs. {pointsToUse.toFixed(2)}</span>
+                <span className="text-green-700">Points Discount</span>
+                <span className="text-green-700">-Rs. {pointsToUse.toFixed(2)}</span>
               </div>
             )}
           </div>
@@ -424,16 +424,16 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
 
         {/* Discount code section */}
         <div className="mt-4 mb-2">
-          <span className="text-[#333333] font-medium">DISCOUNT CODE</span>
+          <span className="font-archivo text-xs uppercase tracking-wide text-flannel">DISCOUNT CODE</span>
           {discountCode ? (
             <div className="flex justify-between items-center text-sm mt-2">
-              <span className="text-green-600">
+              <span className="text-green-700">
                 Code ({discountCode}){discountSource === 'code' ? ' applied' : ' entered - your account discount is better'}
               </span>
               <button
                 type="button"
                 onClick={handleRemoveDiscountCode}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-flannel/50 hover:text-flannel/80"
               >
                 <X size={14} />
               </button>
@@ -446,19 +446,19 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
                   value={discountCodeDraft}
                   onChange={(e) => setDiscountCodeDraft(e.target.value)}
                   placeholder="Enter code"
-                  className="flex-1 p-1 border border-gray-300 rounded text-sm bg-white text-black"
+                  className="flex-1 p-2 border border-hairline text-sm bg-shirting text-ink font-archivo focus:outline-none focus:border-claret"
                 />
                 <button
                   type="button"
                   onClick={handleApplyDiscountCode}
                   disabled={isLoading}
-                  className="px-3 py-1 bg-black text-white rounded text-sm disabled:opacity-50"
+                  className="px-4 py-2 bg-navy text-paper font-archivo font-semibold uppercase tracking-wide text-xs disabled:opacity-50 hover:bg-ink transition-colors"
                 >
                   Apply
                 </button>
               </div>
               {discountCodeError && (
-                <p className="text-red-600 text-xs mt-1">{discountCodeError}</p>
+                <p className="text-claret text-xs mt-1">{discountCodeError}</p>
               )}
             </div>
           )}
@@ -466,16 +466,16 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
 
         {/* Gift card section */}
         <div className="mt-4 mb-2">
-          <span className="text-[#333333] font-medium">GIFT CARD</span>
+          <span className="font-archivo text-xs uppercase tracking-wide text-flannel">GIFT CARD</span>
           {giftCardCode ? (
             <div className="flex justify-between items-center text-sm mt-2">
-              <span className="text-green-600">Gift Card ({giftCardCode})</span>
+              <span className="text-green-700">Gift Card ({giftCardCode})</span>
               <div className="flex items-center gap-2">
-                <span className="text-green-600">-Rs. {giftCardAmount.toFixed(2)}</span>
+                <span className="text-green-700">-Rs. {giftCardAmount.toFixed(2)}</span>
                 <button
                   type="button"
                   onClick={handleRemoveGiftCard}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-flannel/50 hover:text-flannel/80"
                 >
                   <X size={14} />
                 </button>
@@ -489,19 +489,19 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
                   value={giftCardInput}
                   onChange={(e) => setGiftCardInput(e.target.value)}
                   placeholder="Enter code"
-                  className="flex-1 p-1 border border-gray-300 rounded text-sm bg-white text-black"
+                  className="flex-1 p-2 border border-hairline text-sm bg-shirting text-ink font-archivo focus:outline-none focus:border-claret"
                 />
                 <button
                   type="button"
                   onClick={handleApplyGiftCard}
                   disabled={giftCardValidating}
-                  className="px-3 py-1 bg-black text-white rounded text-sm disabled:opacity-50"
+                  className="px-4 py-2 bg-navy text-paper font-archivo font-semibold uppercase tracking-wide text-xs disabled:opacity-50 hover:bg-ink transition-colors"
                 >
                   {giftCardValidating ? "Checking..." : "Apply"}
                 </button>
               </div>
               {giftCardError && (
-                <p className="text-red-600 text-xs mt-1">{giftCardError}</p>
+                <p className="text-claret text-xs mt-1">{giftCardError}</p>
               )}
             </div>
           )}
@@ -512,8 +512,8 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
           <div className="flex items-center">
             <span>Shipping</span>
             <div className="relative group ml-2">
-              <Info size={16} className="text-gray-500" />
-              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-white p-2 rounded shadow-md text-sm w-64 z-10">
+              <Info size={16} className="text-flannel/70" />
+              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-shirting p-2 shadow-md text-sm w-64 z-10">
                 <p className="mb-1 font-medium">Shipping Information:</p>
                 <p className="text-xs mb-1">Country: {getCountryDisplayName()}</p>
                 <p className="text-xs mb-1">Free shipping on orders ≥ Rs. {FREE_SHIPPING_THRESHOLD.toLocaleString()}</p>
@@ -525,33 +525,33 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
               </div>
             </div>
           </div>
-          <span className={totalPrice >= 5000 ? 'text-green-600 font-medium' : ''}>
+          <span className={totalPrice >= 5000 ? 'text-green-700 font-medium' : ''}>
             {getShippingDisplayText()}
           </span>
         </div>
 
         {totalPrice < FREE_SHIPPING_THRESHOLD && (
           <div className="mb-4">
-            <div className="bg-gray-200 rounded-full h-2">
+            <div className="bg-paper h-1.5">
               <div 
-                className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                className="bg-brass h-1.5 transition-all duration-300"
                 style={{ width: `${Math.min((totalPrice / FREE_SHIPPING_THRESHOLD) * 100, 100)}%` }}
               ></div>
             </div>
-            <p className="text-xs text-gray-600 mt-1 text-center">
+            <p className="text-xs text-flannel/80 mt-1 text-center">
               Rs. {(FREE_SHIPPING_THRESHOLD - totalPrice).toFixed(2)} away from free shipping!
             </p>
           </div>
         )}
 
-        <div className="flex justify-between font-semibold text-lg mt-4 pt-4 border-t border-gray-200">
+        <div className="flex justify-between font-archivo font-semibold text-navy text-base mt-4 pt-4 border-t border-hairline uppercase tracking-wide">
           <span>Total</span>
           <span>Rs. {calculateTotal().toFixed(2)}</span>
         </div>
 
         {/* Show points to be earned */}
         {cartItems.length > 0 && (
-          <div className="mt-4 text-center text-sm text-gray-600">
+          <div className="mt-4 text-center text-sm text-flannel/80">
             You'll earn {Math.floor(calculateTotal() / 100)} reward points from this purchase
           </div>
         )}

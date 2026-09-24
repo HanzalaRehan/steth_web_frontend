@@ -42,7 +42,7 @@ const GenderQuickSelect = ({ onDismiss }) => {
         <>
           <Motion.div
             key="gender-select-backdrop"
-            className="fixed inset-0 bg-black/50 z-[10000]"
+            className="fixed inset-0 bg-navy/50 z-[10000]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -63,34 +63,34 @@ const GenderQuickSelect = ({ onDismiss }) => {
             transition={{ duration: 0.2 }}
           >
             <Motion.div
-              className="w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden"
+              className="w-full max-w-sm bg-shirting  shadow-2xl overflow-hidden"
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
               transition={{ type: "tween", ease: "easeOut", duration: 0.3 }}
             >
               <div className="px-8 py-10 text-center">
-                <h2 className="text-2xl font-bold text-black mb-2">Welcome to STETH</h2>
-                <p className="text-gray-600 mb-8">Who are you shopping for?</p>
+                <h2 className="text-2xl font-bold text-ink mb-2">Welcome to STETH</h2>
+                <p className="text-flannel/80 mb-8">Who are you shopping for?</p>
                 <div className="flex flex-col gap-3">
                   <button
                     type="button"
                     onClick={() => choose("/women")}
-                    className="bg-black text-white rounded-md py-3 font-medium uppercase tracking-wide hover:bg-gray-800 transition-colors"
+                    className="bg-navy text-paper  py-3 font-medium uppercase tracking-wide hover:bg-ink transition-colors"
                   >
                     Shop Women
                   </button>
                   <button
                     type="button"
                     onClick={() => choose("/men")}
-                    className="bg-black text-white rounded-md py-3 font-medium uppercase tracking-wide hover:bg-gray-800 transition-colors"
+                    className="bg-navy text-paper  py-3 font-medium uppercase tracking-wide hover:bg-ink transition-colors"
                   >
                     Shop Men
                   </button>
                   <button
                     type="button"
                     onClick={() => choose(null)}
-                    className="border border-gray-300 text-black rounded-md py-3 font-medium uppercase tracking-wide hover:bg-gray-100 transition-colors"
+                    className="border border-hairline text-ink  py-3 font-medium uppercase tracking-wide hover:bg-paper transition-colors"
                   >
                     Shop All
                   </button>

@@ -62,30 +62,34 @@ const FeatureSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="w-full px-4 py-16 bg-[#0B132B]"
+      className="w-full px-4 py-16 bg-navy"
     >
       <div className="max-w-7xl mx-auto">
-        <p className="text-center text-sm md:text-base font-medium uppercase tracking-wide text-gray-300 mb-10">
-          For doctors, by doctors
-        </p>
+        <div className="flex items-center justify-center gap-4 mb-10">
+          <span className="block w-10 h-[2px] bg-brass"></span>
+          <p className="text-center font-archivo text-xs md:text-sm font-semibold uppercase tracking-[0.3em] text-brass">
+            For doctors, by doctors
+          </p>
+          <span className="block w-10 h-[2px] bg-brass"></span>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-8 w-full">
           {features.map((feature, index) => (
             <div
               key={feature.title}
               ref={el => featuresRef.current[index] = el}
-              className="flex flex-col items-center text-center text-white space-y-3 p-4 md:p-6 w-full"
+              className="flex flex-col items-center text-center text-paper space-y-3 p-4 md:p-6 w-full"
             >
-              <div className="w-16 h-16 mb-2 flex items-center justify-center">
+              <div className="w-16 h-16 mb-2 flex items-center justify-center border border-brass/40">
                 <img
                   src={feature.icon}
                   alt={feature.title}
-                  className="max-w-full max-h-full object-contain [filter:brightness(0)_invert(1)]"
+                  className="max-w-[60%] max-h-[60%] object-contain [filter:brightness(0)_invert(1)]"
                 />
               </div>
-              <h3 className="text-lg md:text-2xl font-semibold">
+              <h3 className="font-caslon text-lg md:text-2xl">
                 {feature.title}
               </h3>
-              <p className="text-sm md:text-base text-gray-300 px-2">
+              <p className="font-spectral text-sm md:text-base text-[#A8B0C8] px-2">
                 {feature.description}
               </p>
             </div>

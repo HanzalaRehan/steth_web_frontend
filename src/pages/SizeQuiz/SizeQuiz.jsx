@@ -60,20 +60,20 @@ const SizeQuiz = () => {
   const savedFromQuiz = profile?.latest?.recommendation?.source === "quiz"
 
   return (
-    <div className="min-h-screen flex flex-col w-full bg-white">
+    <div className="min-h-screen flex flex-col w-full bg-shirting">
       <Header />
       <main className="flex-grow">
         <div className="max-w-2xl mx-auto py-16 px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+          <h1 className="font-caslon text-3xl md:text-4xl text-navy mb-3">
             Take Our Sizing Quiz
           </h1>
-          <p className="text-gray-500 mb-8">
+          <p className="text-flannel/70 mb-8">
             A few quick questions and we'll find your size — and you'll earn
             reward points for it.
           </p>
 
           {savedSize && (
-            <div className="bg-[#0B132B] rounded-2xl p-8 text-white mb-8">
+            <div className="bg-[#0B132B]  p-8 text-paper mb-8">
               <p className="text-sm text-gray-300 mb-1">Your size</p>
               <p className="text-6xl font-bold">{savedSize}</p>
 
@@ -88,7 +88,7 @@ const SizeQuiz = () => {
               </p>
 
               {profile.quizCompleted ? (
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-xs text-flannel/50 mt-2">
                   You’ve already earned {profile.quizPointsAwarded} points for this
                   quiz. You can retake it any time — it just won’t pay again.
                 </p>
@@ -103,7 +103,7 @@ const SizeQuiz = () => {
           {isLoggedIn ? (
             <button
               onClick={() => setIsQuizOpen(true)}
-              className="bg-black text-white rounded-md px-8 py-3 font-medium hover:bg-gray-800 transition-colors"
+              className="bg-navy text-paper  px-8 py-3 font-medium hover:bg-ink transition-colors"
             >
               {/* Keyed to whether the quiz was actually completed, not to
                   whether a size exists - a size from "What's My Size?" is not
@@ -112,13 +112,13 @@ const SizeQuiz = () => {
               {profile?.quizCompleted ? "Retake the quiz" : "Start the quiz"}
             </button>
           ) : (
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100">
-              <p className="text-gray-600 mb-4">
+            <div className="bg-paper  p-8 border border-hairline">
+              <p className="text-flannel/80 mb-4">
                 Sign in to take the quiz and collect your points.
               </p>
               <button
                 onClick={() => openAuthPanel("login")}
-                className="bg-black text-white rounded-md px-6 py-3 font-medium hover:bg-gray-800 transition-colors"
+                className="bg-navy text-paper  px-6 py-3 font-medium hover:bg-ink transition-colors"
               >
                 Log In
               </button>

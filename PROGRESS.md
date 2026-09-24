@@ -528,3 +528,25 @@ Everything else: Cart, Checkout, Account overlay, Auth panel, Cart drawer, FAQs,
 
 ### What's next
 Get sign-off on scope before continuing the restyle into Cart/Checkout/Account/the remaining homepage sections/admin - each is a real chunk of work in its own right. Rewrite `DESIGN.md` once the palette is fully migrated (premature while half the site is still on the old system). Live-verify the size selector against real mixed-stock inventory.
+
+## Session: Savile Row restyle, continued - Cart, Checkout, rest of homepage, remaining pages (2026-09-24)
+
+Asked explicitly to continue the previous session's re-theme into Cart, Checkout, and "all other pages." Deliberately **excluded `/admin/*`** - that section has its own separate, pre-existing shadcn dark/orange theme (documented in `DESIGN.md`) that was already flagged there as its own larger migration, not something to fold into this pass without a separate decision.
+
+### Method - two passes, not one
+Given ~50 remaining files, a single hand-authored pass on every one wasn't realistic in-session, so this went in two tiers, both disclosed rather than presented as uniformly "done":
+
+1. **Systematic sweep (scripted, all ~50 remaining files at once):** old-palette Tailwind utilities (`bg-white`, `text-black`, `border-gray-300`, `bg-red-50`, etc.) mapped 1:1 to the new tokens (`bg-shirting`, `text-ink`, `border-hairline`, `text-claret`, ...); all `rounded-md/lg/xl/2xl/3xl` (and bare `rounded`) stripped sitewide for the design system's "square corners, no exceptions" rule, `rounded-full` deliberately left alone (dots, avatars, radio indicators - legitimate circles, not a corner-radius violation). Verified with `npm run lint`/`npm run build` after every batch.
+2. **Hand-authored pass (headings, buttons, labels → Caslon/Archivo Narrow, brass price dividers, square-cornered inputs):** applied to the pages actually asked for by name plus the shared overlays used everywhere - **Cart** (`Cart.jsx`, `YouMayAlsoLike.jsx`), **Checkout** (`CheckoutPage.jsx` + all 5 sub-components: `ContactForm`, `DeliveryForm`, `PaymentMethod`, `OrderSummary`, `MobileOrderSummary`, plus `FigsLogo.jsx` - dropped its logo image for the wordmark-only treatment, matching `Header.jsx`), the rest of the **homepage** (`FeatureSection`, `DiscountOffers`/Rewards & Benefits, `NewsletterSignup`, all 4 best-seller product-card components across Home/Men/Women), the **Men's/Women's catalog grids** (`Products.jsx` x2) and **`ColorProductPage.jsx`**, the shared **`AuthPanel`** (`LoginForm`/`SignupForm`/`VerifyOtpForm`), **`CartDrawer`**, and **`AccountOverlay`**, and headings across **FAQs, Rewards (all 4 files), GiftCards, Student, SizeQuiz, Blog (list+detail), Affiliate, AboutUs, PrivacyPolicy, TermsAndConditions**.
+
+### A real bug found and fixed mid-sweep
+The scripted sweep's `bg-red-50` → `bg-shirting` rule matched as a *substring* inside `bg-red-500` (a different, unrelated class), corrupting it to `bg-shirting0` in two places: `CheckoutPage.jsx`'s validation-error banner and `Password-Recovery.jsx`'s password-strength bar. Caught by grepping the whole tree afterward for `<token><digit>` patterns (e.g. `shirting0`) - both fixed to `bg-claret` (matching the "weak/error" semantic the original red was carrying). Grepped the entire `src/` tree afterward for the same corruption pattern site-wide; nothing else matched.
+
+### Still on the old system (disclosed, not silently skipped)
+`SizeFinder.jsx`, `ContactUs.jsx`, `OTP.jsx`, `Password-Recovery.jsx` (only its corrupted class was touched, not restyled), `Features.jsx`, `ReviewsSection.jsx`, `ProductDetail.jsx`'s thin wrapper, and the entire `/admin/*` section only have the systematic sweep applied (colors/corners), not the hand-authored heading/button pass. `DESIGN.md` still hasn't been rewritten for the new system.
+
+### Verification
+`npm run lint`: 49 problems, unchanged baseline, zero new, checked after every batch. `npm run build`: succeeded clean throughout. Live: the shared dev-server port (3000) was held by another concurrent session for this whole pass, so verification ran on a manually-started instance on port 3001 instead of through the usual preview tooling. With a `cartItems` entry injected directly into `localStorage` (this sandbox still can't reach the real backend, so no real product data), confirmed live: the empty-cart state, the populated cart (item row, quantity stepper, brass-accented "You May Also Like" cards, Summary panel), and the full Checkout page (Caslon section headings, the Cash on Delivery payment card, Order Summary panel, Apply/discount code UI, free-shipping "Free" in green) - all render correctly with the new palette and no visual regressions. Did not verify the populated Checkout submit flow itself (needs a reachable backend) or any of the pages in the "still on the old system" list above.
+
+### What's next
+`SizeFinder`/`ContactUs`/`OTP`/`Password-Recovery`/`Features`/`ReviewsSection`/`ProductDetail.jsx` wrapper, plus a deliberate decision on `/admin/*` (separate theme migration, own scope). Rewrite `DESIGN.md` once the palette is fully migrated.

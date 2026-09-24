@@ -27,7 +27,7 @@ const ProductFeatures = () => {
   ];
 
   return (
-    <section className="w-full bg-gray-100 py-12">
+    <section className="w-full bg-paper py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 items-center justify-items-center relative">
           {features.map((feature, index) => (
@@ -39,7 +39,7 @@ const ProductFeatures = () => {
                   className="w-16 h-16 object-contain"
                 />
               </div>
-              <h3 className="text-gray-700 text-sm font-medium tracking-wider text-center">
+              <h3 className="text-flannel text-sm font-medium tracking-wider text-center">
                 {feature.title}
               </h3>
               {index < features.length - 1 && (

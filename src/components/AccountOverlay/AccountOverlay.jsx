@@ -7,7 +7,7 @@ import { useAccountOverlay } from "../../context/AccountContext"
 import { API_BASE_URL } from "../../config/api"
 
 const STATUS_COLORS = {
-  Pending: "bg-gray-100 text-gray-800",
+  Pending: "bg-paper text-flannel",
   Confirmed: "bg-blue-100 text-blue-800",
   Processing: "bg-yellow-100 text-yellow-800",
   Shipped: "bg-purple-100 text-purple-800",
@@ -130,7 +130,7 @@ const AccountOverlay = () => {
         <>
           <Motion.div
             key="account-overlay-backdrop"
-            className="fixed inset-0 bg-black/50 z-[10000]"
+            className="fixed inset-0 bg-navy/50 z-[10000]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -139,25 +139,25 @@ const AccountOverlay = () => {
           />
           <Motion.div
             key="account-overlay"
-            className="fixed inset-y-0 right-0 z-[10001] w-full sm:max-w-md bg-white shadow-2xl flex flex-col"
+            className="fixed inset-y-0 right-0 z-[10001] w-full sm:max-w-md bg-shirting shadow-2xl flex flex-col"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "tween", ease: "easeOut", duration: 0.3 }}
           >
-            <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-black">My Account</h2>
+            <div className="flex items-center justify-between px-4 py-4 border-b border-hairline">
+              <h2 className="font-caslon text-xl text-navy">My Account</h2>
               <button
                 type="button"
                 onClick={closeAccountOverlay}
-                className="p-2 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-full text-flannel/70 hover:text-ink hover:bg-paper transition-colors"
                 aria-label="Close"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="flex border-b border-gray-200">
+            <div className="flex border-b border-hairline">
               {[
                 { key: "for-you", label: "For You", icon: Sparkles },
                 { key: "orders", label: "Orders", icon: Package },
@@ -169,8 +169,8 @@ const AccountOverlay = () => {
                     key={tab.key}
                     type="button"
                     onClick={() => setActiveTab(tab.key)}
-                    className={`flex-1 py-3 flex items-center justify-center gap-1.5 text-sm font-medium transition-colors ${
-                      activeTab === tab.key ? "text-black border-b-2 border-black" : "text-gray-400 hover:text-gray-600"
+                    className={`flex-1 py-3 flex items-center justify-center gap-1.5 font-archivo text-xs font-semibold uppercase tracking-wide transition-colors ${
+                      activeTab === tab.key ? "text-ink border-b-2 border-navy" : "text-flannel/50 hover:text-flannel/80"
                     }`}
                   >
                     <TabIcon size={16} />
@@ -184,14 +184,14 @@ const AccountOverlay = () => {
               {activeTab === "for-you" && (
                 <div className="text-center py-10">
                   <Sparkles size={40} className="mx-auto text-gray-300 mb-4" />
-                  <h3 className="font-medium text-black mb-2">Loyalty & Rewards</h3>
-                  <p className="text-sm text-gray-600 mb-5">
+                  <h3 className="font-caslon text-lg text-navy mb-2">Loyalty & Rewards</h3>
+                  <p className="text-sm text-flannel/80 mb-5">
                     Your points, perks, and personalized picks are coming here soon.
                   </p>
                   <button
                     type="button"
                     onClick={() => goTo("/rewards")}
-                    className="px-4 py-2 border border-black rounded-full text-sm font-medium hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2.5 border border-navy text-navy font-archivo font-semibold uppercase tracking-wide text-xs hover:bg-paper transition-colors"
                   >
                     Visit Rewards
                   </button>
@@ -202,12 +202,12 @@ const AccountOverlay = () => {
                 <div>
                   {isLoadingOrders ? (
                     <div className="flex justify-center py-10">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black" />
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-navy" />
                     </div>
                   ) : orders.length === 0 ? (
                     <div className="text-center py-10">
                       <Package size={40} className="mx-auto text-gray-300 mb-4" />
-                      <p className="text-gray-600">No orders yet</p>
+                      <p className="text-flannel/80">No orders yet</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -215,26 +215,26 @@ const AccountOverlay = () => {
                         const isExpanded = expandedOrderId === order._id
                         const canCancel = CANCELLABLE_STATUSES.includes(order.orderStatus)
                         return (
-                          <div key={order._id} className="border border-gray-200 rounded-lg overflow-hidden">
+                          <div key={order._id} className="border border-hairline  overflow-hidden">
                             <button
                               type="button"
                               onClick={() => setExpandedOrderId(isExpanded ? null : order._id)}
-                              className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+                              className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-paper transition-colors"
                             >
                               <div>
-                                <p className="text-sm font-medium text-black">
+                                <p className="text-sm font-medium text-ink">
                                   #{order.orderId || order._id.slice(-6)}
                                 </p>
-                                <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                <p className="text-xs text-flannel/70 flex items-center gap-1 mt-0.5">
                                   <Calendar size={12} />
                                   {new Date(order.createdAt).toLocaleDateString()}
                                 </p>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium text-black">Rs. {order.total?.toFixed(2)}</span>
+                                <span className="text-sm font-medium text-ink">Rs. {order.total?.toFixed(2)}</span>
                                 <span
                                   className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                    STATUS_COLORS[order.orderStatus] || "bg-gray-100 text-gray-800"
+                                    STATUS_COLORS[order.orderStatus] || "bg-paper text-flannel"
                                   }`}
                                 >
                                   {order.orderStatus}
@@ -243,17 +243,17 @@ const AccountOverlay = () => {
                             </button>
 
                             {isExpanded && (
-                              <div className="px-4 pb-4 border-t border-gray-100 pt-3">
-                                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                              <div className="px-4 pb-4 border-t border-hairline pt-3">
+                                <h4 className="text-xs font-semibold text-flannel/50 uppercase tracking-wide mb-2">
                                   Status Timeline
                                 </h4>
                                 <ol className="space-y-2 mb-4">
                                   {(order.statusHistory || []).map((entry, index) => (
                                     <li key={index} className="flex items-start gap-2 text-sm">
-                                      <span className="w-2 h-2 mt-1.5 rounded-full bg-black shrink-0" />
+                                      <span className="w-2 h-2 mt-1.5 rounded-full bg-navy shrink-0" />
                                       <div>
-                                        <span className="font-medium text-black">{entry.status}</span>
-                                        <span className="text-gray-500 ml-2 text-xs">
+                                        <span className="font-medium text-ink">{entry.status}</span>
+                                        <span className="text-flannel/70 ml-2 text-xs">
                                           {new Date(entry.changedAt).toLocaleString()}
                                         </span>
                                       </div>
@@ -267,7 +267,7 @@ const AccountOverlay = () => {
                                       type="button"
                                       onClick={() => handleCancelOrder(order._id)}
                                       disabled={cancellingId === order._id}
-                                      className="px-3 py-1.5 border border-red-300 text-red-600 rounded-md text-xs font-medium hover:bg-red-50 transition-colors disabled:opacity-50"
+                                      className="px-3 py-1.5 border border-red-300 text-claret  text-xs font-medium hover:bg-shirting transition-colors disabled:opacity-50"
                                     >
                                       {cancellingId === order._id ? "Cancelling..." : "Cancel Order"}
                                     </button>
@@ -276,7 +276,7 @@ const AccountOverlay = () => {
                                     href={`mailto:info@stethset.com?subject=${encodeURIComponent(
                                       `Question about order #${order.orderId || order._id.slice(-6)}`
                                     )}`}
-                                    className="px-3 py-1.5 border border-gray-300 text-gray-700 rounded-md text-xs font-medium hover:bg-gray-50 transition-colors"
+                                    className="px-3 py-1.5 border border-hairline text-flannel  text-xs font-medium hover:bg-paper transition-colors"
                                   >
                                     Contact Us About This Order
                                   </a>
@@ -298,39 +298,39 @@ const AccountOverlay = () => {
                       <img src={profile.profilePicUrl} alt="Profile" className="w-20 h-20 rounded-full object-cover" />
                     ) : (
                       <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
-                        <User size={36} className="text-gray-400" />
+                        <User size={36} className="text-flannel/50" />
                       </div>
                     )}
                   </div>
 
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <User size={20} className="text-gray-500" />
+                      <User size={20} className="text-flannel/70" />
                       <div>
-                        <p className="text-xs text-gray-500">Username</p>
-                        <p className="font-medium text-black">{profile?.username || authUser?.username || "-"}</p>
+                        <p className="text-xs text-flannel/70">Username</p>
+                        <p className="font-medium text-ink">{profile?.username || authUser?.username || "-"}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Mail size={20} className="text-gray-500" />
+                      <Mail size={20} className="text-flannel/70" />
                       <div>
-                        <p className="text-xs text-gray-500">Email</p>
-                        <p className="font-medium text-black break-all">{profile?.email || authUser?.email || "-"}</p>
+                        <p className="text-xs text-flannel/70">Email</p>
+                        <p className="font-medium text-ink break-all">{profile?.email || authUser?.email || "-"}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Award size={20} className="text-gray-500" />
+                      <Award size={20} className="text-flannel/70" />
                       <div>
-                        <p className="text-xs text-gray-500">Reward Points</p>
-                        <p className="font-medium text-black">{profile?.rewardPoints || 0}</p>
+                        <p className="text-xs text-flannel/70">Reward Points</p>
+                        <p className="font-medium text-ink">{profile?.rewardPoints || 0}</p>
                       </div>
                     </div>
                     {profile?.addresses?.find((a) => a.isDefault) && (
                       <div className="flex items-start gap-3">
-                        <MapPin size={20} className="text-gray-500 shrink-0" />
+                        <MapPin size={20} className="text-flannel/70 shrink-0" />
                         <div>
-                          <p className="text-xs text-gray-500">Saved Address</p>
-                          <p className="font-medium text-black">
+                          <p className="text-xs text-flannel/70">Saved Address</p>
+                          <p className="font-medium text-ink">
                             {profile.addresses.find((a) => a.isDefault).addressLine1},{" "}
                             {profile.addresses.find((a) => a.isDefault).city}
                           </p>
@@ -342,7 +342,7 @@ const AccountOverlay = () => {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="mt-8 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors"
+                    className="mt-8 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-shirting text-claret  hover:bg-red-100 transition-colors"
                   >
                     <LogOut size={18} />
                     Logout

@@ -230,9 +230,9 @@ const ColorTileCarousel = () => {
 
   if (isLoading) {
     return (
-      <div className="relative w-full bg-white py-8 my-20">
+      <div className="relative w-full bg-shirting py-8 my-20">
         <div className="flex justify-center items-center min-h-[300px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy"></div>
         </div>
       </div>
     )
@@ -240,16 +240,16 @@ const ColorTileCarousel = () => {
 
   if (colorTiles.length === 0) {
     return (
-      <div className="relative w-full bg-white py-8 my-20">
+      <div className="relative w-full bg-shirting py-8 my-20">
         <div className="flex justify-center items-center min-h-[300px]">
-          <p className="text-gray-500">No color tiles available</p>
+          <p className="text-flannel/70">No color tiles available</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="relative w-full bg-white py-8 my-20">
+    <div className="relative w-full bg-shirting py-8 my-20">
       <div
         ref={carouselRef}
         className="relative w-full flex flex-col items-center justify-center"
@@ -294,8 +294,8 @@ const ColorTileCarousel = () => {
               key={index}
               className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
                 index === activeIndex 
-                  ? "bg-black scale-125" 
-                  : "bg-black/50"
+                  ? "bg-navy scale-125" 
+                  : "bg-navy/50"
               }`}
             />
           ))}
@@ -304,14 +304,14 @@ const ColorTileCarousel = () => {
         {/* Navigation arrows */}
         <button
           onClick={prevSlide}
-          className="hidden md:flex absolute left-1 sm:left-2 md:left-4 top-1/2 transform -translate-y-1/2 text-black bg-transparent rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 items-center justify-center text-2xl sm:text-3xl md:text-4xl z-20"
+          className="hidden md:flex absolute left-1 sm:left-2 md:left-4 top-1/2 transform -translate-y-1/2 text-ink bg-transparent rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 items-center justify-center text-2xl sm:text-3xl md:text-4xl z-20"
           aria-label="Previous slide"
         >
           ‹
         </button>
         <button
           onClick={nextSlide}
-          className="hidden md:flex absolute right-1 sm:right-2 md:right-4 top-1/2 transform -translate-y-1/2 border-none text-black bg-transparent rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 items-center justify-center text-2xl sm:text-3xl md:text-4xl z-20"
+          className="hidden md:flex absolute right-1 sm:right-2 md:right-4 top-1/2 transform -translate-y-1/2 border-none text-ink bg-transparent rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 items-center justify-center text-2xl sm:text-3xl md:text-4xl z-20"
           aria-label="Next slide"
         >
           ›

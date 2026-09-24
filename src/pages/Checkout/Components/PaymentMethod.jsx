@@ -212,32 +212,32 @@ const PaymentMethod = ({ data = {}, onChange }) => {
   return (
     <div className="space-y-4 relative z-0">
       {/* Payment Method Selector */}
-      <div className="border border-gray-300 rounded overflow-hidden">
+      <div className="border border-hairline">
         {/* Cash on Delivery Option */}
         <div
-          className={`cursor-pointer ${selectedMethod === "cash-on-delivery" ? "bg-gray-50" : ""}`}
+          className={`cursor-pointer ${selectedMethod === "cash-on-delivery" ? "bg-paper" : ""}`}
           onClick={() => handleMethodChange("cash-on-delivery")}
         >
           <div className="flex items-center px-3 py-3">
-            <div className="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center mr-2">
-              {selectedMethod === "cash-on-delivery" && <div className="w-3 h-3 bg-black rounded-full"></div>}
+            <div className="w-5 h-5 rounded-full border border-hairline flex items-center justify-center mr-2">
+              {selectedMethod === "cash-on-delivery" && <div className="w-3 h-3 bg-navy rounded-full"></div>}
             </div>
-            <span className="text-lg font-medium">Cash on Delivery</span>
+            <span className="font-archivo font-semibold uppercase tracking-[0.1em] text-sm text-navy">Cash on Delivery</span>
           </div>
 
           {/* Cash on Delivery Details - Only shown when selected */}
           {selectedMethod === "cash-on-delivery" && (
-            <div ref={methodDetailsRef} className="border-t border-gray-200">
+            <div ref={methodDetailsRef} className="border-t border-hairline">
               <div className="p-4">
-                <p className="text-sm mb-3">You'll pay when your order is delivered to your doorstep.</p>
-                <div className="bg-gray-100 p-3 rounded mb-3">
-                  <p className="text-sm text-gray-600">
+                <p className="text-sm mb-3 font-spectral text-ink">You'll pay when your order is delivered to your doorstep.</p>
+                <div className="bg-paper p-3 border border-hairline mb-3">
+                  <p className="text-sm font-spectral text-flannel/80">
                     • The delivery person will accept cash payment
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm font-spectral text-flannel/80">
                     • Please have the exact amount ready
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm font-spectral text-flannel/80">
                     • A receipt will be provided upon delivery
                   </p>
                 </div>
@@ -248,69 +248,69 @@ const PaymentMethod = ({ data = {}, onChange }) => {
 
         {/* Bank Transfer Option */}
         <div
-          className={`border-t border-gray-200 cursor-pointer ${selectedMethod === "bank-transfer" ? "bg-gray-50" : ""}`}
+          className={`border-t border-hairline cursor-pointer ${selectedMethod === "bank-transfer" ? "bg-paper" : ""}`}
           onClick={() => handleMethodChange("bank-transfer")}
         >
           <div className="flex items-center px-3 py-3">
-            <div className="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center mr-2">
-              {selectedMethod === "bank-transfer" && <div className="w-3 h-3 bg-black rounded-full"></div>}
+            <div className="w-5 h-5 rounded-full border border-hairline flex items-center justify-center mr-2">
+              {selectedMethod === "bank-transfer" && <div className="w-3 h-3 bg-navy rounded-full"></div>}
             </div>
-            <span className="text-lg font-medium">Bank Transfer</span>
+            <span className="font-archivo font-semibold uppercase tracking-[0.1em] text-sm text-navy">Bank Transfer</span>
           </div>
 
           {/* Bank Transfer Details - Only shown when selected */}
           {selectedMethod === "bank-transfer" && (
-            <div ref={methodDetailsRef} className="border-t border-gray-200">
+            <div ref={methodDetailsRef} className="border-t border-hairline">
               <div className="p-4">
-                <p className="text-sm mb-2">Send payment to any of our bank accounts:</p>
-                <div className="bg-gray-100 p-3 rounded mb-3">
+                <p className="text-sm mb-2 font-spectral text-ink">Send payment to any of our bank accounts:</p>
+                <div className="bg-paper p-3 border border-hairline mb-3">
                   <div>
-                    <p className="font-medium">Meezan Bank</p>
-                    <p className="text-sm text-gray-600">Account Number: 03080102452328</p>
-                    <p className="text-sm text-gray-600">IBAN: PK33MEZN0003080102452328</p>
-                    <p className="text-sm text-gray-600">Account Title: ALI HUZAIFA BIN REHAN</p>
+                    <p className="font-archivo font-semibold text-sm text-navy">Meezan Bank</p>
+                    <p className="text-sm font-spectral text-flannel/80">Account Number: 03080102452328</p>
+                    <p className="text-sm font-spectral text-flannel/80">IBAN: PK33MEZN0003080102452328</p>
+                    <p className="text-sm font-spectral text-flannel/80">Account Title: ALI HUZAIFA BIN REHAN</p>
                   </div>
                 </div>
-                <p className="text-sm mb-3">Please upload a screenshot of your payment receipt:</p>
-                
+                <p className="text-sm mb-3 font-spectral text-ink">Please upload a screenshot of your payment receipt:</p>
+
                 {/* Simplified upload area with clear visual feedback */}
-                <div 
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
+                <div
+                  className="border-2 border-dashed border-hairline p-4 text-center"
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                 >
                   {/* File Input */}
-                  <input 
-                    type="file" 
+                  <input
+                    type="file"
                     id="receipt-upload"
                     onChange={handleReceiptUpload}
                     accept=".jpg,.jpeg,.png,.pdf"
                     className="hidden"
                   />
-                  
+
                   {/* Upload Icon */}
-                  <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                  
+                  <Upload className="mx-auto h-8 w-8 text-flannel/50 mb-2" strokeWidth={1.5} />
+
                   {/* File Status Display */}
                   {formData.bankTransfer?.receipt ? (
-                    <div className="bg-green-50 p-2 rounded mb-2 text-green-700 border border-green-200">
-                      <p className="font-medium">File uploaded successfully!</p>
-                      <p className="text-sm">
-                        {formData.bankTransfer.receipt.name || 
+                    <div className="bg-paper p-2 mb-2 text-green-700 border border-green-200">
+                      <p className="font-archivo font-semibold text-sm">File uploaded successfully!</p>
+                      <p className="text-sm font-spectral">
+                        {formData.bankTransfer.receipt.name ||
                          (formData.bankTransfer.receiptName ? formData.bankTransfer.receiptName : "Receipt")}
                       </p>
                     </div>
                   ) : (
                     <>
-                      <p className="text-sm text-gray-500">Click to upload or drag and drop</p>
-                      <p className="text-xs text-gray-400 mt-1">PNG, JPG or PDF (max. 5MB)</p>
+                      <p className="text-sm font-spectral text-flannel/70">Click to upload or drag and drop</p>
+                      <p className="text-xs font-spectral text-flannel/50 mt-1">PNG, JPG or PDF (max. 5MB)</p>
                     </>
                   )}
-                  
+
                   {/* Upload Button */}
                   <label
                     htmlFor="receipt-upload"
-                    className="mt-3 inline-block bg-blue-600 text-white text-sm px-4 py-2 rounded cursor-pointer"
+                    className="mt-3 inline-block bg-navy text-paper font-archivo font-semibold uppercase tracking-[0.12em] text-xs px-4 py-2.5 cursor-pointer hover:bg-ink transition-colors"
                   >
                     {formData.bankTransfer?.receipt ? 'Change Receipt' : 'Upload Receipt'}
                   </label>

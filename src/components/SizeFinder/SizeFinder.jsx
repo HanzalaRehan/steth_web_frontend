@@ -143,16 +143,16 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/50 p-4">
+      <div className="bg-shirting  w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-hairline">
           <h3 className="text-lg font-semibold">
             {isQuiz ? "Take Our Sizing Quiz" : "What's My Size?"}
           </h3>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="text-gray-400 hover:text-black text-2xl leading-none"
+            className="text-flannel/50 hover:text-claret text-2xl leading-none"
           >
             &times;
           </button>
@@ -160,15 +160,15 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }
 
         {result ? (
           <div className="p-6 text-center">
-            <p className="text-sm text-gray-500 mb-1">We recommend</p>
-            <p className="text-6xl font-bold text-gray-900 mb-4">
+            <p className="text-sm text-flannel/70 mb-1">We recommend</p>
+            <p className="text-6xl font-bold text-ink mb-4">
               {result.recommendedSize}
             </p>
 
             {/* The whole point of showing both: the shopper can see the chart
                 answer and why we moved off it for their fit preference. */}
             {result.adjustedForFit && (
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-flannel/80 mb-4">
                 Your measurements are a{" "}
                 <span className="font-semibold">{result.baseSize}</span> — we
                 sized up for the looser fit you asked for.
@@ -176,7 +176,7 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }
             )}
 
             {result.notes?.length > 0 && (
-              <ul className="text-left text-sm text-gray-600 space-y-2 mb-5">
+              <ul className="text-left text-sm text-flannel/80 space-y-2 mb-5">
                 {result.notes.map((note, index) => (
                   <li key={index} className="flex gap-2">
                     <span aria-hidden="true">→</span>
@@ -187,13 +187,13 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }
             )}
 
             {result.rewards?.pointsAwarded > 0 && (
-              <div className="rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800 mb-5">
+              <div className=" bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800 mb-5">
                 You earned {result.rewards.pointsAwarded} reward points!
               </div>
             )}
 
             {result.confidence === "low" && (
-              <p className="text-xs text-gray-400 mb-4">
+              <p className="text-xs text-flannel/50 mb-4">
                 Based on your height and weight. Add your measurements for a
                 sharper match.
               </p>
@@ -202,7 +202,7 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }
             <div className="flex gap-3">
               <button
                 onClick={reset}
-                className="flex-1 border border-gray-300 rounded-md px-4 py-2.5 text-sm font-medium hover:border-black transition-colors"
+                className="flex-1 border border-hairline  px-4 py-2.5 text-sm font-medium hover:border-navy transition-colors"
               >
                 Start over
               </button>
@@ -212,7 +212,7 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }
                   leave when they choose to. */}
               <button
                 onClick={onDone || onClose}
-                className="flex-1 bg-black text-white rounded-md px-4 py-2.5 text-sm font-medium hover:bg-gray-800 transition-colors"
+                className="flex-1 bg-navy text-paper  px-4 py-2.5 text-sm font-medium hover:bg-ink transition-colors"
               >
                 {onDone ? "Back to rewards" : "Done"}
               </button>
@@ -220,7 +220,7 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }
           </div>
         ) : (
           <form onSubmit={submit} className="p-6">
-            <p className="text-sm text-gray-500 mb-5">
+            <p className="text-sm text-flannel/70 mb-5">
               Fill in what you know — everything is optional, and we'll estimate
               the rest.
             </p>
@@ -238,10 +238,10 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }
                   <div key={field.name}>
                     <label
                       htmlFor={field.name}
-                      className="block text-sm font-medium text-gray-900 mb-1"
+                      className="block text-sm font-medium text-ink mb-1"
                     >
                       {field.label}{" "}
-                      <span className="font-normal text-gray-400">
+                      <span className="font-normal text-flannel/50">
                         ({field.unit === "kg" ? "kg" : "inches"}, {field.hint})
                       </span>
                     </label>
@@ -256,14 +256,14 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }
                       onChange={(e) => update(field.name, e.target.value)}
                       onWheel={blurOnWheel}
                       aria-invalid={outOfRange}
-                      className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+                      className={`w-full  border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
                         outOfRange
                           ? "border-red-400 focus:ring-red-200"
-                          : "border-gray-300 focus:ring-black/10"
+                          : "border-hairline focus:ring-black/10"
                       }`}
                     />
                     {outOfRange && (
-                      <p className="mt-1 text-xs text-red-600">
+                      <p className="mt-1 text-xs text-claret">
                         {field.label} should be between {bounds.min} and {bounds.max}{" "}
                         {field.unit === "kg" ? "kg" : "inches"}.
                       </p>
@@ -273,7 +273,7 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }
               })}
 
               <fieldset>
-                <legend className="block text-sm font-medium text-gray-900 mb-2">
+                <legend className="block text-sm font-medium text-ink mb-2">
                   How do you like it to fit?
                 </legend>
                 <div className="flex gap-3">
@@ -285,10 +285,10 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }
                       key={option.value}
                       type="button"
                       onClick={() => update("fitPreference", option.value)}
-                      className={`flex-1 rounded-md border px-4 py-2.5 text-sm font-medium transition-colors ${
+                      className={`flex-1  border px-4 py-2.5 text-sm font-medium transition-colors ${
                         form.fitPreference === option.value
-                          ? "border-black bg-black text-white"
-                          : "border-gray-300 text-gray-700 hover:border-black"
+                          ? "border-navy bg-navy text-paper"
+                          : "border-hairline text-flannel hover:border-navy"
                       }`}
                     >
                       {option.label}
@@ -299,7 +299,7 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }
             </div>
 
             {error && (
-              <p className="mt-4 text-sm text-red-600" role="alert">
+              <p className="mt-4 text-sm text-claret" role="alert">
                 {error}
               </p>
             )}
@@ -307,7 +307,7 @@ const SizeFinder = ({ isOpen, onClose, mode = "whats-my-size", onSized, onDone }
             <button
               type="submit"
               disabled={isSubmitting || invalidFields.length > 0}
-              className="mt-6 w-full bg-black text-white rounded-md px-4 py-3 text-sm font-medium hover:bg-gray-800 disabled:opacity-40 transition-colors"
+              className="mt-6 w-full bg-navy text-paper  px-4 py-3 text-sm font-medium hover:bg-ink disabled:opacity-40 transition-colors"
             >
               {isSubmitting ? "Working it out..." : "Find my size"}
             </button>

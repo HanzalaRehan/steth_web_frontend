@@ -345,10 +345,10 @@ export default function ColorProductsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-shirting">
         <Header />
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy"></div>
         </div>
         <AwsomeHumansFooter />
       </div>
@@ -357,28 +357,28 @@ export default function ColorProductsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-shirting">
         <Header />
-        <div className="flex justify-center items-center h-64 text-red-500">Error: {error}</div>
+        <div className="flex justify-center items-center h-64 text-claret">Error: {error}</div>
         <AwsomeHumansFooter />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white w-screen overflow-x-hidden">
+    <div className="min-h-screen bg-shirting w-screen overflow-x-hidden">
       <div className="w-screen overflow-x-hidden">
         <Header />
         
         {/* Hero Section */}
         <section
           ref={heroRef}
-          className="w-full py-16 bg-gradient-to-br from-gray-800 to-black text-white relative overflow-hidden"
+          className="w-full py-16 bg-gradient-to-br from-navy to-ink text-paper relative overflow-hidden"
           style={{ opacity: animationsReady ? (animationsInitialized.current ? 1 : 0) : 1 }}
         >
           <div className="container mx-auto px-4 md:px-6 max-w-6xl overflow-hidden">
             <div className="text-center mb-12">
-              <h1 className="text-3xl md:text-5xl font-bold mb-4 break-words max-w-full">
+              <h1 className="font-caslon text-3xl md:text-5xl mb-4 break-words max-w-full">
                 {colorInfo ? `${colorInfo.name.toUpperCase()} COLLECTION` : "COLOR COLLECTION"}
               </h1>
             </div>
@@ -389,10 +389,10 @@ export default function ColorProductsPage() {
         <section className="py-16">
           <div className="container mx-auto px-4 md:px-6 max-w-6xl">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold break-words max-w-full">
+              <h2 className="font-caslon text-3xl text-navy break-words max-w-full">
                 {colorInfo ? `${colorInfo.name} Products` : "Color Products"}
               </h2>
-              <p className="text-gray-600 mt-2 break-words max-w-full">
+              <p className="text-flannel/80 mt-2 break-words max-w-full">
                 {filteredProducts.length} products available in {colorInfo ? colorInfo.name : "various colors"}
               </p>
             </div>
@@ -400,18 +400,18 @@ export default function ColorProductsPage() {
             {/* Filter section */}
             <div 
               ref={filterSectionRef}
-              className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 mb-12"
+              className="w-full max-w-4xl mx-auto bg-shirting overflow-hidden border border-hairline border-t-2 border-t-brass mb-12"
               style={{ opacity: animationsReady ? (animationsInitialized.current ? 1 : 0) : 1 }}
             >
               <div className="p-6 sm:p-8 flex flex-wrap gap-6 items-center">
                 {/* Color indicator */}
-                <div className="flex items-center gap-2 font-medium text-black">
-                  <span className="text-gray-600">COLOR:</span>
-                  <span className="font-bold">{colorInfo ? colorInfo.name.toUpperCase() : "ALL"}</span>
+                <div className="flex items-center gap-2 font-archivo text-navy">
+                  <span className="text-flannel/70 text-xs uppercase tracking-wide">Color:</span>
+                  <span className="font-semibold text-sm uppercase tracking-wide">{colorInfo ? colorInfo.name.toUpperCase() : "ALL"}</span>
                 </div>
 
                 {/* Total count */}
-                <div className="ml-auto text-black font-medium">
+                <div className="ml-auto font-archivo text-xs uppercase tracking-wide text-flannel/70">
                   {filteredProducts.length} Total
                 </div>
               </div>
@@ -427,14 +427,14 @@ export default function ColorProductsPage() {
                 >
                   <div
                     ref={(el) => (productRefs.current[index] = el)}
-                    className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
+                    className="flex flex-col bg-shirting  overflow-hidden transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
                     style={{ 
                       opacity: animationsReady ? (animationsInitialized.current ? 1 : 0) : 1,
                       transform: animationsReady ? (animationsInitialized.current ? 'translateY(0)' : 'translateY(50px)') : 'none'
                     }}
                   >
                     {/* Product image */}
-                    <div className="bg-gray-100 overflow-hidden aspect-[3/4.5]">
+                    <div className="bg-paper overflow-hidden aspect-[3/4.5]">
                       <img
                         src={product.primaryImage || "/placeholder.svg"}
                         alt={`${product.name} - ${product.color}`}
@@ -446,17 +446,20 @@ export default function ColorProductsPage() {
                     {/* Product details */}
                     <div className="flex flex-col p-4">
                       {/* Product name */}
-                      <h3 className="text-gray-900 font-medium text-base md:text-lg lg:text-xl mb-2">{product.name}</h3>
+                      <h3 className="font-caslon text-navy text-lg md:text-xl mb-2">{product.name}</h3>
 
                       {/* Color and color count */}
                       <div className="flex items-center gap-2 mb-3">
-                        <span className="text-gray-700 text-xs md:text-sm">{product.color}</span>
-                        <span className="text-gray-500 text-xs md:text-sm">{product.colorCount} Colors</span>
+                        <span className="text-flannel text-xs md:text-sm">{product.color}</span>
+                        <span className="text-flannel/70 text-xs md:text-sm">{product.colorCount} Colors</span>
                       </div>
 
                       {/* Price */}
-                      <div className="text-gray-900 font-bold text-sm md:text-base lg:text-lg">
-                        {formatPrice(product.price)}
+                      <div className="flex items-center gap-2.5">
+                        <span className="block w-5 h-px bg-brass"></span>
+                        <div className="font-archivo text-ink text-sm tracking-wide">
+                          {formatPrice(product.price)}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -467,25 +470,25 @@ export default function ColorProductsPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-16 bg-gradient-to-br from-gray-800 to-black text-white">
+        <section className="py-16 bg-gradient-to-br from-navy to-ink text-paper">
           <div className="container mx-auto px-4 md:px-6 max-w-6xl text-center">
-            <h2 className="text-2xl md:text-4xl font-bold mb-4 break-words max-w-full">
+            <h2 className="font-caslon text-2xl md:text-4xl mb-4 break-words max-w-full">
               Find Your Perfect Style
             </h2>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8 break-words max-w-full">
+            <p className="text-lg text-[#A8B0C8] max-w-2xl mx-auto mb-8 break-words max-w-full">
               Explore our complete collection and discover more colors and styles.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/"
-                className="inline-flex items-center justify-center px-6 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 bg-shirting text-ink font-medium font-archivo font-semibold uppercase tracking-[0.14em] text-xs hover:bg-paper transition-colors"
               >
                 Shop All Products
                 <ArrowRight size={16} className="ml-2" />
               </Link>
               <Link
                 to="/"
-                className="inline-flex items-center justify-center px-6 py-3 border border-white text-white font-medium rounded-md hover:bg-white/10 transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 border border-paper text-paper font-archivo font-semibold uppercase tracking-[0.14em] text-xs hover:bg-shirting/10 transition-colors"
               >
                 Browse All Colors
               </Link>

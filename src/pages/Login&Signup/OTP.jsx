@@ -182,15 +182,15 @@ const OTP = () => {
   }
 
   return (
-    <div className="min-h-screen w-screen flex-col items-center justify-center bg-gray-50">
+    <div className="min-h-screen w-screen flex-col items-center justify-center bg-paper">
       <Header/>
-      <div className="flex items-center justify-center bg-gray-50 px-4 py-12">
-        <div ref={containerRef} className="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="flex items-center justify-center bg-paper px-4 py-12">
+        <div ref={containerRef} className="w-full max-w-md bg-shirting  shadow-lg overflow-hidden">
           {/* Header */}
-          <div className="p-6 sm:p-8 bg-black text-white">
+          <div className="p-6 sm:p-8 bg-navy text-paper">
             <button
               onClick={handleGoBack}
-              className="mb-4 flex items-center text-sm text-gray-300 hover:text-white transition-colors"
+              className="mb-4 flex items-center text-sm text-gray-300 hover:text-paper transition-colors"
             >
               <ArrowLeft size={16} className="mr-1" />
               Back to login
@@ -207,14 +207,14 @@ const OTP = () => {
 
           {/* Error Message */}
           {error && (
-            <div ref={errorRef} className="mx-6 sm:mx-8 mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">
+            <div ref={errorRef} className="mx-6 sm:mx-8 mt-4 p-3 bg-shirting border border-claret text-red-700 ">
               {error}
             </div>
           )}
 
           {/* Success Message */}
           {successMessage && (
-            <div ref={successRef} className="mx-6 sm:mx-8 mt-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-md">
+            <div ref={successRef} className="mx-6 sm:mx-8 mt-4 p-3 bg-green-50 border border-green-200 text-green-700 ">
               {successMessage}
             </div>
           )}
@@ -243,7 +243,7 @@ const OTP = () => {
                         inputRefs.current[index - 1].focus()
                       }
                     }}
-                    className="w-12 h-12 text-center text-xl bg-white text-black border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black"
+                    className="w-12 h-12 text-center text-xl bg-shirting text-ink border border-hairline  focus:ring-2 focus:ring-black focus:border-navy"
                   />
                 ))}
               </div>
@@ -253,11 +253,11 @@ const OTP = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200"
+                  className="w-full flex justify-center items-center py-2 px-4 border border-transparent  shadow-sm text-sm font-medium text-paper bg-navy hover:bg-ink focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200"
                 >
                   {isLoading ? (
                     <svg
-                      className="animate-spin h-5 w-5 text-white"
+                      className="animate-spin h-5 w-5 text-paper"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -280,7 +280,7 @@ const OTP = () => {
 
               {/* Timer and Resend Button */}
               <div className="mt-4 flex items-center justify-between">
-                <div ref={timerRef} className="text-sm text-gray-500">
+                <div ref={timerRef} className="text-sm text-flannel/70">
                   {canResend ? (
                     "OTP expired"
                   ) : (
@@ -295,8 +295,8 @@ const OTP = () => {
                   disabled={!canResend}
                   className={`text-sm font-medium ${
                     canResend
-                      ? "text-black hover:text-gray-700"
-                      : "text-gray-400 cursor-not-allowed"
+                      ? "text-ink hover:text-flannel"
+                      : "text-flannel/50 cursor-not-allowed"
                   }`}
                 >
                   Resend OTP

@@ -424,22 +424,22 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="bg-white text-gray-900 text-base md:text-lg md:w-screen w-full overflow-x-hidden min-h-screen">
+    <div className="bg-shirting text-ink text-base md:text-lg md:w-screen w-full overflow-x-hidden min-h-screen">
       {/* Header */}
-      <header className="border-b border-gray-200 py-4 px-4 md:px-0 md:py-6">
+      <header className="border-b border-hairline py-4 px-4 md:px-0 md:py-6">
         <div className="max-w-7xl mx-auto">
           <FigsLogo />
         </div>
       </header>
 
       {/* Mobile Order Summary Toggle */}
-      <div className="md:hidden border-b border-gray-300 bg-white">
+      <div className="md:hidden border-b border-hairline bg-shirting">
         <button
           onClick={() => setShowOrderSummary(!showOrderSummary)}
-          className="w-full py-3 px-4 flex justify-between items-center bg-white border border-gray-300 rounded-none"
+          className="w-full py-3 px-4 flex justify-between items-center bg-shirting border border-hairline"
         >
           <div className="flex items-center gap-2">
-            <span className="font-medium text-base md:text-lg">Order summary</span>
+            <span className="font-archivo font-semibold uppercase tracking-[0.14em] text-sm text-navy">Order summary</span>
             {showOrderSummary ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
           </div>
         </button>
@@ -455,7 +455,7 @@ const CheckoutPage = () => {
 
       {/* Validation Error Banner */}
       {showValidationError && validationErrors.length > 0 && (
-        <div className="fixed top-0 left-0 right-0 bg-red-500 text-white p-4 z-50">
+        <div className="fixed top-0 left-0 right-0 bg-claret text-paper p-4 z-50">
           <div className="max-w-7xl mx-auto">
             <div className="flex justify-between items-center">
               <div>
@@ -468,7 +468,7 @@ const CheckoutPage = () => {
               </div>
               <button
                 onClick={() => setShowValidationError(false)}
-                className="text-white hover:text-gray-200"
+                className="text-paper hover:text-gray-200"
               >
                 ×
               </button>
@@ -481,7 +481,7 @@ const CheckoutPage = () => {
         {/* Left Column - Checkout Form */}
         <div className="px-4 py-4 md:py-8 md:pr-8">
           <div className="mb-6" ref={addToFormSectionsRef}>
-            <h2 className="text-xl md:text-2xl font-medium mb-2">Contact</h2>
+            <h2 className="font-caslon text-2xl text-navy mb-3">Contact</h2>
             <ContactForm
               data={checkoutDetails.customerInfo.contactInfo}
               onChange={handleContactInfoChange}
@@ -489,24 +489,24 @@ const CheckoutPage = () => {
           </div>
 
           <div className="mb-6" ref={addToFormSectionsRef}>
-            <h2 className="text-xl md:text-2xl font-medium mb-2">Delivery</h2>
-            <DeliveryForm 
+            <h2 className="font-caslon text-2xl text-navy mb-3">Delivery</h2>
+            <DeliveryForm
               data={checkoutDetails}
-              onDeliveryInfoChange={handleDeliveryInfoChange} 
+              onDeliveryInfoChange={handleDeliveryInfoChange}
             />
           </div>
 
           <div className="mb-6" ref={addToFormSectionsRef}>
-            <h2 className="text-xl md:text-2xl font-medium mb-2">Payment</h2>
-            <p className="text-sm md:text-base text-gray-500 mb-3">All transactions are secure and encrypted.</p>
-            <PaymentMethod 
-              data={checkoutDetails.customerInfo.payment} 
-              onChange={handlePaymentMethodChange} 
+            <h2 className="font-caslon text-2xl text-navy mb-2">Payment</h2>
+            <p className="text-sm md:text-base font-spectral italic text-flannel/70 mb-3">All transactions are secure and encrypted.</p>
+            <PaymentMethod
+              data={checkoutDetails.customerInfo.payment}
+              onChange={handlePaymentMethodChange}
             />
           </div>
 
           <div className="mb-6" ref={addToFormSectionsRef}>
-            <p className="text-sm md:text-base mb-4">
+            <p className="text-sm md:text-base font-spectral mb-4">
               By placing this order, you agree to the STETHS{" "}
               <a href="/terms" className="underline">
                 Terms of Use
@@ -518,7 +518,7 @@ const CheckoutPage = () => {
               .
             </p>
             <button
-              className="w-full bg-black text-white py-4 rounded font-medium text-base md:text-lg disabled:opacity-70"
+              className="w-full bg-navy text-paper py-4 font-archivo font-semibold uppercase tracking-[0.18em] text-sm disabled:opacity-70 hover:bg-ink transition-colors"
               onClick={handleSubmitOrder}
               disabled={cartItems.length === 0 || isProcessing}
             >
@@ -526,7 +526,7 @@ const CheckoutPage = () => {
                 <span className="flex items-center justify-center gap-2">
                   {/* Spinner icon */}
                   <svg 
-                    className="animate-spin h-5 w-5 text-white" 
+                    className="animate-spin h-5 w-5 text-paper" 
                     xmlns="http://www.w3.org/2000/svg" 
                     fill="none" 
                     viewBox="0 0 24 24"
@@ -551,7 +551,7 @@ const CheckoutPage = () => {
                 "Checkout"
               )}
             </button>
-            <p className="text-xs md:text-sm text-gray-500 mt-4">
+            <p className="text-xs md:text-sm text-flannel/70 mt-4">
               Your info will be saved to a Shop account. By continuing, you agree to Shop's{" "}
               <a href="/terms" className="underline">
                 Terms of Service
@@ -564,14 +564,14 @@ const CheckoutPage = () => {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-4 text-sm md:text-base text-gray-500 mt-8">
-            <a href="/terms" className="hover:text-gray-700">
+          <div className="flex flex-wrap gap-4 text-sm md:text-base text-flannel/70 mt-8">
+            <a href="/terms" className="hover:text-flannel">
               Refund Policy
             </a>
-            <a href="/terms" className="hover:text-gray-700">
+            <a href="/terms" className="hover:text-flannel">
               Privacy Policy
             </a>
-            <a href="/terms" className="hover:text-gray-700">
+            <a href="/terms" className="hover:text-flannel">
               Terms of Use
             </a>
           </div>
@@ -579,7 +579,7 @@ const CheckoutPage = () => {
 
         {/* Right Column - Order Summary */}
         <div className="hidden md:block">
-          <div className="sticky top-6 bg-gray-50 p-6">
+          <div className="sticky top-6 bg-paper p-6">
             <OrderSummary
               onDiscountCodeChange={handleDiscountCodeChange}
               onRemoveProduct={handleRemoveProduct}
@@ -591,44 +591,46 @@ const CheckoutPage = () => {
       </main>
 
       {orderSuccess && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div className="bg-white p-8 rounded-lg max-w-md w-full text-center">
-      <svg 
-        className="w-16 h-16 text-green-500 mx-auto mb-4" 
-        fill="none" 
-        stroke="currentColor" 
-        viewBox="0 0 24 24"
-      >
-        <path 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          strokeWidth="2" 
-          d="M5 13l4 4L19 7" 
-        />
-      </svg>
-      <h2 className="text-2xl font-bold mb-2">Order Successful!</h2>
-      <p className="mb-4">Your order ID: {orderId}</p>
-      <p className="mb-4">Thank you for your purchase. You'll be redirected to the homepage shortly.</p>
-      
-      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 text-left">
-        <p className="text-yellow-800 font-medium">
+  <div className="fixed inset-0 bg-navy bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="bg-shirting p-8 border border-hairline max-w-md w-full text-center">
+      <div className="mx-auto mb-4 w-16 h-16 border border-brass flex items-center justify-center">
+        <svg
+          className="w-8 h-8 text-navy"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+      </div>
+      <h2 className="font-caslon text-3xl text-navy mb-2">Order Successful!</h2>
+      <p className="mb-4 font-spectral text-ink">Your order ID: {orderId}</p>
+      <p className="mb-4 font-spectral text-flannel">Thank you for your purchase. You'll be redirected to the homepage shortly.</p>
+
+      <div className="bg-paper border-l-2 border-brass p-4 mb-6 text-left">
+        <p className="text-navy font-archivo font-semibold uppercase tracking-[0.1em] text-xs">
           An order confirmation has been sent to your email.
         </p>
-        <p className="text-yellow-700 text-sm mt-1">
+        <p className="text-flannel text-sm mt-1 font-spectral">
           Please check your inbox and spam folder. All future updates about your order will be sent to your email.
         </p>
       </div>
-      
-      <button 
+
+      <button
         onClick={() => window.location.href = '/'}
-        className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition"
+        className="bg-navy text-paper px-6 py-3 font-archivo font-semibold uppercase tracking-[0.16em] text-sm hover:bg-ink transition-colors"
       >
         Go Home Now
       </button>
     </div>
 
 
-    
+
   </div>
 )}
 

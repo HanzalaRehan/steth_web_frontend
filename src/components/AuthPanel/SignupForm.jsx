@@ -138,11 +138,11 @@ const SignupForm = ({ meta }) => {
 
   return (
     <div className="p-6 sm:p-8">
-      <h2 className="text-2xl md:text-3xl font-bold">Create an account</h2>
-      <p className="mt-2 text-gray-500 text-sm md:text-base">Fill in the form to get started</p>
+      <h2 className="font-caslon text-2xl md:text-3xl text-navy">Create an account</h2>
+      <p className="mt-2 font-spectral text-flannel/70 text-sm md:text-base">Fill in the form to get started</p>
 
       {error && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md flex items-center justify-between">
+        <div className="mt-4 p-3 bg-shirting border border-claret text-red-700  flex items-center justify-between">
           <span className="text-sm md:text-base">{error}</span>
           <button type="button" onClick={() => setError("")}>
             <X size={16} />
@@ -152,19 +152,19 @@ const SignupForm = ({ meta }) => {
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div className="space-y-1">
-          <label htmlFor="signupUsername" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="signupUsername" className="block text-sm font-medium text-flannel">
             Username
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <User size={18} className="text-gray-400" />
+              <User size={18} className="text-flannel/50" />
             </div>
             <input
               id="signupUsername"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="block w-full pl-10 pr-3 py-2 text-sm border bg-white border-gray-300 rounded-md shadow-sm focus:ring-black focus:border-black text-gray-900"
+              className="block w-full pl-10 pr-3 py-2 text-sm border bg-shirting border-hairline  shadow-sm focus:ring-0 focus:border-claret text-ink"
               placeholder="johndoe"
               required
             />
@@ -172,19 +172,19 @@ const SignupForm = ({ meta }) => {
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="signupEmail" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="signupEmail" className="block text-sm font-medium text-flannel">
             Email Address
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Mail size={18} className="text-gray-400" />
+              <Mail size={18} className="text-flannel/50" />
             </div>
             <input
               id="signupEmail"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="block w-full pl-10 pr-3 py-2 text-sm border border-gray-300 bg-white rounded-md shadow-sm focus:ring-black focus:border-black text-gray-900"
+              className="block w-full pl-10 pr-3 py-2 text-sm border border-hairline bg-shirting  shadow-sm focus:ring-0 focus:border-claret text-ink"
               placeholder="you@example.com"
               required
             />
@@ -192,19 +192,19 @@ const SignupForm = ({ meta }) => {
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="signupPassword" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="signupPassword" className="block text-sm font-medium text-flannel">
             Password
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock size={18} className="text-gray-400" />
+              <Lock size={18} className="text-flannel/50" />
             </div>
             <input
               id="signupPassword"
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="block w-full pl-10 pr-10 py-2 text-sm border bg-white border-gray-300 rounded-md shadow-sm focus:ring-black focus:border-black text-gray-900"
+              className="block w-full pl-10 pr-10 py-2 text-sm border bg-shirting border-hairline  shadow-sm focus:ring-0 focus:border-claret text-ink"
               placeholder="••••••••"
               required
             />
@@ -214,28 +214,28 @@ const SignupForm = ({ meta }) => {
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? (
-                <EyeOff size={18} className="text-gray-400 hover:text-gray-500" />
+                <EyeOff size={18} className="text-flannel/50 hover:text-flannel/70" />
               ) : (
-                <Eye size={18} className="text-gray-400 hover:text-gray-500" />
+                <Eye size={18} className="text-flannel/50 hover:text-flannel/70" />
               )}
             </button>
           </div>
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="signupConfirmPassword" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="signupConfirmPassword" className="block text-sm font-medium text-flannel">
             Confirm Password
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock size={18} className="text-gray-400" />
+              <Lock size={18} className="text-flannel/50" />
             </div>
             <input
               id="signupConfirmPassword"
               type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="block w-full pl-10 pr-10 py-2 text-sm border bg-white border-gray-300 rounded-md shadow-sm focus:ring-black focus:border-black text-gray-900"
+              className="block w-full pl-10 pr-10 py-2 text-sm border bg-shirting border-hairline  shadow-sm focus:ring-0 focus:border-claret text-ink"
               placeholder="••••••••"
               required
             />
@@ -245,9 +245,9 @@ const SignupForm = ({ meta }) => {
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             >
               {showConfirmPassword ? (
-                <EyeOff size={18} className="text-gray-400 hover:text-gray-500" />
+                <EyeOff size={18} className="text-flannel/50 hover:text-flannel/70" />
               ) : (
-                <Eye size={18} className="text-gray-400 hover:text-gray-500" />
+                <Eye size={18} className="text-flannel/50 hover:text-flannel/70" />
               )}
             </button>
           </div>
@@ -256,7 +256,7 @@ const SignupForm = ({ meta }) => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full flex justify-center items-center py-2.5 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200"
+          className="w-full flex justify-center items-center py-3 px-4 font-archivo font-semibold uppercase tracking-[0.16em] text-sm text-paper bg-navy hover:bg-ink focus:outline-none focus:ring-0 transition-colors duration-200"
         >
           {isLoading ? "Creating account..." : (
             <>
@@ -268,29 +268,29 @@ const SignupForm = ({ meta }) => {
 
         <div className="relative my-4">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
+            <div className="w-full border-t border-hairline"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            <span className="px-2 bg-shirting text-flannel/70">Or continue with</span>
           </div>
         </div>
 
         <div id="googleSignInDivSignup" className="w-full [&>div]:w-full" />
 
         {googleLoading && (
-          <div className="w-full flex justify-center items-center h-[42px] px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white">
+          <div className="w-full flex justify-center items-center h-[42px] px-4 border border-hairline  shadow-sm text-sm font-medium text-flannel bg-shirting">
             Signing up with Google...
           </div>
         )}
       </form>
 
       <div className="mt-6 text-center">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-flannel/80">
           Already have an account?{" "}
           <button
             type="button"
             onClick={() => openAuthPanel("login", meta)}
-            className="font-medium text-black hover:text-gray-800"
+            className="font-medium text-ink hover:text-flannel"
           >
             Sign in
           </button>

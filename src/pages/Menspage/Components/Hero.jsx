@@ -192,7 +192,7 @@ const Hero = () => {
           >
             <button 
               onClick={scrollToProducts}
-              className="group relative px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-white text-black text-sm sm:text-base font-medium uppercase tracking-wide rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl shadow-lg border-2 border-black"
+              className="group relative px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-white text-black text-sm sm:text-base font-medium uppercase tracking-wide  overflow-hidden transition-all duration-300 hover:shadow-xl shadow-lg border-2 border-black"
               onMouseEnter={(e) => {
                 gsap.to(e.target, {
                   scale: 1.05,

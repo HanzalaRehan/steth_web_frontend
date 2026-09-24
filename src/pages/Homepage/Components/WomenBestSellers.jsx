@@ -128,9 +128,9 @@ const ProductCard = ({ product }) => {
       className="group cursor-pointer w-full h-full flex flex-col"
     >
       {/* Image Container */}
-      <div 
+      <div
         ref={imageContainerRef}
-        className="relative w-full aspect-[2.5/4] mb-4 bg-[#F8F8F8] overflow-hidden rounded-lg"
+        className="relative w-full aspect-[2.5/4] mb-4 bg-paper overflow-hidden"
         style={{
           '--hover-progress': 0
         }}
@@ -167,9 +167,9 @@ const ProductCard = ({ product }) => {
 
         {/* Fallback content when images fail to load */}
         {imageError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+          <div className="absolute inset-0 flex items-center justify-center bg-paper">
             <div className="text-center p-4">
-              <p className="text-gray-500 text-sm">Image not available</p>
+              <p className="text-flannel/70 text-sm">Image not available</p>
             </div>
           </div>
         )}
@@ -177,12 +177,15 @@ const ProductCard = ({ product }) => {
 
       {/* Product Details */}
       <div className="px-1 mt-auto">
-          <h3 className="text-base font-medium mb-2 text-gray-900 leading-tight">
+          <h3 className="font-caslon text-lg mb-2 text-navy leading-tight">
             {product.name}
           </h3>
-          <p className="text-base font-bold text-gray-900">
-            Rs.{(product.price)}
-          </p>
+          <div className="flex items-center gap-2.5">
+            <span className="block w-5 h-px bg-brass"></span>
+            <p className="font-archivo text-sm tracking-wide text-ink">
+              Rs.{(product.price)}
+            </p>
+          </div>
         </div>
     </Link>
   );
@@ -224,10 +227,10 @@ const MenBestSellers = () => {
 
   if (loading) {
     return (
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-shirting">
         <div className="max-w-[90%] mx-auto px-4 md:px-8">
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy"></div>
           </div>
         </div>
       </section>
@@ -236,19 +239,19 @@ const MenBestSellers = () => {
 
   if (error) {
     return (
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-shirting">
         <div className="max-w-[90%] mx-auto px-4 md:px-8">
-          <div className="text-center text-red-500">{error}</div>
+          <div className="text-center text-claret">{error}</div>
         </div>
       </section>
     );
   }
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-shirting">
       <div className="max-w-[90%] mx-auto px-4 md:px-8">
         {/* Title */}
-        <h2 className="text-2xl md:text-3xl font-bold text-black mb-8">
+        <h2 className="font-caslon text-2xl md:text-3xl text-navy mb-8">
           Women's
         </h2>
 

@@ -276,24 +276,24 @@ const Cart = () => {
       className="relative z-50"
     >
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+      <div className="fixed inset-0 bg-navy/30" aria-hidden="true" />
       
       {/* Modal container */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="w-full max-w-md rounded-lg bg-white p-6">
-          <Dialog.Title className="text-xl font-bold mb-4 text-black">
+        <Dialog.Panel className="w-full max-w-md border border-hairline bg-shirting p-8">
+          <Dialog.Title className="font-caslon text-2xl mb-4 text-navy">
             Login Required for Checkout
           </Dialog.Title>
-          
+
           <Dialog.Description className="mb-6">
-            <div className="space-y-4 text-black">
+            <div className="space-y-4 text-ink font-spectral">
               <p>Please log in to proceed with your purchase.</p>
-              
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h3 className="font-medium text-blue-800 mb-2">
-                  Benefits of creating an account:
+
+              <div className="bg-paper border border-brass p-4">
+                <h3 className="font-archivo font-semibold uppercase tracking-[0.14em] text-xs text-navy mb-3">
+                  Benefits of creating an account
                 </h3>
-                <ul className="list-disc list-inside space-y-1 text-blue-700">
+                <ul className="list-disc list-inside space-y-1.5 text-flannel">
                   <li>Earn reward points with every purchase</li>
                   <li>Get 10% off your first order</li>
                   <li>Track your order history</li>
@@ -309,7 +309,7 @@ const Cart = () => {
                 setIsLoginModalOpen(false);
                 navigate('/login', { state: { from: '/cart' } });
               }}
-              className="flex-1 py-2 bg-black text-white rounded hover:bg-gray-800"
+              className="flex-1 py-3 bg-navy text-paper font-archivo font-semibold uppercase tracking-[0.16em] text-sm hover:bg-ink transition-colors"
             >
               Login / Register
             </button>
@@ -319,7 +319,7 @@ const Cart = () => {
                 // Proceed to checkout as guest
                 navigate('/checkout');
               }}
-              className="flex-1 py-2 bg-white text-black border border-black rounded hover:bg-gray-100"
+              className="flex-1 py-3 bg-shirting text-ink border border-navy font-archivo font-semibold uppercase tracking-[0.16em] text-sm hover:bg-paper transition-colors"
             >
               Continue as Guest
             </button>
@@ -331,17 +331,17 @@ const Cart = () => {
 
 
   return (
-    <div className="flex flex-col min-h-screen w-screen overflow-x-hidden bg-[#f8f8ff]">
+    <div className="flex flex-col min-h-screen w-screen overflow-x-hidden bg-paper">
         {/* Navigation */}
-      <div className="bg-white shadow-sm w-full">
+      <div className="bg-shirting shadow-sm w-full">
             <Header />
           <div className="container mx-auto px-4 py-4">
-            <div className="flex gap-4">
-              <a href="/" className="text-sm hover:underline">
+            <div className="flex gap-4 font-archivo text-xs uppercase tracking-[0.14em]">
+              <a href="/" className="text-flannel hover:text-claret no-underline">
                 Home
               </a>
-              <span className="text-gray-400">/</span>
-              <a href="/checkout" className="text-sm hover:underline">
+              <span className="text-flannel/40">/</span>
+              <a href="/checkout" className="text-flannel hover:text-claret no-underline">
                 Checkout
               </a>
             </div>
@@ -353,30 +353,30 @@ const Cart = () => {
           <div className="container px-4 py-6 mx-auto">
             <div
               ref={cartRef}
-              className="flex flex-col lg:flex-row max-w-6xl mx-auto bg-white rounded-lg shadow-md"
+              className="flex flex-col lg:flex-row max-w-6xl mx-auto bg-shirting border border-hairline"
             >
               {/* Cart Items Section */}
               <div className="flex-1 p-4 md:p-8">
                 <div className="flex justify-between items-center mb-6">
-                  <h1 className="text-2xl md:text-3xl font-bold text-black">Shopping Cart</h1>
-                  <span className="text-[#6b6b6b]">{products.length} items</span>
+                  <h1 className="font-caslon text-2xl md:text-3xl text-navy">Shopping Cart</h1>
+                  <span className="font-archivo text-xs uppercase tracking-wide text-flannel/70">{products.length} items</span>
                 </div>
 
               {products.length === 0 ? (
-                <div className="border-t border-[#e5e5e5] py-12 text-center">
-                  <div className="text-lg text-gray-600 mb-4">Your cart is empty</div>
-                  <a href="/" className="inline-block py-2 px-4 bg-black text-white rounded hover:bg-gray-800">
+                <div className="border-t border-hairline py-12 text-center">
+                  <div className="font-spectral text-lg text-flannel/80 mb-4">Your cart is empty</div>
+                  <a href="/" className="inline-block py-3 px-6 bg-navy text-paper font-archivo font-semibold uppercase tracking-[0.16em] text-sm hover:bg-ink transition-colors no-underline">
                     Continue Shopping
                   </a>
                 </div>
               ) : (
-                <div className="border-t border-[#e5e5e5]">
+                <div className="border-t border-hairline">
                   {products.map((product) => (
                     <div
                       key={`${product.id}-${product.colorName}-${product.size}`}
-                      className="cart-item py-4 md:py-6 flex flex-col sm:flex-row items-start sm:items-center border-b border-[#e5e5e5]"
+                      className="cart-item py-4 md:py-6 flex flex-col sm:flex-row items-start sm:items-center border-b border-hairline"
                     >
-                      <div className="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded bg-[#f0f0f0]">
+                      <div className="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 bg-paper">
                         <img
                           src={product.image || "/placeholder.svg"}
                           alt={product.name}
@@ -385,9 +385,9 @@ const Cart = () => {
                       </div>
 
                       <div className="ml-0 sm:ml-4 mt-2 sm:mt-0 flex-1">
-                        <div className="text-[#6b6b6b] truncate">{product.category}</div>
-                        <div className="text-black font-medium truncate">{product.name}</div>
-                        <div className="text-sm text-gray-600">
+                        <div className="font-archivo text-[11px] uppercase tracking-wide text-flannel/70 truncate">{product.category}</div>
+                        <div className="font-caslon text-lg text-navy truncate">{product.name}</div>
+                        <div className="text-sm font-spectral text-flannel/80">
                           Color: {product.colorName} | Size: {product.size}
                         </div>
                       </div>
@@ -395,7 +395,7 @@ const Cart = () => {
                       <div className="flex items-center mt-2 sm:mt-0">
                         <button
                           onClick={() => decreaseQuantity(product.id, product.colorName, product.size)}
-                          className="w-8 h-8 flex items-center justify-center bg-white border border-[#d1d1d1] rounded text-black hover:bg-gray-50 text-xl font-bold"
+                          className="w-8 h-8 flex items-center justify-center bg-shirting border border-hairline text-ink hover:border-navy text-xl font-archivo"
                           aria-label="Decrease quantity"
                         >
                           −
@@ -405,29 +405,29 @@ const Cart = () => {
                           type="text"
                           value={product.quantity}
                           readOnly
-                          className="mx-2 w-10 h-8 text-center bg-white border border-[#d1d1d1] rounded text-black"
+                          className="mx-2 w-10 h-8 text-center bg-shirting border border-hairline text-ink font-archivo"
                           aria-label="Quantity"
                         />
 
                         <button
                           onClick={() => increaseQuantity(product.id, product.colorName, product.size)}
-                          className="w-8 h-8 flex items-center justify-center bg-white text-black border border-[#d1d1d1] rounded hover:bg-gray-50 text-xl font-bold"
+                          className="w-8 h-8 flex items-center justify-center bg-shirting text-ink border border-hairline hover:border-navy text-xl font-archivo"
                           aria-label="Increase quantity"
                         >
                           +
                         </button>
                       </div>
 
-                      <div className="ml-auto sm:ml-6 w-24 text-right mt-2 sm:mt-0 font-medium text-black">
+                      <div className="ml-auto sm:ml-6 w-24 text-right mt-2 sm:mt-0 font-archivo text-ink">
                         Rs. {product.totalPrice.toFixed(2)}
                       </div>
 
                       <button
                         onClick={() => removeProduct(product.id, product.colorName, product.size)}
-                        className="ml-2 sm:ml-6 bg-white text-black hover:bg-gray-50 p-1 rounded"
+                        className="ml-2 sm:ml-6 bg-shirting text-flannel/70 hover:text-claret p-1"
                         aria-label="Remove item"
                       >
-                        <X size={20} stroke="black" />
+                        <X size={20} />
                       </button>
                     </div>
                   ))}
@@ -435,8 +435,8 @@ const Cart = () => {
               )}
 
                 <div className="mt-6">
-                  <a href="/" className="flex items-center text-black no-underline hover:underline">
-                    <ArrowLeft className="h-5 w-5 mr-2" stroke="black" />
+                  <a href="/" className="flex items-center text-ink no-underline hover:text-claret font-archivo text-sm uppercase tracking-wide">
+                    <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to shop
                   </a>
                 </div>
@@ -446,33 +446,33 @@ const Cart = () => {
               </div>
 
               {/* Summary Section */}
-              <div className="summary-section w-full lg:w-1/3 p-4 md:p-8 bg-[#f0f0f0]">
-                <h2 className="text-xl md:text-2xl font-bold mb-6 text-black">Summary</h2>
+              <div className="summary-section w-full lg:w-1/3 p-4 md:p-8 bg-paper border-t lg:border-t-0 lg:border-l border-hairline">
+                <h2 className="font-caslon text-xl md:text-2xl mb-6 text-navy">Summary</h2>
 
-                <div className="border-t border-[#d1d1d1] pt-4">
-                  <div className="flex justify-between mb-2">
-                    <span className="text-[#333333] font-medium">ITEMS {products.length}</span>
-                  <span className="text-black font-medium">Rs. {calculateSubtotal().toFixed(2)}</span>
+                <div className="border-t border-hairline pt-4">
+                  <div className="flex justify-between mb-2 font-archivo text-sm">
+                    <span className="text-flannel uppercase tracking-wide text-xs">Items {products.length}</span>
+                  <span className="text-ink">Rs. {calculateSubtotal().toFixed(2)}</span>
                 </div>
-                
+
                 {/* Shipping costs if any */}
                 {shipping > 0 && (
-                  <div className="flex justify-between mb-2">
-                    <span className="text-[#333333]">Shipping</span>
-                    <span className="text-black">Rs. {shipping.toFixed(2)}</span>
+                  <div className="flex justify-between mb-2 font-archivo text-sm">
+                    <span className="text-flannel">Shipping</span>
+                    <span className="text-ink">Rs. {shipping.toFixed(2)}</span>
                   </div>
                 )}
-                
+
                 {/* Discounts section */}
                 {discounts && (discounts.amount > 0 || discounts.reasons.length > 0) && (
   <div className="mt-4 mb-2">
     <div className="flex items-center">
-      <span className="text-[#333333] font-medium">DISCOUNTS</span>
+      <span className="font-archivo text-xs uppercase tracking-wide text-flannel">Discounts</span>
       <div className="relative group ml-2">
-        <Info size={16} className="text-gray-500" />
-        <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-white p-2 rounded shadow-md text-sm w-48 z-10">
-          <p className="mb-1 font-medium">Available Discounts:</p>
-          <ul className="list-disc list-inside">
+        <Info size={16} className="text-flannel/70" />
+        <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-shirting border border-hairline p-2 shadow-md text-sm w-48 z-10">
+          <p className="mb-1 font-archivo text-xs uppercase tracking-wide text-navy">Available Discounts:</p>
+          <ul className="list-disc list-inside font-spectral">
             {discounts.reasons.map((reason, index) => (
               <li key={index} className="text-xs">{reason}</li>
             ))}
@@ -480,37 +480,37 @@ const Cart = () => {
         </div>
       </div>
     </div>
-    
+
     {/* Always show the discount amount if there is one */}
     {discounts.amount > 0 && (
-      <div className="flex justify-between text-sm mt-1">
-        <span className="text-green-600">
-          {discounts.reasons.length > 0 
-            ? discounts.reasons[0] 
+      <div className="flex justify-between text-sm mt-1 font-archivo">
+        <span className="text-green-700">
+          {discounts.reasons.length > 0
+            ? discounts.reasons[0]
             : "Discount"}
         </span>
-        <span className="text-green-600">-Rs. {discounts.amount.toFixed(2)}</span>
+        <span className="text-green-700">-Rs. {discounts.amount.toFixed(2)}</span>
       </div>
     )}
-    
+
     {/* Show additional discount reasons if any */}
     {discounts.reasons.slice(1).map((reason, index) => (
-      <div key={index} className="flex justify-between text-sm mt-1">
-        <span className="text-green-600">{reason}</span>
-        <span className="text-green-600"></span>
+      <div key={index} className="flex justify-between text-sm mt-1 font-archivo">
+        <span className="text-green-700">{reason}</span>
+        <span className="text-green-700"></span>
       </div>
     ))}
   </div>
 )}
-                
+
                 {/* Points section - only show if logged in */}
                 {pointsAvailable > 0 && (
                   <div className="mt-4 mb-2">
                     <div className="flex items-center">
-                      <span className="text-[#333333] font-medium">REWARD POINTS</span>
+                      <span className="font-archivo text-xs uppercase tracking-wide text-flannel">Reward Points</span>
                       <div className="relative group ml-2">
-                        <Info size={16} className="text-gray-500" />
-                        <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-white p-2 rounded shadow-md text-sm w-48 z-10">
+                        <Info size={16} className="text-flannel/70" />
+                        <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-shirting border border-hairline p-2 shadow-md text-sm w-48 z-10 font-spectral">
                           <p className="mb-1">You have {pointsAvailable} points available</p>
                           <p className="text-xs">1 point = Rs. 1 discount</p>
                         </div>
@@ -523,50 +523,50 @@ const Cart = () => {
                         max={pointsAvailable}
                         value={pointsToUse}
                         onChange={handlePointsChange}
-                        className="w-20 p-1 border border-gray-300 rounded text-sm"
+                        className="w-20 p-1 border border-hairline text-sm font-archivo focus:outline-none focus:border-claret"
                       />
-                      <span className="ml-2 text-sm text-gray-600">/ {pointsAvailable} available</span>
+                      <span className="ml-2 text-sm font-spectral text-flannel/80">/ {pointsAvailable} available</span>
                     </div>
                     {pointsToUse > 0 && (
-                      <div className="flex justify-between text-sm mt-1">
-                        <span className="text-green-600">Points Discount</span>
-                        <span className="text-green-600">-Rs. {pointsToUse.toFixed(2)}</span>
+                      <div className="flex justify-between text-sm mt-1 font-archivo">
+                        <span className="text-green-700">Points Discount</span>
+                        <span className="text-green-700">-Rs. {pointsToUse.toFixed(2)}</span>
                       </div>
                     )}
                   </div>
                 )}
                 </div>
 
-                <div className="border-t border-[#d1d1d1] pt-4 mt-4">
-                  <div className="flex justify-between mb-6">
-                    <span className="text-[#333333] font-medium">TOTAL PRICE</span>
-                  <span className="text-black font-bold">Rs. {calculateTotal().toFixed(2)}</span>
+                <div className="border-t border-hairline pt-4 mt-4">
+                  <div className="flex justify-between mb-6 font-archivo">
+                    <span className="text-navy uppercase tracking-wide text-sm font-semibold">Total Price</span>
+                  <span className="text-ink font-semibold">Rs. {calculateTotal().toFixed(2)}</span>
                   </div>
 
                 {products.length > 0 ? (
                     <button
                     onClick={handleCheckout}
-                      className="w-full py-3 bg-black text-white rounded font-semibold hover:bg-gray-800 transition-colors"
+                      className="w-full py-3.5 bg-navy text-paper font-archivo font-semibold uppercase tracking-[0.18em] text-sm hover:bg-ink transition-colors"
                       aria-label="Proceed to checkout"
                     disabled={isLoading}
                   >
-                    {isLoading ? 'CALCULATING...' : 'CHECKOUT'}
+                    {isLoading ? 'Calculating...' : 'Checkout'}
                   </button>
                 ) : (
                   <button
-                    className="w-full py-3 bg-gray-400 text-white rounded font-semibold cursor-not-allowed"
+                    className="w-full py-3.5 bg-chalk text-flannel/60 font-archivo font-semibold uppercase tracking-[0.18em] text-sm cursor-not-allowed"
                     disabled
                     >
-                      CHECKOUT
+                      Checkout
                     </button>
                 )}
-                
+
                 {/* Show how many points will be earned */}
                 {products.length > 0 && (
-                  <div className="mt-4 text-center text-sm text-gray-600">
+                  <div className="mt-4 text-center text-sm font-spectral text-flannel/80">
                     <div>1 Reward Point = 1 Rs</div>
                     You'll earn {Math.floor(calculateTotal() / 100)} reward points from this purchase
-                    
+
                 </div>
                 )}
               </div>

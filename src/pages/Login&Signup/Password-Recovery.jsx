@@ -104,7 +104,7 @@ const PasswordRecovery = () => {
       })
 
       // Change color based on strength
-      let color = "bg-red-500"
+      let color = "bg-claret"
       if (strength >= 4) color = "bg-green-500"
       else if (strength >= 3) color = "bg-yellow-500"
       else if (strength >= 2) color = "bg-orange-500"
@@ -129,11 +129,11 @@ const PasswordRecovery = () => {
   }
 
   const getStrengthColor = () => {
-    if (password.length === 0) return "text-gray-400"
+    if (password.length === 0) return "text-flannel/50"
     if (passwordStrength >= 4) return "text-green-500"
     if (passwordStrength >= 3) return "text-yellow-500"
     if (passwordStrength >= 2) return "text-orange-500"
-    return "text-red-500"
+    return "text-claret"
   }
 
   const handleSubmit = async (e) => {
@@ -209,19 +209,19 @@ const PasswordRecovery = () => {
   }
 
   return (
-    <div className="min-h-screen w-screen flex-col items-center justify-center bg-gray-50">
+    <div className="min-h-screen w-screen flex-col items-center justify-center bg-paper">
       <Header />
       
-      <div className="flex items-center justify-center bg-gray-50 px-4 py-12">
+      <div className="flex items-center justify-center bg-paper px-4 py-12">
         <div 
           ref={containerRef} 
-          className={`w-full ${isMobile ? 'max-w-sm' : 'max-w-md'} bg-white rounded-lg shadow-lg overflow-hidden`}
+          className={`w-full ${isMobile ? 'max-w-sm' : 'max-w-md'} bg-shirting  shadow-lg overflow-hidden`}
         >
           {/* Header */}
-          <div className={`p-4 sm:p-6 md:p-8 bg-black text-white`}>
+          <div className={`p-4 sm:p-6 md:p-8 bg-navy text-paper`}>
             <button
               onClick={handleGoBack}
-              className={`mb-2 md:mb-4 flex items-center ${isMobile ? 'text-xs' : 'text-sm'} text-gray-300 hover:text-white transition-colors`}
+              className={`mb-2 md:mb-4 flex items-center ${isMobile ? 'text-xs' : 'text-sm'} text-gray-300 hover:text-paper transition-colors`}
             >
               <ArrowLeft size={isMobile ? 14 : 16} className="mr-1" />
               Back to verification
@@ -245,7 +245,7 @@ const PasswordRecovery = () => {
           {error && (
             <div
               ref={errorRef}
-              className={`mx-4 sm:mx-6 md:mx-8 mt-3 md:mt-4 p-2 md:p-3 bg-red-50 border border-red-200 text-red-700 rounded-md flex items-center ${isMobile ? 'text-xs' : 'text-sm'}`}
+              className={`mx-4 sm:mx-6 md:mx-8 mt-3 md:mt-4 p-2 md:p-3 bg-shirting border border-claret text-red-700  flex items-center ${isMobile ? 'text-xs' : 'text-sm'}`}
             >
               <AlertCircle size={isMobile ? 14 : 16} className="mr-2 flex-shrink-0" />
               {error}
@@ -258,7 +258,7 @@ const PasswordRecovery = () => {
               <div className="space-y-1">
                 <label 
                   htmlFor="password" 
-                  className={`block ${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700`}
+                  className={`block ${isMobile ? 'text-xs' : 'text-sm'} font-medium text-flannel`}
                 >
                   New Password
                 </label>
@@ -268,7 +268,7 @@ const PasswordRecovery = () => {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className={`block w-full pr-10 py-2 px-3 border bg-white text-black border-gray-300 rounded-md shadow-sm focus:ring-black focus:border-black ${isMobile ? 'text-xs' : 'text-sm'}`}
+                    className={`block w-full pr-10 py-2 px-3 border bg-shirting text-ink border-hairline  shadow-sm focus:ring-black focus:border-navy ${isMobile ? 'text-xs' : 'text-sm'}`}
                     placeholder="••••••••"
                     required
                   />
@@ -278,9 +278,9 @@ const PasswordRecovery = () => {
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeOff size={isMobile ? 16 : 18} className="text-gray-400 hover:text-gray-500" />
+                      <EyeOff size={isMobile ? 16 : 18} className="text-flannel/50 hover:text-flannel/70" />
                     ) : (
-                      <Eye size={isMobile ? 16 : 18} className="text-gray-400 hover:text-gray-500" />
+                      <Eye size={isMobile ? 16 : 18} className="text-flannel/50 hover:text-flannel/70" />
                     )}
                   </button>
                 </div>
@@ -288,7 +288,7 @@ const PasswordRecovery = () => {
                 {/* Password Strength Indicator */}
                 <div className="mt-2">
                   <div className="flex justify-between items-center mb-1">
-                    <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>Password strength</div>
+                    <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-flannel/70`}>Password strength</div>
                     <div 
                       ref={strengthTextRef} 
                       className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${getStrengthColor()}`}
@@ -303,35 +303,35 @@ const PasswordRecovery = () => {
 
                 {/* Password Requirements */}
                 <ul className="mt-2 space-y-1">
-                  <li className={`flex items-center ${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>
+                  <li className={`flex items-center ${isMobile ? 'text-xs' : 'text-sm'} text-flannel/70`}>
                     {password.length >= 8 ? (
                       <Check size={isMobile ? 10 : 12} className="mr-1 text-green-500" />
                     ) : (
-                      <X size={isMobile ? 10 : 12} className="mr-1 text-gray-400" />
+                      <X size={isMobile ? 10 : 12} className="mr-1 text-flannel/50" />
                     )}
                     <span className={isMobile ? "text-xs" : "text-sm"}>At least 8 characters</span>
                   </li>
-                  <li className={`flex items-center ${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>
+                  <li className={`flex items-center ${isMobile ? 'text-xs' : 'text-sm'} text-flannel/70`}>
                     {/[A-Z]/.test(password) ? (
                       <Check size={isMobile ? 10 : 12} className="mr-1 text-green-500" />
                     ) : (
-                      <X size={isMobile ? 10 : 12} className="mr-1 text-gray-400" />
+                      <X size={isMobile ? 10 : 12} className="mr-1 text-flannel/50" />
                     )}
                     <span className={isMobile ? "text-xs" : "text-sm"}>At least one uppercase letter</span>
                   </li>
-                  <li className={`flex items-center ${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>
+                  <li className={`flex items-center ${isMobile ? 'text-xs' : 'text-sm'} text-flannel/70`}>
                     {/[0-9]/.test(password) ? (
                       <Check size={isMobile ? 10 : 12} className="mr-1 text-green-500" />
                     ) : (
-                      <X size={isMobile ? 10 : 12} className="mr-1 text-gray-400" />
+                      <X size={isMobile ? 10 : 12} className="mr-1 text-flannel/50" />
                     )}
                     <span className={isMobile ? "text-xs" : "text-sm"}>At least one number</span>
                   </li>
-                  <li className={`flex items-center ${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>
+                  <li className={`flex items-center ${isMobile ? 'text-xs' : 'text-sm'} text-flannel/70`}>
                     {/[^A-Za-z0-9]/.test(password) ? (
                       <Check size={isMobile ? 10 : 12} className="mr-1 text-green-500" />
                     ) : (
-                      <X size={isMobile ? 10 : 12} className="mr-1 text-gray-400" />
+                      <X size={isMobile ? 10 : 12} className="mr-1 text-flannel/50" />
                     )}
                     <span className={isMobile ? "text-xs" : "text-sm"}>At least one special character</span>
                   </li>
@@ -342,7 +342,7 @@ const PasswordRecovery = () => {
               <div className="space-y-1">
                 <label 
                   htmlFor="confirmPassword" 
-                  className={`block ${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700`}
+                  className={`block ${isMobile ? 'text-xs' : 'text-sm'} font-medium text-flannel`}
                 >
                   Confirm Password
                 </label>
@@ -352,11 +352,11 @@ const PasswordRecovery = () => {
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className={`block w-full pr-10 py-2 px-3 border bg-white text-black ${
+                    className={`block w-full pr-10 py-2 px-3 border bg-shirting text-ink ${
                       confirmPassword && password !== confirmPassword
                         ? "border-red-300 focus:ring-red-500 focus:border-red-500"
-                        : "border-gray-300 focus:ring-black focus:border-black"
-                    } rounded-md shadow-sm ${isMobile ? 'text-xs' : 'text-sm'}`}
+                        : "border-hairline focus:ring-black focus:border-navy"
+                    }  shadow-sm ${isMobile ? 'text-xs' : 'text-sm'}`}
                     placeholder="••••••••"
                     required
                   />
@@ -366,14 +366,14 @@ const PasswordRecovery = () => {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
                     {showConfirmPassword ? (
-                      <EyeOff size={isMobile ? 16 : 18} className="text-gray-400 hover:text-gray-500" />
+                      <EyeOff size={isMobile ? 16 : 18} className="text-flannel/50 hover:text-flannel/70" />
                     ) : (
-                      <Eye size={isMobile ? 16 : 18} className="text-gray-400 hover:text-gray-500" />
+                      <Eye size={isMobile ? 16 : 18} className="text-flannel/50 hover:text-flannel/70" />
                     )}
                   </button>
                 </div>
                 {confirmPassword && password !== confirmPassword && (
-                  <p className={`mt-1 ${isMobile ? 'text-xs' : 'text-sm'} text-red-600`}>Passwords do not match</p>
+                  <p className={`mt-1 ${isMobile ? 'text-xs' : 'text-sm'} text-claret`}>Passwords do not match</p>
                 )}
               </div>
             </div>
@@ -383,11 +383,11 @@ const PasswordRecovery = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm ${isMobile ? 'text-xs' : 'text-sm'} font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200`}
+                className={`w-full flex justify-center items-center py-2 px-4 border border-transparent  shadow-sm ${isMobile ? 'text-xs' : 'text-sm'} font-medium text-paper bg-navy hover:bg-ink focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200`}
               >
                 {isLoading ? (
                   <svg
-                    className={`animate-spin ${isMobile ? 'h-4 w-4' : 'h-5 w-5'} text-white`}
+                    className={`animate-spin ${isMobile ? 'h-4 w-4' : 'h-5 w-5'} text-paper`}
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"

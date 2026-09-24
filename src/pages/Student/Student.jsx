@@ -13,7 +13,7 @@ const StudentVerification = () => {
   const [verificationSubmitted, setVerificationSubmitted] = useState(false);
 
   return (
-    <div className="bg-white w-screen">
+    <div className="bg-shirting w-screen">
       <Header />
       <Hero isLoggedIn={isLoggedIn} />
       {isLoggedIn && !verificationSubmitted && (
@@ -60,11 +60,11 @@ const Hero = ({ isLoggedIn }) => {
   return (
     <section
       ref={heroRef}
-      className="relative bg-gradient-to-br from-gray-800 to-black text-white py-20 px-4 sm:px-6 lg:px-8"
+      className="relative bg-gradient-to-br from-gray-800 to-black text-paper py-20 px-4 sm:px-6 lg:px-8"
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">
+          <h1 className="font-caslon text-3xl md:text-5xl text-navy mb-4">
             STUDENT EXCLUSIVE: 5% OFF ALL ORDERS
           </h1>
           <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
@@ -74,19 +74,19 @@ const Hero = ({ isLoggedIn }) => {
         </div>
 
         <div ref={benefitsRef} className="grid md:grid-cols-3 gap-8 mt-12">
-          <div className="benefit-item bg-white/10 p-6 rounded-lg">
+          <div className="benefit-item bg-shirting/10 p-6 ">
             <div className="text-2xl font-bold mb-2">5% OFF</div>
             <p className="text-gray-300">
               Permanent discount on all subsequent orders after verification
             </p>
           </div>
-          <div className="benefit-item bg-white/10 p-6 rounded-lg">
+          <div className="benefit-item bg-shirting/10 p-6 ">
             <div className="text-2xl font-bold mb-2">QUALITY GEAR</div>
             <p className="text-gray-300">
               Professional-grade medical wear at student-friendly prices
             </p>
           </div>
-          <div className="benefit-item bg-white/10 p-6 rounded-lg">
+          <div className="benefit-item bg-shirting/10 p-6 ">
             <div className="text-2xl font-bold mb-2">EASY VERIFICATION</div>
             <p className="text-gray-300">
               Simple one-time verification process with your student ID
@@ -98,7 +98,7 @@ const Hero = ({ isLoggedIn }) => {
           {!isLoggedIn ? (
             <Link
               to="/login"
-              className="inline-flex items-center px-8 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors"
+              className="inline-flex items-center px-8 py-3 bg-shirting text-ink font-medium  hover:bg-gray-200 transition-colors"
             >
               Login to Verify
               <ArrowRight size={16} className="ml-2" />
@@ -106,7 +106,7 @@ const Hero = ({ isLoggedIn }) => {
           ) : (
             <a
               href="#verify"
-              className="inline-flex items-center px-8 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors"
+              className="inline-flex items-center px-8 py-3 bg-shirting text-ink font-medium  hover:bg-gray-200 transition-colors"
             >
               Verify Now
               <ArrowRight size={16} className="ml-2" />
@@ -286,8 +286,8 @@ const VerificationForm = ({ verificationSubmitted, setVerificationSubmitted }) =
     <section id="verify" className="py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-black">Verify as a Student</h2>
-          <p className="text-gray-600 mt-2">
+          <h2 className="font-caslon text-3xl text-navy">Verify as a Student</h2>
+          <p className="text-flannel/80 mt-2">
             Complete the form below to verify your student status and unlock your 5% discount
           </p>
         </div>
@@ -295,7 +295,7 @@ const VerificationForm = ({ verificationSubmitted, setVerificationSubmitted }) =
         {error && (
           <div
             ref={errorRef}
-            className="mx-auto max-w-md mb-6 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md flex items-center justify-between"
+            className="mx-auto max-w-md mb-6 p-3 bg-shirting border border-claret text-red-700  flex items-center justify-between"
           >
             <span className="text-sm md:text-base">{error}</span>
             <button onClick={() => setError("")}>
@@ -306,10 +306,10 @@ const VerificationForm = ({ verificationSubmitted, setVerificationSubmitted }) =
 
         <div
           ref={verificationFormRef}
-          className="w-full max-w-md md:max-w-lg mx-auto bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200"
+          className="w-full max-w-md md:max-w-lg mx-auto bg-shirting  shadow-lg overflow-hidden border border-hairline"
         >
-          <div className="p-6 sm:p-8 bg-gradient-to-br from-gray-800 to-black text-white">
-            <h2 className="text-2xl md:text-3xl font-bold">Student Verification</h2>
+          <div className="p-6 sm:p-8 bg-gradient-to-br from-gray-800 to-black text-paper">
+            <h2 className="font-caslon text-2xl md:text-3xl text-navy">Student Verification</h2>
             <p className="mt-2 text-gray-300 text-sm md:text-base">
               Provide your student details to get verified
             </p>
@@ -318,12 +318,12 @@ const VerificationForm = ({ verificationSubmitted, setVerificationSubmitted }) =
           <form onSubmit={handleVerificationSubmit} className="p-6 sm:p-8 space-y-4 md:space-y-6">
             {/* Full Name Field */}
             <div className="space-y-1">
-              <label htmlFor="fullName" className="block text-sm md:text-base font-medium text-gray-700">
+              <label htmlFor="fullName" className="block text-sm md:text-base font-medium text-flannel">
                 Full Name
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User size={18} className="text-gray-400" />
+                  <User size={18} className="text-flannel/50" />
                 </div>
                 <input
                   id="fullName"
@@ -335,23 +335,23 @@ const VerificationForm = ({ verificationSubmitted, setVerificationSubmitted }) =
                       setErrors({ ...errors, fullName: "" })
                     }
                   }}
-                  className={`block w-full pl-10 pr-3 py-2 md:py-3 text-black text-sm md:text-base border bg-white rounded-md shadow-sm focus:ring-black focus:border-black ${
-                    errors.fullName ? "border-red-500" : "border-gray-300"
+                  className={`block w-full pl-10 pr-3 py-2 md:py-3 text-ink text-sm md:text-base border bg-shirting  shadow-sm focus:ring-black focus:border-navy ${
+                    errors.fullName ? "border-red-500" : "border-hairline"
                   }`}
                   placeholder="John Doe"
                 />
               </div>
-              {errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
+              {errors.fullName && <p className="mt-1 text-sm text-claret">{errors.fullName}</p>}
             </div>
 
             {/* Roll Number Field */}
             <div className="space-y-1">
-              <label htmlFor="rollNumber" className="block text-sm md:text-base font-medium text-gray-700">
+              <label htmlFor="rollNumber" className="block text-sm md:text-base font-medium text-flannel">
                 Roll Number
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <BookOpen size={18} className="text-gray-400" />
+                  <BookOpen size={18} className="text-flannel/50" />
                 </div>
                 <input
                   id="rollNumber"
@@ -363,23 +363,23 @@ const VerificationForm = ({ verificationSubmitted, setVerificationSubmitted }) =
                       setErrors({ ...errors, rollNumber: "" })
                     }
                   }}
-                  className={`block w-full pl-10 pr-3 py-2 text-black md:py-3 text-sm md:text-base border bg-white rounded-md shadow-sm focus:ring-black focus:border-black ${
-                    errors.rollNumber ? "border-red-500" : "border-gray-300"
+                  className={`block w-full pl-10 pr-3 py-2 text-ink md:py-3 text-sm md:text-base border bg-shirting  shadow-sm focus:ring-black focus:border-navy ${
+                    errors.rollNumber ? "border-red-500" : "border-hairline"
                   }`}
                   placeholder="MED2023001"
                 />
               </div>
-              {errors.rollNumber && <p className="mt-1 text-sm text-red-600">{errors.rollNumber}</p>}
+              {errors.rollNumber && <p className="mt-1 text-sm text-claret">{errors.rollNumber}</p>}
             </div>
 
             {/* Institution Name Field */}
             <div className="space-y-1">
-              <label htmlFor="institutionName" className="block text-sm md:text-base font-medium text-gray-700">
+              <label htmlFor="institutionName" className="block text-sm md:text-base font-medium text-flannel">
                 Institution Name
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <BookOpen size={18} className="text-gray-400" />
+                  <BookOpen size={18} className="text-flannel/50" />
                 </div>
                 <input
                   id="institutionName"
@@ -391,23 +391,23 @@ const VerificationForm = ({ verificationSubmitted, setVerificationSubmitted }) =
                       setErrors({ ...errors, institutionName: "" })
                     }
                   }}
-                  className={`block w-full pl-10 pr-3 py-2 text-black md:py-3 text-sm md:text-base border bg-white rounded-md shadow-sm focus:ring-black focus:border-black ${
-                    errors.institutionName ? "border-red-500" : "border-gray-300"
+                  className={`block w-full pl-10 pr-3 py-2 text-ink md:py-3 text-sm md:text-base border bg-shirting  shadow-sm focus:ring-black focus:border-navy ${
+                    errors.institutionName ? "border-red-500" : "border-hairline"
                   }`}
                   placeholder="Your University/College Name"
                 />
               </div>
-              {errors.institutionName && <p className="mt-1 text-sm text-red-600">{errors.institutionName}</p>}
+              {errors.institutionName && <p className="mt-1 text-sm text-claret">{errors.institutionName}</p>}
             </div>
 
             {/* University Email Field */}
             <div className="space-y-1">
-              <label htmlFor="universityEmail" className="block text-sm md:text-base font-medium text-gray-700">
+              <label htmlFor="universityEmail" className="block text-sm md:text-base font-medium text-flannel">
                 University Email
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail size={18} className="text-gray-400" />
+                  <Mail size={18} className="text-flannel/50" />
                 </div>
                 <input
                   id="universityEmail"
@@ -419,25 +419,25 @@ const VerificationForm = ({ verificationSubmitted, setVerificationSubmitted }) =
                       setErrors({ ...errors, universityEmail: "" })
                     }
                   }}
-                  className={`block w-full pl-10 text-black pr-3 py-2 md:py-3 text-sm md:text-base border bg-white rounded-md shadow-sm focus:ring-black focus:border-black ${
-                    errors.universityEmail ? "border-red-500" : "border-gray-300"
+                  className={`block w-full pl-10 text-ink pr-3 py-2 md:py-3 text-sm md:text-base border bg-shirting  shadow-sm focus:ring-black focus:border-navy ${
+                    errors.universityEmail ? "border-red-500" : "border-hairline"
                   }`}
                   placeholder="john.doe@university.edu"
                 />
               </div>
-              {errors.universityEmail && <p className="mt-1 text-sm text-red-600">{errors.universityEmail}</p>}
+              {errors.universityEmail && <p className="mt-1 text-sm text-claret">{errors.universityEmail}</p>}
             </div>
 
             {/* Student Card Upload */}
             <div className="space-y-1">
-              <label htmlFor="studentCard" className="block text-sm md:text-base font-medium text-gray-700">
+              <label htmlFor="studentCard" className="block text-sm md:text-base font-medium text-flannel">
                 Upload Student Card
               </label>
               <div className="relative">
                 <label
                   htmlFor="studentCard"
-                  className={`flex items-center justify-center w-full p-4 md:p-6 border-2 border-dashed rounded-md cursor-pointer hover:bg-gray-50 ${
-                    errors.studentCard ? "border-red-500" : "border-gray-300"
+                  className={`flex items-center justify-center w-full p-4 md:p-6 border-2 border-dashed  cursor-pointer hover:bg-paper ${
+                    errors.studentCard ? "border-red-500" : "border-hairline"
                   }`}
                 >
                   <div className="flex flex-col items-center space-y-2">
@@ -447,19 +447,19 @@ const VerificationForm = ({ verificationSubmitted, setVerificationSubmitted }) =
                           <img
                             src={URL.createObjectURL(studentCard) || "/placeholder.svg"}
                             alt="Student Card Preview"
-                            className="h-24 object-contain mb-2 rounded-md max-w-full"
+                            className="h-24 object-contain mb-2  max-w-full"
                           />
                         ) : (
-                          <div className="bg-gray-100 p-3 rounded-md mb-2">
-                            <Upload size={24} className="text-gray-400" />
+                          <div className="bg-paper p-3  mb-2">
+                            <Upload size={24} className="text-flannel/50" />
                           </div>
                         )}
-                        <span className="text-sm md:text-base text-gray-700 font-medium">{studentCard.name}</span>
+                        <span className="text-sm md:text-base text-flannel font-medium">{studentCard.name}</span>
                       </div>
                     ) : (
                       <>
-                        <Upload size={24} className="text-gray-400" />
-                        <span className="text-sm md:text-base text-gray-500">
+                        <Upload size={24} className="text-flannel/50" />
+                        <span className="text-sm md:text-base text-flannel/70">
                           Click to upload your student card
                         </span>
                       </>
@@ -474,7 +474,7 @@ const VerificationForm = ({ verificationSubmitted, setVerificationSubmitted }) =
                   />
                 </label>
               </div>
-              {errors.studentCard && <p className="mt-1 text-sm text-red-600">{errors.studentCard}</p>}
+              {errors.studentCard && <p className="mt-1 text-sm text-claret">{errors.studentCard}</p>}
             </div>
 
             {/* Submit Button */}
@@ -482,11 +482,11 @@ const VerificationForm = ({ verificationSubmitted, setVerificationSubmitted }) =
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center items-center py-2 md:py-3 px-4 border border-transparent rounded-md shadow-sm text-sm md:text-base font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200"
+                className="w-full flex justify-center items-center py-2 md:py-3 px-4 border border-transparent  shadow-sm text-sm md:text-base font-medium text-paper bg-navy hover:bg-ink focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200"
               >
                 {isLoading ? (
                   <svg
-                    className="animate-spin h-5 w-5 text-white"
+                    className="animate-spin h-5 w-5 text-paper"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -538,13 +538,13 @@ const SuccessMessage = () => {
       <div className="max-w-7xl mx-auto">
         <div
           ref={successRef}
-          className="max-w-2xl mx-auto text-center p-8 bg-white border border-gray-200 rounded-lg shadow-lg"
+          className="max-w-2xl mx-auto text-center p-8 bg-shirting border border-hairline  shadow-lg"
         >
           <div className="flex justify-center mb-4">
             <CheckCircle size={64} className="text-green-500" />
           </div>
-          <h2 className="text-2xl font-bold mb-4 text-black">Verification Submitted!</h2>
-          <p className="text-gray-600 mb-6">
+          <h2 className="font-caslon text-2xl text-navy mb-4">Verification Submitted!</h2>
+          <p className="text-flannel/80 mb-6">
             Your student verification is pending review. You will receive an email once your student status has
             been confirmed. This typically takes 1-2 business days.
           </p>
@@ -566,10 +566,10 @@ const SuccessMessage = () => {
               <li>Your account will be activated with student benefits</li>
               <li>Enjoy 5% off on all your orders!</li>
             </ol>
-            <div className="mt-8 pt-6 border-t border-gray-200">
+            <div className="mt-8 pt-6 border-t border-hairline">
               <a
                 href="/"
-                className="inline-flex items-center px-6 py-3 bg-black text-white font-medium rounded-md hover:bg-gray-800 transition-colors"
+                className="inline-flex items-center px-6 py-3 bg-navy text-paper font-medium  hover:bg-ink transition-colors"
               >
                 Return to Homepage
               </a>
@@ -585,11 +585,11 @@ const CTA = ({ isLoggedIn, verificationSubmitted }) => {
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-gradient-to-br from-gray-800 to-black text-white shadow-xl overflow-hidden">
+        <div className="bg-gradient-to-br from-gray-800 to-black text-paper shadow-xl overflow-hidden">
           <div className="px-6 py-12 sm:px-12 lg:py-16 lg:px-16">
             <div className="lg:grid lg:grid-cols-2 lg:gap-8 items-center">
               <div>
-                <h2 className="text-2xl md:text-4xl font-bold mb-4">
+                <h2 className="font-caslon text-2xl md:text-4xl text-navy mb-4">
                   Ready to Save on Premium Medical Wear?
                 </h2>
                 <p className="text-lg text-gray-300 max-w-2xl">
@@ -601,28 +601,28 @@ const CTA = ({ isLoggedIn, verificationSubmitted }) => {
                   {!isLoggedIn ? (
                     <Link
                       to="/login"
-                      className="inline-flex items-center justify-center px-6 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors"
+                      className="inline-flex items-center justify-center px-6 py-3 bg-shirting text-ink font-medium  hover:bg-gray-200 transition-colors"
                     >
                       Login Now
                     </Link>
                   ) : !verificationSubmitted ? (
                     <a
                       href="#verify"
-                      className="inline-flex items-center justify-center px-6 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors"
+                      className="inline-flex items-center justify-center px-6 py-3 bg-shirting text-ink font-medium  hover:bg-gray-200 transition-colors"
                     >
                       Verify Now
                     </a>
                   ) : (
                     <a
                       href="/"
-                      className="inline-flex items-center justify-center px-6 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors"
+                      className="inline-flex items-center justify-center px-6 py-3 bg-shirting text-ink font-medium  hover:bg-gray-200 transition-colors"
                     >
                       Shop Now
                     </a>
                   )}
                   <a
                     href="/"
-                    className="inline-flex items-center justify-center px-6 py-3 border border-white text-white font-medium rounded-md hover:bg-white/10 transition-colors"
+                    className="inline-flex items-center justify-center px-6 py-3 border border-white text-paper font-medium  hover:bg-shirting/10 transition-colors"
                   >
                     Browse Collection
                   </a>

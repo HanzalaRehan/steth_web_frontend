@@ -73,17 +73,17 @@ const RewardsCTA = () => {
   ];
 
   return (
-    <div className="bg-white flex flex-col items-center justify-center py-16 md:py-16">
+    <div className="bg-shirting flex flex-col items-center justify-center py-16 md:py-16">
       {/* Main content with padding */}
       <div className="container mx-auto px-4">
         {/* Main Rewards Section */}
         {/* Heading set to match the rewards page bands (HOW IT WORKS / HOW TO
             EARN POINTS) so the programme reads as one thing across the site. */}
         <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">
-            REWARDS &amp; BENEFITS
+          <h2 className="font-caslon text-3xl md:text-4xl text-navy mb-3">
+            Rewards &amp; Benefits
           </h2>
-          <p className="text-gray-500 max-w-xl mx-auto">
+          <p className="font-spectral italic text-flannel/80 max-w-xl mx-auto">
             Three ways every Steth order gives something back.
           </p>
         </div>
@@ -95,25 +95,25 @@ const RewardsCTA = () => {
               <div
                 key={tier.title}
                 ref={el => cardRefs.current[index] = el}
-                className="flex flex-col rounded-2xl border border-gray-200 p-8 text-center transition-colors hover:border-gray-300"
+                className="flex flex-col border border-hairline border-t-2 border-t-brass p-8 text-center transition-colors bg-shirting"
               >
                 <div className="mb-5 flex justify-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full border border-gray-900">
-                    <Icon className="h-7 w-7 text-gray-900" strokeWidth={1.5} />
+                  <div className="flex h-16 w-16 items-center justify-center border border-brass">
+                    <Icon className="h-7 w-7 text-navy" strokeWidth={1.5} />
                   </div>
                 </div>
 
-                <h3 className="mb-2 text-lg font-semibold text-gray-900">
+                <h3 className="mb-2 font-caslon text-xl text-navy">
                   {tier.title}
                 </h3>
-                <p className="mb-6 text-sm text-gray-500">
+                <p className="mb-6 text-sm font-spectral text-flannel/80">
                   {tier.description}
                 </p>
 
-                <ul className="mt-auto space-y-2.5 text-left text-sm text-gray-700">
+                <ul className="mt-auto space-y-2.5 text-left text-sm font-spectral text-flannel">
                   {tier.details.map((detail, idx) => (
                     <li key={idx} className="flex gap-2.5">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-gray-900" strokeWidth={2} />
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-claret" strokeWidth={2} />
                       <span>{detail}</span>
                     </li>
                   ))}

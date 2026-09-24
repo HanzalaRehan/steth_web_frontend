@@ -52,18 +52,18 @@ const GiftCards = () => {
 
   if (purchasedCard) {
     return (
-      <div className="min-h-screen flex flex-col w-full bg-white">
+      <div className="min-h-screen flex flex-col w-full bg-shirting">
         <Header />
         <main className="flex-grow flex items-center justify-center py-24 px-4">
-          <div className="max-w-md w-full text-center bg-gray-50 rounded-2xl p-8 border border-gray-100">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Gift card purchased!</h1>
-            <p className="text-gray-600 mb-6">
+          <div className="max-w-md w-full text-center bg-paper  p-8 border border-hairline">
+            <h1 className="font-caslon text-2xl text-navy mb-2">Gift card purchased!</h1>
+            <p className="text-flannel/80 mb-6">
               PKR {purchasedCard.initialBalance.toLocaleString()} for {purchasedCard.recipientEmail}
             </p>
-            <div className="bg-black text-white rounded-lg py-4 px-6 text-2xl font-mono tracking-widest mb-4">
+            <div className="bg-navy text-paper  py-4 px-6 text-2xl font-mono tracking-widest mb-4">
               {purchasedCard.code}
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-flannel/70">
               Save this code - it's needed to redeem the balance at checkout. Valid until{" "}
               {new Date(purchasedCard.expiryDate).toLocaleDateString()}.
             </p>
@@ -75,20 +75,20 @@ const GiftCards = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col w-full bg-white">
+    <div className="min-h-screen flex flex-col w-full bg-shirting">
       <Header />
       <main className="flex-grow py-16 px-4">
         <div className="max-w-lg mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 text-center">Gift Cards</h1>
-          <p className="text-gray-600 mb-8 text-center">Give the gift of STETH scrubs.</p>
+          <h1 className="font-caslon text-3xl md:text-4xl text-navy mb-2 text-center">Gift Cards</h1>
+          <p className="text-flannel/80 mb-8 text-center">Give the gift of STETH scrubs.</p>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">{error}</div>
+            <div className="mb-4 p-3 bg-shirting border border-claret text-red-700  text-sm">{error}</div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6 bg-gray-50 rounded-2xl p-6 border border-gray-100">
+          <form onSubmit={handleSubmit} className="space-y-6 bg-paper  p-6 border border-hairline">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Amount (PKR)</label>
+              <label className="block text-sm font-medium text-flannel mb-2">Amount (PKR)</label>
               <div className="grid grid-cols-3 gap-2 mb-3">
                 {PRESET_AMOUNTS.map((preset) => (
                   <button
@@ -98,10 +98,10 @@ const GiftCards = () => {
                       setAmount(preset)
                       setCustomAmount("")
                     }}
-                    className={`py-2 rounded-md border text-sm font-medium transition-colors ${
+                    className={`py-2  border text-sm font-medium transition-colors ${
                       !customAmount && amount === preset
-                        ? "bg-black text-white border-black"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
+                        ? "bg-navy text-paper border-navy"
+                        : "bg-shirting text-flannel border-hairline hover:border-gray-400"
                     }`}
                   >
                     {preset.toLocaleString()}
@@ -114,12 +114,12 @@ const GiftCards = () => {
                 placeholder="Or enter a custom amount"
                 value={customAmount}
                 onChange={(e) => setCustomAmount(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full px-3 py-2 border border-hairline  focus:outline-none focus:ring-2 focus:ring-black"
               />
             </div>
 
             <div>
-              <label htmlFor="recipientEmail" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="recipientEmail" className="block text-sm font-medium text-flannel mb-1">
                 Recipient Email
               </label>
               <input
@@ -128,12 +128,12 @@ const GiftCards = () => {
                 required
                 value={recipientEmail}
                 onChange={(e) => setRecipientEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full px-3 py-2 border border-hairline  focus:outline-none focus:ring-2 focus:ring-black"
               />
             </div>
 
             <div>
-              <label htmlFor="note" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="note" className="block text-sm font-medium text-flannel mb-1">
                 Note (optional)
               </label>
               <textarea
@@ -141,14 +141,14 @@ const GiftCards = () => {
                 rows={3}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full px-3 py-2 border border-hairline  focus:outline-none focus:ring-2 focus:ring-black"
               />
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-black text-white rounded-md font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
+              className="w-full py-3 bg-navy text-paper  font-medium hover:bg-ink transition-colors disabled:opacity-50"
             >
               {isLoading ? "Processing..." : `Purchase Gift Card - PKR ${effectiveAmount ? effectiveAmount.toLocaleString() : "0"}`}
             </button>

@@ -119,35 +119,35 @@ const DeliveryForm = ({ data = {}, onDeliveryInfoChange = () => {} }) => {
   return (
     <div className="space-y-4">
       <div>
-        <div className={`border ${errors.address ? 'border-red-500' : 'border-gray-300'} overflow-hidden focus-within:border-gray-500`}>
+        <div className={`border ${errors.address ? 'border-claret' : 'border-hairline'} overflow-hidden focus-within:border-navy`}>
           <input
             type="text"
             placeholder="Street Address"
-            className="w-full px-3 py-3 outline-none bg-white"
+            className="w-full px-3 py-3 outline-none bg-shirting font-spectral text-ink"
             value={formData.address}
             onChange={(e) => updateFormData('address', e.target.value)}
             onBlur={(e) => validateField('address', e.target.value)}
           />
         </div>
-        {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
+        {errors.address && <p className="text-xs text-claret mt-1">{errors.address}</p>}
       </div>
 
       <div>
-        <div className={`border ${errors.city ? 'border-red-500' : 'border-gray-300'} overflow-hidden focus-within:border-gray-500`}>
+        <div className={`border ${errors.city ? 'border-claret' : 'border-hairline'} overflow-hidden focus-within:border-navy`}>
           <input
             type="text"
             placeholder="City"
-            className="w-full px-3 py-3 outline-none bg-white"
+            className="w-full px-3 py-3 outline-none bg-shirting font-spectral text-ink"
             value={formData.city}
             onChange={(e) => updateFormData('city', e.target.value)}
             onBlur={(e) => validateField('city', e.target.value)}
           />
         </div>
-        {errors.city && <p className="text-xs text-red-500 mt-1">{errors.city}</p>}
+        {errors.city && <p className="text-xs text-claret mt-1">{errors.city}</p>}
       </div>
 
       {hasAccount && (
-        <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+        <label className="flex items-center gap-2 text-sm text-flannel cursor-pointer">
           <input
             type="checkbox"
             checked={saveAddress}

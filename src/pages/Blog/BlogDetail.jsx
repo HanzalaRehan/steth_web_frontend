@@ -33,30 +33,30 @@ const BlogDetail = () => {
   }, [slug])
 
   return (
-    <div className="min-h-screen flex flex-col w-full bg-white">
+    <div className="min-h-screen flex flex-col w-full bg-shirting">
       <Header />
       <main className="flex-grow py-16 px-4">
         <div className="max-w-2xl mx-auto">
           {loading ? (
-            <p className="text-center text-gray-500">Loading...</p>
+            <p className="text-center text-flannel/70">Loading...</p>
           ) : notFound || !post ? (
             <div className="text-center">
-              <p className="text-gray-600 mb-4">This post doesn't exist.</p>
-              <Link to="/blog" className="text-black underline">Back to Blog</Link>
+              <p className="text-flannel/80 mb-4">This post doesn't exist.</p>
+              <Link to="/blog" className="text-ink underline">Back to Blog</Link>
             </div>
           ) : (
             <article>
               {post.coverImage && (
-                <div className="aspect-video overflow-hidden rounded-2xl mb-6 bg-gray-100">
+                <div className="aspect-video overflow-hidden  mb-6 bg-paper">
                   <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
                 </div>
               )}
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{post.title}</h1>
-              <p className="text-sm text-gray-500 mb-8">
+              <h1 className="font-caslon text-3xl text-navy mb-2">{post.title}</h1>
+              <p className="text-sm text-flannel/70 mb-8">
                 {post.author} • {new Date(post.publishedAt).toLocaleDateString()}
               </p>
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{post.body}</p>
-              <Link to="/blog" className="inline-block mt-10 text-sm text-black underline">
+              <p className="text-flannel leading-relaxed whitespace-pre-wrap">{post.body}</p>
+              <Link to="/blog" className="inline-block mt-10 text-sm text-ink underline">
                 ← Back to Blog
               </Link>
             </article>

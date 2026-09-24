@@ -262,7 +262,7 @@ export default function ProductReviews() {
         {[1, 2, 3, 4, 5].map((star) => (
           <svg
             key={star}
-            className={`w-4 h-4 md:w-5 md:h-5 ${star <= rating ? "text-black" : "text-gray-300"}`}
+            className={`w-4 h-4 md:w-5 md:h-5 ${star <= rating ? "text-ink" : "text-gray-300"}`}
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -274,16 +274,16 @@ export default function ProductReviews() {
   }
 
   return (
-    <div className="w-full bg-gray-100" ref={containerRef}>
-      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12 text-black">
+    <div className="w-full bg-paper" ref={containerRef}>
+      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12 text-ink">
         {/* Header - Made responsive for mobile */}
         <div
           ref={headerRef}
           className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-4 sm:gap-0"
           style={{ opacity: 1 }} // Ensure visibility even before animations
         >
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">The Reviews Are In</h2>
-          <button className="w-full sm:w-auto px-4 md:px-6 py-2 md:py-3 border-2 border-black text-black bg-white rounded-none font-medium hover:bg-black hover:text-white transition-colors text-sm md:text-base">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-ink">The Reviews Are In</h2>
+          <button className="w-full sm:w-auto px-4 md:px-6 py-2 md:py-3 border-2 border-navy text-ink bg-shirting rounded-none font-medium hover:bg-navy hover:text-paper transition-colors text-sm md:text-base">
             SEE ALL REVIEWS
           </button>
         </div>
@@ -291,12 +291,12 @@ export default function ProductReviews() {
         {/* Rating Summary */}
         <div
           ref={summaryRef}
-          className="bg-white border border-gray-100 p-6 md:p-8 mb-6 text-center"
+          className="bg-shirting border border-hairline p-6 md:p-8 mb-6 text-center"
           style={{ opacity: 1 }} // Ensure visibility even before animations
         >
           <div className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2">4.5/5</div>
           <div className="flex justify-center mb-2">{renderStars(4.5)}</div>
-          <p className="text-sm md:text-base text-gray-600">
+          <p className="text-sm md:text-base text-flannel/80">
             Based On {initialReviewsData.totalReviews.toLocaleString()} Reviews
           </p>
         </div>
@@ -306,22 +306,22 @@ export default function ProductReviews() {
           {reviews.map((review, index) => (
             <div
               key={review.id}
-              className="bg-white border border-gray-100 p-4 md:p-6"
+              className="bg-shirting border border-hairline p-4 md:p-6"
               ref={(el) => (reviewRefs.current[index] = el)}
               style={{ opacity: 1 }} // Ensure visibility even before animations
             >
               <div className="flex justify-between items-start mb-3 md:mb-4">
                 <div className="flex">{renderStars(review.rating)}</div>
-                <span className="text-gray-600 text-xs md:text-sm">{review.date}</span>
+                <span className="text-flannel/80 text-xs md:text-sm">{review.date}</span>
               </div>
               <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3">{review.title}</h3>
-              <div className="text-gray-700 text-sm md:text-base">
+              <div className="text-flannel text-sm md:text-base">
                 {review.content.length > 150 && !review.isExpanded ? (
                   <>
                     <p>{review.content.substring(0, 150)}...</p>
                     <button
                       onClick={() => toggleReadMore(review.id)}
-                      className="bg-black rounded-none font-medium mt-2 hover:underline text-white px-3 py-1 text-xs md:text-sm"
+                      className="bg-navy rounded-none font-medium mt-2 hover:underline text-paper px-3 py-1 text-xs md:text-sm"
                     >
                       Read More
                     </button>
@@ -332,7 +332,7 @@ export default function ProductReviews() {
                     {review.content.length > 150 && (
                       <button
                         onClick={() => toggleReadMore(review.id)}
-                        className="text-white font-medium mt-2 hover:underline text-xs md:text-sm"
+                        className="text-paper font-medium mt-2 hover:underline text-xs md:text-sm"
                       >
                         Read Less
                       </button>
@@ -354,7 +354,7 @@ export default function ProductReviews() {
             <button
               onClick={loadMoreReviews}
               disabled={isLoading}
-              className="px-6 md:px-8 py-2 md:py-3 border-2 bg-black text-white rounded-none border-black font-medium hover:bg-white hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
+              className="px-6 md:px-8 py-2 md:py-3 border-2 bg-navy text-paper rounded-none border-navy font-medium hover:bg-shirting hover:text-claret transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
             >
               {isLoading ? "Loading..." : "LOAD MORE"}
             </button>

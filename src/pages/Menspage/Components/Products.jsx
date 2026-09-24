@@ -310,7 +310,7 @@ export default function ProductPage() {
   }
 
   if (error) {
-    return <div id="products" className="flex justify-center items-center h-64 text-red-500">Error: {error}</div>
+    return <div id="products" className="flex justify-center items-center h-64 text-claret">Error: {error}</div>
   }
 
   const sortLabel = SORT_OPTIONS.find((option) => option.value === sortOption)?.label ?? "Sort"
@@ -318,7 +318,7 @@ export default function ProductPage() {
   return (
     <div id="products" className="mx-auto px-4 lg:px-20 py-8 w-full">
       {/* Heading */}
-      <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 text-black px-4">Men's Collection</h1>
+      <h1 className="font-caslon text-2xl md:text-3xl lg:text-4xl mb-6 text-navy px-4">Men's Collection</h1>
 
       {/* Filter section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-4">
@@ -326,7 +326,7 @@ export default function ProductPage() {
           {/* Category filter */}
           <div className="relative">
             <button
-              className="flex items-center gap-2 font-medium bg-white text-black text-sm md:text-base lg:text-lg border border-gray-300 rounded-md px-4 py-2 shadow-sm"
+              className="flex items-center gap-2 font-archivo font-semibold uppercase tracking-[0.12em] bg-shirting text-ink text-xs md:text-sm border border-hairline px-4 py-2"
               onClick={() => {
                 setCategoryOpen(!categoryOpen)
                 setColorOpen(false)
@@ -338,11 +338,11 @@ export default function ProductPage() {
               CATEGORY <ChevronDown className={`h-4 w-4 transition-transform ${categoryOpen ? "rotate-180" : ""}`} />
             </button>
             {categoryOpen && (
-              <div className="absolute z-10 mt-2 w-56 bg-white shadow-xl rounded-lg py-2 border">
+              <div className="absolute z-10 mt-2 w-56 bg-shirting shadow-xl  py-2 border">
                 {categoryOptions.map((cat) => (
                   <button
                     key={cat}
-                    className={`block px-4 py-2 text-sm w-full bg-white text-black rounded-none text-left hover:bg-gray-100 ${categoryFilter === cat ? "font-bold" : ""}`}
+                    className={`block px-4 py-2 text-sm w-full bg-shirting text-ink rounded-none text-left hover:bg-paper ${categoryFilter === cat ? "font-bold" : ""}`}
                     onClick={() => {
                       setCategoryFilter(cat)
                       setCategoryOpen(false)
@@ -358,7 +358,7 @@ export default function ProductPage() {
           {/* Color filter */}
           <div className="relative">
             <button
-              className="flex items-center gap-2 font-medium bg-white text-black text-sm md:text-base lg:text-lg border border-gray-300 rounded-md px-4 py-2 shadow-sm"
+              className="flex items-center gap-2 font-archivo font-semibold uppercase tracking-[0.12em] bg-shirting text-ink text-xs md:text-sm border border-hairline px-4 py-2"
               onClick={() => {
                 setColorOpen(!colorOpen)
                 setSizeOpen(false)
@@ -369,11 +369,11 @@ export default function ProductPage() {
               COLOR <ChevronDown className={`h-4 w-4 transition-transform ${colorOpen ? "rotate-180" : ""}`} />
             </button>
             {colorOpen && (
-              <div className="absolute z-10 mt-2 w-56 bg-white shadow-xl rounded-lg py-2 border">
+              <div className="absolute z-10 mt-2 w-56 bg-shirting shadow-xl  py-2 border">
                 {availableColors.map((color) => (
                   <button
                     key={color}
-                    className={`flex items-center gap-3 px-4 py-2 text-sm w-full bg-white text-black rounded-none text-left hover:bg-gray-100 ${colorFilter === color ? "font-bold" : ""}`}
+                    className={`flex items-center gap-3 px-4 py-2 text-sm w-full bg-shirting text-ink rounded-none text-left hover:bg-paper ${colorFilter === color ? "font-bold" : ""}`}
                     onClick={() => {
                       setColorFilter(color)
                       setColorOpen(false)
@@ -381,7 +381,7 @@ export default function ProductPage() {
                   >
                     {/* Color dot */}
                     <span
-                      className="inline-block w-4 h-4 rounded-full border border-gray-300"
+                      className="inline-block w-4 h-4 rounded-full border border-hairline"
                       style={{ backgroundColor: colorHexMap[color] || '#e5e7eb' }}
                     ></span>
                     <span>{color}</span>
@@ -394,7 +394,7 @@ export default function ProductPage() {
           {/* Size filter - real, server-side */}
           <div className="relative">
             <button
-              className="flex items-center gap-2 font-medium bg-white text-black text-sm md:text-base lg:text-lg border border-gray-300 rounded-md px-4 py-2 shadow-sm"
+              className="flex items-center gap-2 font-archivo font-semibold uppercase tracking-[0.12em] bg-shirting text-ink text-xs md:text-sm border border-hairline px-4 py-2"
               onClick={() => {
                 setSizeOpen(!sizeOpen)
                 setColorOpen(false)
@@ -405,11 +405,11 @@ export default function ProductPage() {
               SIZE <ChevronDown className={`h-4 w-4 transition-transform ${sizeOpen ? "rotate-180" : ""}`} />
             </button>
             {sizeOpen && (
-              <div className="absolute z-10 mt-2 w-48 bg-white shadow-lg rounded-md py-1 border">
+              <div className="absolute z-10 mt-2 w-48 bg-shirting shadow-lg  py-1 border">
                 {availableSizes.map((size) => (
                   <button
                     key={size}
-                    className={`block px-4 py-2 text-xs md:text-sm w-full bg-white text-black rounded-none text-left hover:bg-gray-100 ${sizeFilter === size ? "font-bold" : ""}`}
+                    className={`block px-4 py-2 text-xs md:text-sm w-full bg-shirting text-ink rounded-none text-left hover:bg-paper ${sizeFilter === size ? "font-bold" : ""}`}
                     onClick={() => changeSize(size)}
                   >
                     {size}
@@ -422,7 +422,7 @@ export default function ProductPage() {
           {/* Sort */}
           <div className="relative">
             <button
-              className="flex items-center gap-2 font-medium bg-white text-black text-sm md:text-base lg:text-lg border border-gray-300 rounded-md px-4 py-2 shadow-sm"
+              className="flex items-center gap-2 font-archivo font-semibold uppercase tracking-[0.12em] bg-shirting text-ink text-xs md:text-sm border border-hairline px-4 py-2"
               onClick={() => {
                 setSortOpen(!sortOpen)
                 setColorOpen(false)
@@ -433,11 +433,11 @@ export default function ProductPage() {
               SORT: {sortLabel} <ChevronDown className={`h-4 w-4 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
             </button>
             {sortOpen && (
-              <div className="absolute z-10 mt-2 w-56 bg-white shadow-xl rounded-lg py-2 border">
+              <div className="absolute z-10 mt-2 w-56 bg-shirting shadow-xl  py-2 border">
                 {SORT_OPTIONS.map((option) => (
                   <button
                     key={option.value}
-                    className={`block px-4 py-2 text-sm w-full bg-white text-black rounded-none text-left hover:bg-gray-100 ${sortOption === option.value ? "font-bold" : ""}`}
+                    className={`block px-4 py-2 text-sm w-full bg-shirting text-ink rounded-none text-left hover:bg-paper ${sortOption === option.value ? "font-bold" : ""}`}
                     onClick={() => changeSort(option.value)}
                   >
                     {option.label}
@@ -449,7 +449,7 @@ export default function ProductPage() {
         </div>
 
         {/* Total count */}
-        <div className="text-black px-4 font-medium text-sm md:text-base lg:text-lg">
+        <div className="text-ink px-4 font-medium text-sm md:text-base lg:text-lg">
           {totalCount} Total
         </div>
       </div>
@@ -469,7 +469,7 @@ export default function ProductPage() {
                   className="flex flex-col transition-all duration-300 hover:shadow-md cursor-pointer"
                 >
                   {/* Product image */}
-                  <div className="bg-gray-100 overflow-hidden mb-3 aspect-[3/4.5]">
+                  <div className="bg-paper overflow-hidden mb-3 aspect-[3/4.5]">
                     <img
                       src={getImageUrl(product.primaryImage, { width: 500 }) || "/placeholder.svg"}
                       alt={`${product.name} - ${product.color}`}
@@ -481,19 +481,22 @@ export default function ProductPage() {
                   {/* Product details */}
                   <div className="flex flex-col p-2">
                     {/* Product name */}
-                    <h3 className="text-gray-900 font-medium text-base md:text-lg lg:text-xl mb-1">
+                    <h3 className="font-caslon text-navy text-lg md:text-xl mb-1">
                       {product.name}
                     </h3>
 
                     {/* Color and color count */}
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-gray-700 text-xs md:text-sm lg:text-base">{product.color}</span>
-                      <span className="text-gray-500 text-xs md:text-sm lg:text-base">{product.colorCount} Colors</span>
+                      <span className="text-flannel text-xs md:text-sm lg:text-base">{product.color}</span>
+                      <span className="text-flannel/70 text-xs md:text-sm lg:text-base">{product.colorCount} Colors</span>
                     </div>
 
                     {/* Price */}
-                    <div className="text-gray-900 font-medium text-sm md:text-base lg:text-lg">
-                      {formatPrice(product.price)}
+                    <div className="flex items-center gap-2.5">
+                      <span className="block w-5 h-px bg-brass"></span>
+                      <div className="font-archivo text-ink text-sm tracking-wide">
+                        {formatPrice(product.price)}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -508,18 +511,18 @@ export default function ProductPage() {
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="border border-gray-300 rounded-md px-4 py-2 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+                className="border border-navy text-ink font-archivo font-semibold uppercase tracking-[0.14em] px-5 py-2.5 text-xs disabled:opacity-40 disabled:cursor-not-allowed hover:bg-paper transition-colors"
               >
                 Previous
               </button>
-              <span className="text-sm text-gray-700 font-medium">
+              <span className="text-sm text-flannel font-medium">
                 Page {currentPage} of {totalPages}
               </span>
               <button
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="bg-black text-white rounded-md px-4 py-2 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-800 transition-colors"
+                className="bg-navy text-paper font-archivo font-semibold uppercase tracking-[0.14em] px-5 py-2.5 text-xs disabled:opacity-40 disabled:cursor-not-allowed hover:bg-ink transition-colors"
               >
                 Next
               </button>
@@ -528,8 +531,8 @@ export default function ProductPage() {
         </>
       ) : (
         <div className="flex flex-col items-center justify-center py-16 px-4">
-          <div className="text-gray-500 text-xl md:text-2xl mb-4">No products found</div>
-          <p className="text-gray-400 text-center mb-6">
+          <div className="text-flannel/70 text-xl md:text-2xl mb-4">No products found</div>
+          <p className="text-flannel/50 text-center mb-6">
             There are no products matching your current filter selection.
           </p>
           <button
@@ -539,7 +542,7 @@ export default function ProductPage() {
               setCategoryFilter("All");
               setCurrentPage(1);
             }}
-            className="bg-black text-white rounded-md px-6 py-3 font-medium hover:bg-gray-800 transition-colors"
+            className="bg-navy text-paper font-archivo font-semibold uppercase tracking-[0.16em] text-sm px-6 py-3.5 hover:bg-ink transition-colors"
           >
             Clear All Filters
           </button>

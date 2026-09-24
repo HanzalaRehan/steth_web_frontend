@@ -130,42 +130,42 @@ export default function NewsletterSignup() {
   }, [isVisible]);
   
   return (
-    <div ref={sectionRef} className="w-full bg-white text-black py-16 px-4 sm:px-6 md:px-8 lg:px-12">
+    <div ref={sectionRef} className="w-full bg-shirting text-ink py-16 px-4 sm:px-6 md:px-8 lg:px-12">
       <div className="max-w-lg mx-auto relative">
         {!submitted ? (
           <>
-            <h2 ref={headingRef} className="text-3xl font-extrabold mb-6 text-center">
+            <h2 ref={headingRef} className="font-caslon text-3xl text-navy mb-6 text-center">
               Join Our Newsletter
             </h2>
-            
+
             <div className="mb-10 relative">
-              <p ref={descriptionRef} className="text-gray-700 text-center">
+              <p ref={descriptionRef} className="font-spectral text-flannel text-center">
                 Sign up now and stay updated with our latest products and exclusive offers.
               </p>
-              
+
               {/* Elegant discount banner */}
               <div className="mt-8 mb-8 relative h-16 flex items-center justify-center">
-                <div 
-                  ref={discountRef} 
-                  className="absolute h-px w-full bg-black opacity-80 top-1/2"
+                <div
+                  ref={discountRef}
+                  className="absolute h-px w-full bg-brass opacity-80 top-1/2"
                 ></div>
-                <div 
+                <div
                   ref={discountTextRef}
-                  className="relative px-6 py-2 bg-white"
+                  className="relative px-6 py-2 bg-shirting"
                 >
-                  <span className="text-2xl font-bold tracking-widest">
-                    10% OFF YOUR FIRST ORDER
+                  <span className="font-archivo text-lg font-semibold uppercase tracking-[0.2em] text-navy">
+                    10% Off Your First Order
                   </span>
                 </div>
               </div>
             </div>
-            
+
             <div ref={inputGroupRef}>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="flex-grow px-6 py-4 rounded-full border border-gray-300 bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent shadow-sm"
+                  className="flex-grow px-5 py-3.5 border border-hairline bg-shirting text-ink font-spectral placeholder-flannel/50 focus:outline-none focus:border-claret"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -173,24 +173,24 @@ export default function NewsletterSignup() {
                 />
                 <button
                   onClick={handleSubmit}
-                  className={`px-8 py-4 bg-black text-white font-medium rounded-full transition-all duration-300 hover:bg-gray-800 hover:shadow-lg ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`px-8 py-3.5 bg-navy text-paper font-archivo font-semibold uppercase tracking-[0.18em] text-sm transition-colors duration-300 hover:bg-ink ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   disabled={isLoading}
                 >
                   {isLoading ? 'Subscribing...' : 'Subscribe'}
                 </button>
               </div>
               {error && (
-                <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
+                <p className="text-claret text-sm mt-2 text-center font-spectral">{error}</p>
               )}
-              <p className="text-gray-500 text-xs mt-4 text-center">
+              <p className="text-flannel/70 text-xs mt-4 text-center font-spectral">
                 By subscribing, you agree to our Privacy Policy and Terms of Service.
               </p>
             </div>
           </>
         ) : (
           <div className="text-center py-10">
-            <h2 className="text-3xl font-extrabold mb-4">Thank You!</h2>
-            <p className="text-gray-700">
+            <h2 className="font-caslon text-3xl text-navy mb-4">Thank You!</h2>
+            <p className="font-spectral text-flannel">
               Thank you! For subscribing to our newsletter.
             </p>
           </div>

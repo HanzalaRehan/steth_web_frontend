@@ -60,10 +60,10 @@ const ProductDetailPage = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="font-poppins min-h-screen flex flex-col bg-white">
+      <div className="font-poppins min-h-screen flex flex-col bg-shirting">
         <Header />
         <div className="flex-grow flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy"></div>
         </div>
         <AwsomeHumansFooter />
       </div>
@@ -72,10 +72,10 @@ const ProductDetailPage = ({ children }) => {
 
   if (error) {
     return (
-      <div className="font-poppins min-h-screen flex flex-col bg-white">
+      <div className="font-poppins min-h-screen flex flex-col bg-shirting">
         <Header />
         <div className="flex-grow flex items-center justify-center">
-          <p className="text-red-500">{error}</p>
+          <p className="text-claret">{error}</p>
         </div>
         <AwsomeHumansFooter />
       </div>
@@ -83,7 +83,7 @@ const ProductDetailPage = ({ children }) => {
   }
 
   return (
-    <div className="font-poppins min-h-screen flex flex-col bg-white">
+    <div className="font-poppins min-h-screen flex flex-col bg-shirting">
       <Header />
       {product && (
         <>

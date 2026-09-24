@@ -93,7 +93,7 @@ const ProductCard = ({ product }) => {
         {/* Image Container */}
         <div 
           ref={imageContainerRef}
-          className="relative w-full aspect-[2.5/4] mb-4 bg-[#F8F8F8] overflow-hidden rounded-lg"
+          className="relative w-full aspect-[2.5/4] mb-4 bg-paper overflow-hidden"
           style={{
             '--hover-progress': 0
           }}
@@ -125,12 +125,15 @@ const ProductCard = ({ product }) => {
 
         {/* Product Details */}
         <div className="px-1 mt-auto">
-          <h3 className="text-base font-medium mb-2 text-gray-900 leading-tight">
+          <h3 className="font-caslon text-lg mb-2 text-navy leading-tight">
             {product.name}
           </h3>
-          <p className="text-base font-bold text-gray-900">
-            Rs.{(product.price)}
-          </p>
+          <div className="flex items-center gap-2.5">
+            <span className="block w-5 h-px bg-brass"></span>
+            <p className="font-archivo text-sm tracking-wide text-ink">
+              Rs.{(product.price)}
+            </p>
+          </div>
         </div>
       </div>
     </Link>
@@ -174,14 +177,14 @@ const WomenBestSellers = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-navy"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center text-red-500 min-h-[400px] flex items-center justify-center">
+      <div className="text-center text-claret min-h-[400px] flex items-center justify-center">
         {error}
       </div>
     );
@@ -193,10 +196,10 @@ const WomenBestSellers = () => {
   if (products.length === 0) return null;
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-shirting">
       <div className="max-w-[90%] mx-auto px-4 md:px-8">
         {/* Title */}
-        <h2 className="text-2xl md:text-3xl font-bold text-black mb-8">
+        <h2 className="font-caslon text-2xl md:text-3xl text-navy mb-8">
           Best Sellers
         </h2>
 

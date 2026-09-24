@@ -40,7 +40,7 @@ const STEPS = [
 
 const HowItWorks = () => (
   <section className="max-w-6xl mx-auto px-4 py-16">
-    <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-12 text-center tracking-tight">
+    <h2 className="font-caslon text-2xl md:text-4xl text-navy mb-12 text-center">
       HOW IT WORKS
     </h2>
 
@@ -48,14 +48,14 @@ const HowItWorks = () => (
       {STEPS.map((step) => (
         <div key={step.title} className="text-center">
           <div className="flex justify-center mb-5">
-            <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
-              <step.icon size={30} strokeWidth={1.5} className="text-gray-900" />
+            <div className="w-20 h-20 rounded-full bg-paper flex items-center justify-center">
+              <step.icon size={30} strokeWidth={1.5} className="text-ink" />
             </div>
           </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2 tracking-tight">
+          <h3 className="font-caslon text-lg text-navy mb-2">
             {step.title}
           </h3>
-          <p className="text-gray-500 text-sm max-w-xs mx-auto">{step.copy}</p>
+          <p className="text-flannel/70 text-sm max-w-xs mx-auto">{step.copy}</p>
         </div>
       ))}
     </div>
